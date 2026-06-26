@@ -2,6 +2,8 @@ import Foundation
 import UIKit
 
 struct JourneyRouter {
+    nonisolated init() {}
+
     func canOpenBackendProvidedURL(_ url: URL) -> Bool {
         guard let scheme = url.scheme?.lowercased(), !scheme.isEmpty else {
             return false
@@ -37,5 +39,14 @@ struct JourneyRouter {
         }
 
         return URL(string: "tel:\(dialable)")
+    }
+
+    @MainActor
+    func open(_ url: URL) {
+        guard canOpenBackendProvidedURL(url) else {
+            return
+        }
+
+        UIApplication.shared.open(url)
     }
 }

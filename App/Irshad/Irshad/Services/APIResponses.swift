@@ -66,6 +66,21 @@ struct AnalyzeResponse: Decodable, Sendable {
 struct VerifyResponse: Decodable, Sendable {
     let verification: VerificationSummary
     let nextStage: String?
+
+    private enum CodingKeys: String, CodingKey {
+        case verification
+        case nextStage
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        if let verification = try container.decodeIfPresent(VerificationSummary.self, forKey: .verification) {
+            self.verification = verification
+        } else {
+            verification = try VerificationSummary(from: decoder)
+        }
+        nextStage = try container.decodeIfPresent(String.self, forKey: .nextStage)
+    }
 }
 
 struct LicenseResponse: Decodable, Sendable {

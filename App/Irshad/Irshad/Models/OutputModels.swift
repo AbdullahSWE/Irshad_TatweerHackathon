@@ -59,6 +59,80 @@ struct VerificationSummary: Codable, Equatable, Sendable {
     let whatToConfirm: String?
     let message: String?
     let metadata: [String: JSONValue]
+
+    private enum CodingKeys: String, CodingKey {
+        case status
+        case info
+        case verifiedFacts
+        case facts
+        case sources
+        case authority
+        case phone
+        case contactURL
+        case contactUrl
+        case url
+        case whatToConfirm
+        case message
+        case metadata
+    }
+
+    init(
+        status: VerificationStatus,
+        info: String?,
+        verifiedFacts: [String: JSONValue],
+        sources: [String],
+        authority: String?,
+        phone: String?,
+        contactURL: URL?,
+        whatToConfirm: String?,
+        message: String?,
+        metadata: [String: JSONValue]
+    ) {
+        self.status = status
+        self.info = info
+        self.verifiedFacts = verifiedFacts
+        self.sources = sources
+        self.authority = authority
+        self.phone = phone
+        self.contactURL = contactURL
+        self.whatToConfirm = whatToConfirm
+        self.message = message
+        self.metadata = metadata
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        status = try container.decodeIfPresent(VerificationStatus.self, forKey: .status) ?? .unknown("")
+        info = try container.decodeIfPresent(String.self, forKey: .info)
+        verifiedFacts = try container.decodeIfPresent([String: JSONValue].self, forKey: .verifiedFacts)
+            ?? container.decodeIfPresent([String: JSONValue].self, forKey: .facts)
+            ?? [:]
+        sources = try container.decodeIfPresent([String].self, forKey: .sources) ?? []
+        authority = try container.decodeIfPresent(String.self, forKey: .authority)
+        phone = try container.decodeIfPresent(String.self, forKey: .phone)
+        contactURL = try container.decodeIfPresent(URL.self, forKey: .contactURL)
+            ?? container.decodeIfPresent(URL.self, forKey: .contactUrl)
+            ?? container.decodeIfPresent(URL.self, forKey: .url)
+        whatToConfirm = try container.decodeIfPresent(String.self, forKey: .whatToConfirm)
+        message = try container.decodeIfPresent(String.self, forKey: .message)
+        metadata = try container.decodeIfPresent([String: JSONValue].self, forKey: .metadata) ?? [:]
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(status, forKey: .status)
+        try container.encodeIfPresent(info, forKey: .info)
+        try container.encode(verifiedFacts, forKey: .verifiedFacts)
+        try container.encode(sources, forKey: .sources)
+        try container.encodeIfPresent(authority, forKey: .authority)
+        try container.encodeIfPresent(phone, forKey: .phone)
+        try container.encodeIfPresent(contactURL, forKey: .contactURL)
+        try container.encodeIfPresent(whatToConfirm, forKey: .whatToConfirm)
+        try container.encodeIfPresent(message, forKey: .message)
+        try container.encode(metadata, forKey: .metadata)
+    }
 }
 
 struct LicenseRecommendation: Codable, Equatable, Sendable {

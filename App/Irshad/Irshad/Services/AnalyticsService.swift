@@ -11,9 +11,32 @@ protocol AnalyticsServiceProtocol: Sendable {
 }
 
 struct AnalyticsService: AnalyticsServiceProtocol {
-    init() {}
+    private let logger: @Sendable (AnalyticsEvent) -> Void
 
-    func track(_ event: AnalyticsEvent) async {}
+    init(logger: @escaping @Sendable (AnalyticsEvent) -> Void = AnalyticsService.defaultLogger(_:)) {
+        self.logger = logger
+    }
+
+    func track(_ event: AnalyticsEvent) async {
+        logger(event)
+    }
+
+    private static func defaultLogger(_ event: AnalyticsEvent) {
+        #if DEBUG
+        let properties = event.properties
+            .sorted { $0.key < $1.key }
+            .map { "\($0.key)=\($0.value.displayString)" }
+            .joined(separator: ", ")
+
+        if properties.isEmpty {
+            print("[Analytics] \(event.name)")
+        } else {
+            print("[Analytics] \(event.name): \(properties)")
+        }
+        #else
+        _ = event
+        #endif
+    }
 }
 
 struct NoopAnalyticsService: AnalyticsServiceProtocol {
