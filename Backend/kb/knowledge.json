@@ -1,0 +1,1492 @@
+{
+  "metadata": {
+    "project_name": "TBD",
+    "file_type": "knowledge_base_only",
+    "important_note": "This JSON contains verified business setup knowledge only.",
+    "location_focus": "Al Qua'a, Al Ain, Abu Dhabi, UAE",
+    "currency": "AED",
+    "last_verified": "2026-06-26"
+  },
+
+  "authorities": [
+    {
+      "id": "adra_added",
+      "name": "Abu Dhabi Registration Authority / Department of Economic Development",
+      "short_name": "ADRA / ADDED",
+      "role": "Economic licences, trade names, legal forms, business activities, business registration in Abu Dhabi",
+      "phone": "800555",
+      "secondary_phone": "028158888",
+      "email": "contact@tamm.abudhabi",
+      "working_hours": {
+        "listed_hours": "8:00 AM to 3:00 PM",
+        "note": "ADRA contact page lists opening hours as 8:00 AM to 3:00 PM."
+      },
+      "main_website": "https://www.adra.gov.ae",
+      "service_platform": "https://www.tamm.abudhabi",
+      "source_url": "https://www.adra.gov.ae/en/contact-us/adra",
+      "applies_to_license_ids": [
+        "tajer_abu_dhabi",
+        "standard_economic_licence",
+        "farm_small_producers_licence",
+        "freelancer_licence",
+        "mobdea_licence",
+        "instant_licence"
+      ]
+    },
+    {
+      "id": "adafsa",
+      "name": "Abu Dhabi Agriculture and Food Safety Authority",
+      "short_name": "ADAFSA",
+      "role": "Food safety, food product registration, agriculture, livestock, farm and food-related approvals",
+      "phone": "800555",
+      "email": "contact@tamm.abudhabi",
+      "alternate_email": "inquiries@adafsa.gov.ae",
+      "working_hours": {
+        "monday_to_thursday": "7:00 AM to 3:00 PM",
+        "friday": "7:00 AM to 12:00 PM",
+        "note": "ADAFSA contact pages list official working hours for Abu Dhabi, Al Ain and Al Dhafra offices."
+      },
+      "main_website": "https://www.adafsa.gov.ae",
+      "service_platform": "https://www.tamm.abudhabi",
+      "source_url": "https://www.adafsa.gov.ae/en/contact/",
+      "relevant_services": [
+        "Food product registration certificate",
+        "No objection certificate for agriculture, livestock breeding or food production",
+        "Food safety and agriculture/livestock services",
+        "ADAFSA establishment account registration"
+      ]
+    },
+    {
+      "id": "dct_abudhabi",
+      "name": "Department of Culture and Tourism Abu Dhabi",
+      "short_name": "DCT Abu Dhabi",
+      "role": "Tourism-related licences, tourism classifications, tour operator licensing, travel agent licensing, tourist guide training and licensing",
+      "phone": "+97124440444",
+      "technical_support_phone": "+97125995106",
+      "email": "info@dctabudhabi.ae",
+      "technical_support_email": "esupport@dctabudhabi.ae",
+      "main_website": "https://dct.gov.ae",
+      "tourist_guide_website": "https://adtt.dct.gov.ae",
+      "service_platform": "https://www.tamm.abudhabi",
+      "source_url": "https://dct.gov.ae/en/contact.us.aspx"
+    },
+    {
+      "id": "khalifa_fund",
+      "name": "Khalifa Fund for Enterprise Development",
+      "short_name": "Khalifa Fund",
+      "role": "Funding, entrepreneurship support, SME support, training and funding schemes mainly for eligible Emirati entrepreneurs",
+      "phone": "800555",
+      "secondary_phone": "60050056",
+      "third_phone": "026960000",
+      "email": "info@khalifafund.ae",
+      "working_hours": {
+        "monday_to_thursday": "8:00 AM to 4:00 PM",
+        "friday": "8:00 AM to 12:30 PM"
+      },
+      "main_website": "https://www.khalifafund.ae",
+      "service_platform": "https://www.tamm.abudhabi",
+      "source_url": "https://www.khalifafund.ae/contact/"
+    },
+    {
+      "id": "edb",
+      "name": "Emirates Development Bank",
+      "short_name": "EDB",
+      "role": "Development finance, including AgriTech loan programme for farms, growers and food suppliers",
+      "main_website": "https://edb.gov.ae",
+      "source_url": "https://edb.gov.ae/solutions/agritech-loans"
+    },
+    {
+      "id": "adio",
+      "name": "Abu Dhabi Investment Office",
+      "short_name": "ADIO",
+      "role": "Financial and non-financial incentives, access to capital, markets and partnerships, especially for innovation and high-growth sectors",
+      "main_website": "https://www.investwithabudhabi.com",
+      "source_url": "https://www.abudhabi.gov.ae/en/programmes/ghadan-21/investing-in-innovation"
+    },
+    {
+      "id": "maan",
+      "name": "Authority of Social Contribution - Ma'an",
+      "short_name": "Ma'an",
+      "role": "Social investment, social incubator, grants and support for social-impact startups",
+      "main_website": "https://maan.gov.ae/en/",
+      "source_url": "https://programs.maan.gov.ae"
+    }
+  ],
+
+  "licenses": [
+    {
+      "id": "tajer_abu_dhabi",
+      "name": "Tajer Abu Dhabi Licence",
+      "issuing_authority_id": "adra_added",
+      "best_for": [
+        "online shop",
+        "small retail",
+        "social media selling",
+        "home-based trading",
+        "first-time trader"
+      ],
+      "official_application_source": "https://www.tamm.abudhabi/en/life-events/business/Start-a-Business/economic-licence/RequestforIssuingEconomicLicenceAbuDhabiTrader",
+      "information_source": "https://www.adra.gov.ae/en/establishing/tajer-abu-dhabi-licence",
+      "service_hours": {
+        "online_application": "TAMM online service",
+        "authority_support_hours": "ADRA listed opening hours: 8:00 AM to 3:00 PM"
+      },
+      "contact": {
+        "phone": "800555",
+        "secondary_phone": "028158888",
+        "email": "contact@tamm.abudhabi"
+      },
+      "costs": {
+        "base_cost_aed": 790,
+        "official_max_range_aed": 5500,
+        "included_activity_count": 6,
+        "included_activity_cost_aed": 0,
+        "included_activity_note": "The base AED 790 cost includes up to 6 investor-selected activities.",
+        "extra_activity_fee_aed_each": 100,
+        "fee_warning": "Final fee depends on selected economic activities, legal form and any extra approvals."
+      },
+      "activity_options_for_founder": [
+        "Online product selling",
+        "E-commerce trading",
+        "Social media selling",
+        "Small retail trading",
+        "Perfume and cosmetics trading",
+        "Clothing and fashion accessories trading",
+        "Gift items trading",
+        "Handmade product trading",
+        "Dates and honey product trading",
+        "Phone accessories trading",
+        "Household goods trading",
+        "Food product trading, if food approvals are satisfied"
+      ],
+      "eligibility": {
+        "eligible_groups": [
+          "UAE nationals",
+          "UAE residents",
+          "GCC nationals"
+        ],
+        "citizen_vs_resident_note": "ADRA describes Tajer as ideal for one-person companies owned by Emiratis or GCC nationals, and LLCs owned by residents in partnership with Emiratis."
+      },
+      "office_requirement": {
+        "office_required": false,
+        "note": "No office is required for the first three years."
+      },
+      "legal_forms": [
+        "Establishment",
+        "Sole Proprietorship",
+        "Limited Liability Company"
+      ],
+      "required_documents": [
+        "Emirates ID"
+      ],
+      "step_sequence": [
+        "Select economic activities",
+        "Select suitable licence type",
+        "Fill out application forms through TAMM",
+        "Finalize external approvals if required",
+        "Pay licence fees",
+        "Receive economic licence"
+      ],
+      "concrete_next_action": "Search and reserve a trade name, then apply for Tajer Abu Dhabi through TAMM using UAE PASS."
+    },
+
+    {
+      "id": "standard_economic_licence",
+      "name": "Standard Economic Licence",
+      "issuing_authority_id": "adra_added",
+      "best_for": [
+        "physical shop",
+        "larger commercial business",
+        "service company",
+        "retail business with office or shop",
+        "business requiring wider legal forms"
+      ],
+      "official_application_source": "https://www.tamm.abudhabi/en/life-events/business/Start-a-Business/economic-licence",
+      "information_source": "https://www.adra.gov.ae/en/establishing/standard-licence",
+      "service_hours": {
+        "online_application": "TAMM online service",
+        "authority_support_hours": "ADRA listed opening hours: 8:00 AM to 3:00 PM"
+      },
+      "contact": {
+        "phone": "800555",
+        "secondary_phone": "028158888",
+        "email": "contact@tamm.abudhabi"
+      },
+      "costs": {
+        "base_cost_aed": 1200,
+        "included_activity_count": 6,
+        "included_activity_cost_aed": 0,
+        "included_activity_note": "The base AED 1,200 cost includes up to 6 investor-selected activities.",
+        "extra_activity_fee_aed_each": 100,
+        "fee_warning": "Final cost depends on activity, legal form, approvals, lease/Tawtheeq and other service fees."
+      },
+      "activity_options_for_founder": [
+        "Retail shop",
+        "General trading",
+        "Food product trading",
+        "Repair and maintenance service",
+        "Delivery or logistics-related service",
+        "Cleaning or home service",
+        "Training or workshop service",
+        "Small commercial store",
+        "Agricultural product trading",
+        "Beauty or personal care service",
+        "Technical service business",
+        "Tourism or experience-related activity, if DCT approval is satisfied"
+      ],
+      "eligibility": {
+        "eligible_groups": [
+          "UAE nationals",
+          "UAE residents",
+          "GCC nationals"
+        ],
+        "citizen_vs_resident_note": "ADRA describes it as ideal for UAE nationals or residents with companies in partnership with UAE nationals."
+      },
+      "office_requirement": {
+        "office_required": true,
+        "note": "Office space is required, but ADRA says it may be optional in the first year for some economic activities."
+      },
+      "legal_forms": [
+        "Establishment",
+        "Public Shareholding Company",
+        "Private Joint Stock Company",
+        "Sole Proprietorship LLC",
+        "Sole Proprietorship PJSC",
+        "Limited Liability Company",
+        "Partnership Company",
+        "Limited Partnership"
+      ],
+      "required_documents": [
+        "Memorandum of Association",
+        "Tawtheeq",
+        "Lease Agreement"
+      ],
+      "step_sequence": [
+        "Determine business activity",
+        "Reserve trade name",
+        "Select legal form",
+        "Prepare lease/Tawtheeq if required",
+        "Prepare MOA if required",
+        "Apply through TAMM",
+        "Obtain external approvals if required",
+        "Pay fees",
+        "Receive licence"
+      ],
+      "concrete_next_action": "Use TAMM Business Licence Procedure or ADRA activity search to confirm activity requirements and calculated fees before applying."
+    },
+
+    {
+      "id": "farm_small_producers_licence",
+      "name": "Farm Licence / Farms and Small Producers Licence",
+      "issuing_authority_id": "adra_added",
+      "best_for": [
+        "agriculture",
+        "animal production",
+        "plant production",
+        "farm-based production",
+        "farmer training",
+        "veterinary consultancy",
+        "selling farm produce"
+      ],
+      "official_application_source": "https://www.tamm.abudhabi",
+      "information_source": "https://www.adra.gov.ae/en/establishing/small-producers-licence",
+      "service_hours": {
+        "online_application": "TAMM online service",
+        "authority_support_hours": "ADRA listed opening hours: 8:00 AM to 3:00 PM"
+      },
+      "contact": {
+        "phone": "800555",
+        "secondary_phone": "028158888",
+        "email": "contact@tamm.abudhabi"
+      },
+      "costs": {
+        "base_cost_aed": 790,
+        "official_max_range_aed": 5500,
+        "included_activity_count": 6,
+        "included_activity_cost_aed": 0,
+        "included_activity_note": "The Farm Licence cost range includes up to 6 investor-selected activities.",
+        "extra_activity_fee_aed_each": 100,
+        "fee_warning": "Final fee depends on economic activities and legal form."
+      },
+      "activity_options_for_founder": [
+        "Plant production",
+        "Animal production",
+        "Selling farm produce to merchants",
+        "Dates or crop production",
+        "Honey or beekeeping-related production",
+        "Agricultural consultancy",
+        "Farmer training",
+        "Veterinary consultancy",
+        "Livestock-related service",
+        "Farm product packing or preparation, if approvals are satisfied",
+        "Agricultural technology service",
+        "Farm supply or farm support service"
+      ],
+      "eligibility": {
+        "eligible_groups": [
+          "UAE citizens who own private farms",
+          "UAE citizens with estate lease contracts from Department of Municipalities and Transport"
+        ],
+        "citizen_vs_resident_note": "This licence is specifically for eligible UAE citizens who own or lease farms."
+      },
+      "office_requirement": {
+        "office_required": false,
+        "note": "No office is required, but the founder must own or lease a farm."
+      },
+      "legal_forms": [
+        "Establishment",
+        "Sole Proprietorship",
+        "Limited Liability Company"
+      ],
+      "required_documents": [
+        "Deed to farm or proof of farm ownership"
+      ],
+      "possible_extra_approvals": [
+        "ADAFSA approvals may be needed for agriculture, livestock or food production activities."
+      ],
+      "step_sequence": [
+        "Confirm UAE citizen eligibility",
+        "Confirm farm ownership or lease proof",
+        "Select farm-related activities",
+        "Apply through TAMM/ADRA route",
+        "Obtain ADAFSA approval or NOC if required",
+        "Pay fees",
+        "Receive licence"
+      ],
+      "concrete_next_action": "Check farm ownership or lease document first; without that, do not recommend this licence."
+    },
+
+    {
+      "id": "freelancer_licence",
+      "name": "Abu Dhabi Freelancer Licence",
+      "issuing_authority_id": "adra_added",
+      "best_for": [
+        "digital services",
+        "design",
+        "consulting",
+        "creative work",
+        "technical work",
+        "solo skilled services"
+      ],
+      "official_application_source": "https://www.tamm.abudhabi",
+      "information_source": "https://www.adra.gov.ae/en/establishing/freelancer-licence",
+      "service_hours": {
+        "online_application": "TAMM online service",
+        "authority_support_hours": "ADRA listed opening hours: 8:00 AM to 3:00 PM"
+      },
+      "contact": {
+        "phone": "800555",
+        "secondary_phone": "028158888",
+        "email": "contact@tamm.abudhabi"
+      },
+      "costs": {
+        "base_cost_aed": 1200,
+        "included_activity_count": 6,
+        "included_activity_cost_aed": 0,
+        "included_activity_note": "The base AED 1,200 cost includes up to 6 investor-selected activities.",
+        "extra_activity_fee_aed_each": 100,
+        "fee_warning": "Fees depend on economic activities and legal form."
+      },
+      "activity_options_for_founder": [
+        "Graphic design",
+        "Digital marketing",
+        "Social media management",
+        "Photography",
+        "Videography",
+        "Content creation",
+        "Website design",
+        "IT or technical support",
+        "Business consulting",
+        "Translation or writing service",
+        "Training or tutoring service, if allowed",
+        "Creative or media service"
+      ],
+      "eligibility": {
+        "eligible_groups": [
+          "UAE nationals",
+          "UAE residents"
+        ],
+        "citizen_vs_resident_note": "Available to UAE nationals and residents with specialised skills, including people in full-time jobs if requirements are satisfied."
+      },
+      "office_requirement": {
+        "office_required": false,
+        "note": "Can be run from home."
+      },
+      "legal_forms": [
+        "Sole Proprietorship"
+      ],
+      "required_documents": [
+        "Attested academic qualifications if required",
+        "Experience certificates if required",
+        "No Objection Certificate if required",
+        "Professional certificates if required"
+      ],
+      "step_sequence": [
+        "Select freelance activity",
+        "Prepare qualification/professional certificate if required",
+        "Apply through TAMM using UAE PASS",
+        "Submit required documents",
+        "Pay fee",
+        "Receive licence"
+      ],
+      "concrete_next_action": "Classify the skill as a freelance service and check if certificates or NOC are required."
+    },
+
+    {
+      "id": "mobdea_licence",
+      "name": "Mobdea Licence",
+      "issuing_authority_id": "adra_added",
+      "best_for": [
+        "Emirati women home business",
+        "craft",
+        "tailoring",
+        "henna",
+        "painting",
+        "calligraphy",
+        "creative products",
+        "home-based creative work"
+      ],
+      "official_application_source": "https://www.tamm.abudhabi",
+      "information_source": "https://www.adra.gov.ae/en/establishing/mobdea-licence",
+      "service_hours": {
+        "online_application": "TAMM online service",
+        "authority_support_hours": "ADRA listed opening hours: 8:00 AM to 3:00 PM"
+      },
+      "contact": {
+        "phone": "800555",
+        "secondary_phone": "028158888",
+        "email": "contact@tamm.abudhabi"
+      },
+      "costs": {
+        "base_cost_aed": 860,
+        "included_activity_count": 2,
+        "included_activity_cost_aed": 0,
+        "included_activity_condition": "The 2 selected activities must be similar in nature.",
+        "included_activity_note": "The base AED 860 cost includes up to 2 investor-selected activities.",
+        "extra_activity_fee_aed_each": 100,
+        "fee_warning": "Fees depend on economic activities."
+      },
+      "activity_options_for_founder": [
+        "Tailoring",
+        "Henna service",
+        "Handmade crafts",
+        "Painting",
+        "Calligraphy",
+        "Fashion accessories making",
+        "Gift box preparation",
+        "Home-based creative product selling",
+        "Simple e-commerce activity",
+        "Decorative product making",
+        "Embroidery",
+        "Traditional craft products"
+      ],
+      "eligibility": {
+        "eligible_groups": [
+          "Female UAE nationals residing in Abu Dhabi"
+        ],
+        "citizen_vs_resident_note": "This licence is limited to female UAE nationals residing in Abu Dhabi."
+      },
+      "office_requirement": {
+        "office_required": false,
+        "note": "Can be run from home."
+      },
+      "employees_allowed": false,
+      "legal_forms": [
+        "Establishment"
+      ],
+      "required_documents": [],
+      "step_sequence": [
+        "Confirm founder is eligible Emirati female residing in Abu Dhabi",
+        "Select up to two similar activities",
+        "Apply through TAMM",
+        "Finalize approvals if required",
+        "Pay fee",
+        "Receive licence"
+      ],
+      "concrete_next_action": "Check if the founder is eligible for Mobdea and whether the two selected activities are similar in nature."
+    },
+
+    {
+      "id": "instant_licence",
+      "name": "Instant Licence",
+      "issuing_authority_id": "adra_added",
+      "best_for": [
+        "fast setup",
+        "eligible commercial activities",
+        "founder who needs quick licensing"
+      ],
+      "official_application_source": "https://www.tamm.abudhabi",
+      "information_source": "https://www.adra.gov.ae/en/establishing/instant-licence",
+      "service_hours": {
+        "online_application": "TAMM online service",
+        "authority_support_hours": "ADRA listed opening hours: 8:00 AM to 3:00 PM"
+      },
+      "contact": {
+        "phone": "800555",
+        "secondary_phone": "028158888",
+        "email": "contact@tamm.abudhabi"
+      },
+      "costs": {
+        "base_cost_aed": 790,
+        "official_max_range_aed": 5500,
+        "included_activity_count": 6,
+        "included_activity_cost_aed": 0,
+        "included_activity_note": "The Instant Licence cost range includes up to 6 investor-selected activities.",
+        "extra_activity_fee_aed_each": 100,
+        "fee_warning": "Fees depend on economic activities and legal form."
+      },
+      "activity_options_for_founder": [
+        "Eligible retail activity",
+        "Eligible trading activity",
+        "Eligible professional service",
+        "Eligible repair service",
+        "Eligible technical service",
+        "Eligible small commercial activity",
+        "Eligible online business activity",
+        "Eligible workshop or service activity"
+      ],
+      "eligibility": {
+        "eligible_groups": [
+          "UAE nationals",
+          "UAE residents",
+          "GCC nationals"
+        ]
+      },
+      "office_requirement": {
+        "office_required": true,
+        "note": "A lease contract is required."
+      },
+      "legal_forms": [
+        "Establishment",
+        "Sole Proprietorship",
+        "Limited Liability Company"
+      ],
+      "required_documents": [
+        "Lease Contract",
+        "Memorandum of Association"
+      ],
+      "step_sequence": [
+        "Check if activity is eligible for Instant Licence",
+        "Prepare lease contract",
+        "Prepare MOA if required",
+        "Apply through TAMM",
+        "Pay fees",
+        "Submit remaining required documents within allowed period if applicable"
+      ],
+      "concrete_next_action": "Use TAMM/ADRA activity search to confirm whether the selected activity is eligible for Instant Licence."
+    }
+  ],
+
+  "banks": [
+    {
+      "id": "mbank_business",
+      "bank_name": "Mbank / Al Maryah Community Bank",
+      "best_for": [
+        "new trade licence holders",
+        "micro businesses",
+        "low-cost beginner account",
+        "AED-only basic account"
+      ],
+      "contact": {
+        "phone": "600571111",
+        "email": "info@mbankuae.com",
+        "complaints_email": "complaint@mbankuae.com"
+      },
+      "service_hours": {
+        "critical_support": "24/7 for lost/stolen card or suspected fraud",
+        "general_inquiries": "Daily 8:00 AM to 6:00 PM",
+        "branch_hours_note": "Branch timings vary by location."
+      },
+      "website": "https://www.mbank.ae/business-banking/",
+      "source_url": "https://www.mbank.ae/business-banking/faqs/",
+      "plan_options": [
+        {
+          "plan_id": "mbank_basic_business",
+          "account_name": "Basic Business Banking Account",
+          "minimum_balance": "No minimum balance",
+          "monthly_fee": "Free according to Mbank FAQ",
+          "currency": "AED only according to Mbank FAQ",
+          "best_for": "Lowest-cost beginner business account"
+        },
+        {
+          "plan_id": "mbank_business_current",
+          "account_name": "Business Current Account",
+          "minimum_balance": "Verify current package terms",
+          "monthly_fee": "Verify current package terms",
+          "best_for": "Businesses needing current account features, payments and day-to-day operations"
+        }
+      ],
+      "notes": "Good first recommendation when founder needs lowest-cost account and only AED account is enough."
+    },
+
+    {
+      "id": "wio_business",
+      "bank_name": "Wio Bank",
+      "best_for": [
+        "digital-first founders",
+        "online sellers",
+        "small businesses wanting app-based banking",
+        "invoicing and payments"
+      ],
+      "contact": {
+        "support_note": "Wio advertises help through its digital platform.",
+        "address": "Etihad Airways Centre, 5th Floor, Abu Dhabi, UAE"
+      },
+      "service_hours": {
+        "support": "Digital support through Wio platform"
+      },
+      "website": "https://wio.io/business",
+      "source_url": "https://wio.io/business",
+      "plan_options": [
+        {
+          "plan_id": "wio_essential",
+          "account_name": "Essential Plan",
+          "monthly_fee_aed": 99,
+          "best_for": "Freelancers and small businesses",
+          "included_features": [
+            "Free multicurrency account",
+            "2 free users",
+            "10 free local transfers per month",
+            "AED 52.50 per SWIFT international transfer"
+          ]
+        },
+        {
+          "plan_id": "wio_grow",
+          "account_name": "Grow Plan",
+          "monthly_fee_aed": 249,
+          "best_for": "Medium and large businesses",
+          "included_features": [
+            "10 free users",
+            "Unlimited free local transfers",
+            "3 salary payment files per month",
+            "AED 26.25 per SWIFT international transfer",
+            "Up to 3% interest in Saving Spaces"
+          ]
+        }
+      ],
+      "notes": "Good for founders who prefer digital banking, invoicing, app access and multi-user tools."
+    },
+
+    {
+      "id": "mashreq_neobiz",
+      "bank_name": "Mashreq NEOBiz",
+      "best_for": [
+        "digital business banking",
+        "multi-currency account needs",
+        "online business",
+        "small business with fixed monthly fee"
+      ],
+      "contact": {
+        "corporate_phone_uae": "8002278",
+        "corporate_phone_outside_uae": "+97144246620",
+        "corporate_email": "corporate-csu@mashreq.com",
+        "neobiz_contact_page": "https://www.mashreq.com/en/uae/neobiz/contact-us/"
+      },
+      "website": "https://www.mashreq.com/en/uae/neobiz/",
+      "source_url": "https://www.mashreq.com/en/uae/neobiz/",
+      "plan_options": [
+        {
+          "plan_id": "neobiz_pro",
+          "account_name": "NEOBiz Pro",
+          "minimum_balance": "No minimum balance",
+          "monthly_fee_aed": 99,
+          "best_for": "Small digital business wanting lower monthly fee"
+        },
+        {
+          "plan_id": "neobiz_pro_plus",
+          "account_name": "NEOBiz Pro Plus",
+          "minimum_balance": "No minimum balance",
+          "monthly_fee_aed": 199,
+          "best_for": "Business needing more features and higher usage"
+        },
+        {
+          "plan_id": "neobiz_lite",
+          "account_name": "NEO BIZ Lite",
+          "minimum_balance": "No minimum balance",
+          "monthly_fee_aed": 200,
+          "best_for": "Business wanting zero-balance account with fixed maintenance fee"
+        },
+        {
+          "plan_id": "neobiz_prime",
+          "account_name": "NEO BIZ Prime",
+          "minimum_monthly_average_balance_aed": 50000,
+          "monthly_fee": "No monthly maintenance fee if balance requirement is maintained",
+          "best_for": "Business able to maintain AED 50,000 monthly average balance"
+        }
+      ],
+      "notes": "Useful if founder wants a known digital business bank and accepts a monthly fee."
+    },
+
+    {
+      "id": "adcb_business",
+      "bank_name": "ADCB",
+      "best_for": [
+        "Abu Dhabi-based small businesses",
+        "AED-only beginner business account",
+        "businesses wanting established local bank"
+      ],
+      "contact": {
+        "commercial_banking_contact_centre": "600576363",
+        "general_contact_centre": "600502030"
+      },
+      "service_hours": {
+        "commercial_contact_centre": "24 hours a day, 7 days a week"
+      },
+      "website": "https://www.adcb.com/en/business/",
+      "source_url": "https://www.adcb.com/en/business/products-solutions/account-services/smartstart-business-account",
+      "plan_options": [
+        {
+          "plan_id": "adcb_smartstart",
+          "account_name": "SmartStart Business Account",
+          "minimum_balance": "No minimum balance",
+          "monthly_fee_aed": 125,
+          "vat_applies": true,
+          "currency": "AED only",
+          "best_for": "Beginner business wanting no minimum balance with established Abu Dhabi bank",
+          "important_limitations": [
+            "Valid trade licence is mandatory",
+            "No foreign currency inward/outward payments"
+          ]
+        },
+        {
+          "plan_id": "adcb_ebusiness",
+          "account_name": "e-Business Account",
+          "minimum_balance": "No minimum balance according to ADCB e-Business page",
+          "annual_fee_note": "Check current ADCB fee schedule before recommending",
+          "best_for": "Businesses wanting online-focused account features"
+        }
+      ],
+      "required_documents_common": [
+        "Valid trade licence",
+        "Commercial Registration",
+        "Chamber of Commerce Membership Certificate",
+        "MOA and amendments if applicable",
+        "Power of Attorney if applicable",
+        "Passport and visa copies of partners/signatories",
+        "Emirates ID for signatories"
+      ],
+      "notes": "Good for founders who want an established Abu Dhabi bank and accept monthly account fees."
+    },
+
+    {
+      "id": "rakbank_business",
+      "bank_name": "RAKBANK",
+      "best_for": [
+        "startups",
+        "zero-balance business account",
+        "multi-currency needs",
+        "business financing options later"
+      ],
+      "contact": {
+        "business_phone": "+97142130000",
+        "phone_banking": "600544049",
+        "email": "businessbanking@rakbank.ae"
+      },
+      "service_hours": {
+        "urgent_support": "24/7 for urgent requirements such as card blocking, fraud reporting and transaction disputes",
+        "general_product_inquiries": "Daily 9:00 AM to 6:00 PM, including public and national holidays"
+      },
+      "website": "https://www.rakbank.ae/en/business/everyday-banking/accounts",
+      "source_url": "https://www.rakbank.ae/en/business/everyday-banking/accounts/rakstarter-account",
+      "plan_options": [
+        {
+          "plan_id": "rakstarter",
+          "account_name": "RAKstarter Account",
+          "minimum_balance": "No minimum balance",
+          "monthly_fee_note": "Source says no minimum monthly balance is required. Verify full service charges before final recommendation.",
+          "currencies": [
+            "AED",
+            "USD",
+            "EUR",
+            "GBP"
+          ],
+          "best_for": "Startups and entrepreneurs wanting zero-balance business account"
+        },
+        {
+          "plan_id": "business_current_account",
+          "account_name": "Business Current Account",
+          "minimum_balance_note": "Check current RAKBANK service and price guide",
+          "currencies": [
+            "AED",
+            "USD",
+            "EUR",
+            "GBP"
+          ],
+          "best_for": "Businesses needing current account features and multi-currency banking"
+        }
+      ],
+      "notes": "Good for startups wanting zero-balance business banking with possible financing later."
+    },
+
+    {
+      "id": "fab_business",
+      "bank_name": "First Abu Dhabi Bank",
+      "best_for": [
+        "larger SMEs",
+        "businesses that can maintain higher balances",
+        "founders who prefer Abu Dhabi's largest bank"
+      ],
+      "contact": {
+        "source_contact_page": "https://www.bankfab.com/en-ae/contact-us"
+      },
+      "website": "https://www.bankfab.com/en-ae/business-banking/accounts",
+      "source_url": "https://www.bankfab.com/en-ae/business-banking/fees-and-charges",
+      "plan_options": [
+        {
+          "plan_id": "fab_basic_account",
+          "account_name": "Business Basic Account",
+          "minimum_monthly_average_balance_aed": 10000,
+          "fall_below_fee_aed_per_month": 100,
+          "monthly_maintenance_fee_aed": 250,
+          "best_for": "SME that can maintain minimum balance"
+        },
+        {
+          "plan_id": "fab_business_advantage",
+          "account_name": "Business Advantage",
+          "minimum_monthly_average_balance_aed": 250000,
+          "fall_below_fee_aed_per_month": 350,
+          "best_for": "Growing SME with larger balance"
+        },
+        {
+          "plan_id": "fab_business_preferred",
+          "account_name": "Business Preferred",
+          "minimum_monthly_average_balance_aed": 500000,
+          "fall_below_fee_aed_per_month": 500,
+          "best_for": "Higher-balance business"
+        }
+      ],
+      "notes": "Not the first recommendation for very small founders because minimum balances are higher."
+    }
+  ],
+
+  "bank_loans": [
+    {
+      "id": "adcb_business_loan",
+      "provider": "ADCB",
+      "type": "bank_loan",
+      "best_for": [
+        "existing licensed businesses",
+        "SMEs with bank statements",
+        "retail business owners"
+      ],
+      "required_documents": [
+        "Completed application form",
+        "Valid passport",
+        "Emirates ID copy",
+        "Last 6 months bank statements",
+        "Valid trade licence",
+        "MOA/POA for Partnership and LLC companies",
+        "VAT statements",
+        "Commercial tenancy contract",
+        "Assignment letter if POS assignment applies"
+      ],
+      "website": "https://www.adcb.com/en/personal/business-loan/",
+      "source_url": "https://www.adcb.com/en/personal/business-loan/",
+      "important_note": "This is usually more suitable after the founder has a licence and operating history, not before starting."
+    },
+    {
+      "id": "adcb_insta_loan",
+      "provider": "ADCB",
+      "type": "unsecured_business_loan",
+      "max_amount_aed": 1500000,
+      "repayment_period_months": 48,
+      "best_for": [
+        "growing business needing fast working capital",
+        "licensed business with acceptable documentation"
+      ],
+      "website": "https://www.adcb.com/en/business/products-solutions/loans-financing/commercial-banking-lending-solutions/insta-loans",
+      "important_note": "Credit approval is at the sole discretion of the bank."
+    },
+    {
+      "id": "rakbank_business_loan",
+      "provider": "RAKBANK",
+      "type": "collateral_free_business_loan",
+      "max_amount_aed": 5000000,
+      "repayment_period_months": 60,
+      "best_for": [
+        "SMEs needing expansion capital",
+        "businesses wanting collateral-free loan option"
+      ],
+      "website": "https://www.rakbank.ae/en/business/business-finance/business-finance/business-loan",
+      "source_url": "https://www.rakbank.ae/en/business/business-finance/business-finance/business-loan",
+      "important_note": "More suitable for operating businesses than idea-stage founders."
+    },
+    {
+      "id": "rakbank_pos_ecommerce_finance",
+      "provider": "RAKBANK",
+      "type": "POS and e-commerce receivables finance",
+      "best_for": [
+        "businesses already receiving card or e-commerce payments",
+        "retailers",
+        "online sellers"
+      ],
+      "website": "https://www.rakbank.ae/en/business/business-finance/business-finance/point-of-sales-e-commerce-finance",
+      "important_note": "Useful later after the business has payment history."
+    },
+    {
+      "id": "mashreq_trade_working_capital",
+      "provider": "Mashreq",
+      "type": "trade_and_working_capital_finance",
+      "best_for": [
+        "import/export businesses",
+        "working capital needs",
+        "businesses using letters of credit or guarantees"
+      ],
+      "features": [
+        "Short-term loans",
+        "Pre and post sales financing",
+        "Overdrafts",
+        "Factoring",
+        "Letters of credit",
+        "Bank guarantees",
+        "Bill discounting"
+      ],
+      "website": "https://www.mashreq.com/en/uae/business/banking-solutions/loans/trade-working-capital/",
+      "important_note": "This is for more advanced businesses, not the first licence step."
+    }
+  ],
+
+  "government_investments_and_funds": [
+    {
+      "id": "khalifa_fund_microfinance",
+      "provider": "Khalifa Fund",
+      "type": "government_fund_or_development_support",
+      "product_name": "Microfinance Loan",
+      "best_for": [
+        "new Emirati entrepreneurs",
+        "projects with cost up to AED 1 million"
+      ],
+      "funding_up_to_aed": 500000,
+      "project_cost_coverage": "Up to 80%",
+      "repayment_period_months": 12,
+      "grace_period_months": 3,
+      "eligibility_note": "Khalifa Fund support is mainly for eligible Emirati entrepreneurs and SMEs. Confirm eligibility on TAMM/Khalifa Fund before recommending.",
+      "website": "https://www.khalifafund.ae/services/funding-scheme/",
+      "source_url": "https://www.khalifafund.ae/faq/",
+      "concrete_next_action": "If founder is Emirati and has a project plan, check Khalifa Fund funding products through TAMM."
+    },
+    {
+      "id": "khalifa_fund_operating_capital",
+      "provider": "Khalifa Fund",
+      "type": "government_fund_or_development_support",
+      "product_name": "Financing Business - Operating Capital",
+      "best_for": [
+        "day-to-day operating expenses",
+        "cash flow needs",
+        "existing or launching SMEs"
+      ],
+      "funding_up_to_aed": 600000,
+      "minimum_cash_contribution": "No minimum cash contribution according to Khalifa Fund page",
+      "repayment_period_months": 12,
+      "grace_period_months": 3,
+      "website": "https://www.khalifafund.ae/services/funding-scheme/",
+      "important_note": "Use only after confirming founder eligibility and programme status."
+    },
+    {
+      "id": "khalifa_fund_vehicles_logistics",
+      "provider": "Khalifa Fund",
+      "type": "government_fund_or_development_support",
+      "product_name": "Financing Fixed Assets - Vehicles and Logistics",
+      "best_for": [
+        "delivery business",
+        "logistics business",
+        "mobile service business"
+      ],
+      "funding_coverage": "Up to 80% of vehicle cost",
+      "funding_up_to_aed": 1000000,
+      "repayment_period_months": 36,
+      "grace_period_months": 3,
+      "website": "https://www.khalifafund.ae/services/funding-scheme/"
+    },
+    {
+      "id": "khalifa_fund_machinery_equipment",
+      "provider": "Khalifa Fund",
+      "type": "government_fund_or_development_support",
+      "product_name": "Financing Fixed Assets - Machinery and Equipment",
+      "best_for": [
+        "manufacturing",
+        "agriculture equipment",
+        "food production equipment",
+        "workshop tools"
+      ],
+      "funding_coverage": "Up to 80% of equipment cost",
+      "funding_up_to_aed": 1000000,
+      "repayment_period_months": 36,
+      "grace_period_months": 3,
+      "website": "https://www.khalifafund.ae/services/funding-scheme/"
+    },
+    {
+      "id": "khalifa_fund_ecommerce_inventory",
+      "provider": "Khalifa Fund",
+      "type": "government_fund_or_development_support",
+      "product_name": "Financing E-commerce Inventory",
+      "best_for": [
+        "online shops",
+        "e-commerce inventory",
+        "stock purchasing"
+      ],
+      "funding_up_to_aed": 1000000,
+      "repayment_period_months": 36,
+      "grace_period_months": 3,
+      "website": "https://www.khalifafund.ae/services/funding-scheme/"
+    },
+    {
+      "id": "khalifa_fund_priority_sector_loans",
+      "provider": "Khalifa Fund",
+      "type": "interest_free_startup_funding",
+      "best_for": [
+        "licensed Emirati startups",
+        "priority sectors"
+      ],
+      "loan_range_aed": {
+        "min": 150000,
+        "max": 3000000
+      },
+      "repayment_period_months": 84,
+      "grace_period_months": 24,
+      "website": "https://www.mediaoffice.abudhabi/en/economy/khalifa-fund-for-enterprise-development-launches-funding-programmes-to-support-start-ups-in-priority-sectors/",
+      "important_note": "Use only for eligible licensed Emirati startups in priority sectors."
+    },
+    {
+      "id": "edb_agritech_loans",
+      "provider": "Emirates Development Bank",
+      "type": "agritech_financing",
+      "best_for": [
+        "farms",
+        "local growers",
+        "food suppliers",
+        "agritech companies",
+        "food security projects"
+      ],
+      "programme_allocation_aed": 100000000,
+      "website": "https://edb.gov.ae/solutions/agritech-loans",
+      "source_url": "https://edb.gov.ae/posts/emirates-development-bank-launches-uaes-first-of-its-kind-agritech-loans-program-reveals-aed-100-million-financing-support-for-the-uaes-food-security-sector",
+      "important_note": "Best matched to agritech, farming modernization, food production and food security-related projects."
+    },
+    {
+      "id": "adio_innovation_programme",
+      "provider": "Abu Dhabi Investment Office",
+      "type": "government_incentive_and_investment_support",
+      "programme_name": "ADIO Innovation Programme",
+      "programme_size_aed": 2000000000,
+      "best_for": [
+        "high-growth companies",
+        "agritech",
+        "financial services",
+        "ICT",
+        "health services",
+        "biopharma",
+        "tourism innovation"
+      ],
+      "support_types": [
+        "financial incentives",
+        "non-financial incentives",
+        "access to capital",
+        "access to markets",
+        "partnership support"
+      ],
+      "website": "https://www.abudhabi.gov.ae/en/programmes/ghadan-21/investing-in-innovation",
+      "important_note": "This is more suitable for scalable and innovation-led companies, not a basic microbusiness."
+    },
+    {
+      "id": "maan_social_incubator",
+      "provider": "Authority of Social Contribution - Ma'an",
+      "type": "social_impact_grant_or_incubator",
+      "programme_name": "Ma'an Social Incubator",
+      "best_for": [
+        "social impact startups",
+        "community problem-solving ventures",
+        "nonprofit/social enterprise models"
+      ],
+      "grant_up_to_aed": 200000,
+      "support_types": [
+        "incubation",
+        "grant eligibility",
+        "investor access",
+        "office space access"
+      ],
+      "website": "https://programs.maan.gov.ae",
+      "important_note": "Only recommend if the founder's project has a clear social impact angle."
+    },
+    {
+      "id": "adio_adq_ventures_fund",
+      "provider": "ADIO / ADQ",
+      "type": "startup_ecosystem_investment_fund",
+      "programme_name": "Abu Dhabi Ventures Fund",
+      "fund_size_aed": 535000000,
+      "best_for": [
+        "early-stage startups",
+        "venture-backable companies",
+        "innovation ecosystem startups"
+      ],
+      "website": "https://www.adq.ae/newsroom/adio-and-adq-join-forces-to-spur-further-investment-in-abu-dhabis-digital-economy-and-start-up-ecosystem/",
+      "important_note": "This is not a simple grant for microbusinesses; it is relevant for startups that can scale."
+    }
+  ],
+
+  "archetypes": [
+    {
+      "id": "astro_tourism_desert_experience",
+      "name": "Astro-tourism / Desert Experience",
+      "recommended_license_ids": [
+        "standard_economic_licence"
+      ],
+      "extra_authority_ids": [
+        "dct_abudhabi"
+      ],
+      "likely_bank_ids": [
+        "wio_business",
+        "adcb_business",
+        "rakbank_business"
+      ],
+      "funding_or_investment_ids": [
+        "adio_innovation_programme",
+        "khalifa_fund_priority_sector_loans"
+      ],
+      "setup_and_year_1_cost_logic": {
+        "license_cost": "Use Standard Economic Licence base AED 1,200 plus activity/legal form/external approval costs.",
+        "dct_cost_note": "Tourism business licence fees may be structured separately; verify current fee through DCT/TAMM before final answer.",
+        "bank_cost": "Depends on selected bank account plan."
+      },
+      "eligibility_summary": "Can involve UAE nationals or residents depending on legal form and tourism activity. Tourist guide licence requires separate DCT route if guiding personally.",
+      "step_sequence": [
+        "Classify whether this is tour operator, tourist guide, event, or experience business",
+        "Check DCT tourism requirements",
+        "Reserve trade name",
+        "Apply for economic licence through TAMM",
+        "Complete DCT approvals if required",
+        "Open business bank account"
+      ],
+      "concrete_next_action": "Do not start with a generic licence. First classify whether the founder is a guide, tour operator, or event/experience organiser."
+    },
+    {
+      "id": "camel_milk_dairy_product",
+      "name": "Camel Milk / Dairy Product",
+      "recommended_license_ids": [
+        "farm_small_producers_licence",
+        "standard_economic_licence"
+      ],
+      "extra_authority_ids": [
+        "adafsa"
+      ],
+      "likely_bank_ids": [
+        "mbank_business",
+        "adcb_business",
+        "rakbank_business"
+      ],
+      "funding_or_investment_ids": [
+        "edb_agritech_loans",
+        "khalifa_fund_microfinance",
+        "khalifa_fund_machinery_equipment"
+      ],
+      "setup_and_year_1_cost_logic": {
+        "license_cost": "Farm Licence AED 790–5,500 if eligible UAE citizen farm owner/lessee; otherwise Standard Economic Licence base AED 1,200 plus approvals.",
+        "food_approval_cost": "Verify ADAFSA food product registration and food safety approval fees through TAMM.",
+        "bank_cost": "Use low-cost bank option for early stage."
+      },
+      "eligibility_summary": "Farm Licence is for UAE citizens who own or lease farms. Food/dairy products may require ADAFSA approvals.",
+      "step_sequence": [
+        "Confirm founder owns/leases farm and is UAE citizen",
+        "Check Farm Licence activity",
+        "Check ADAFSA food/product approval route",
+        "Register product if required",
+        "Open business bank account",
+        "Explore EDB/Khalifa Fund if eligible"
+      ],
+      "concrete_next_action": "Check ADAFSA requirements before selling any dairy product."
+    },
+    {
+      "id": "dates_honey_product",
+      "name": "Dates / Honey Product",
+      "recommended_license_ids": [
+        "farm_small_producers_licence",
+        "tajer_abu_dhabi",
+        "standard_economic_licence"
+      ],
+      "extra_authority_ids": [
+        "adafsa"
+      ],
+      "likely_bank_ids": [
+        "mbank_business",
+        "wio_business"
+      ],
+      "funding_or_investment_ids": [
+        "khalifa_fund_microfinance",
+        "edb_agritech_loans",
+        "khalifa_fund_ecommerce_inventory"
+      ],
+      "setup_and_year_1_cost_logic": {
+        "license_cost": "Tajer AED 790–5,500 for online/small trading; Farm Licence AED 790–5,500 if eligible farm producer; Standard base AED 1,200 for bigger setup.",
+        "food_approval_cost": "Food product registration or ADAFSA approvals may apply; verify by product."
+      },
+      "eligibility_summary": "Choose Farm Licence only if eligible farm owner/lessee; otherwise Tajer or Standard may fit trading/selling.",
+      "step_sequence": [
+        "Decide if founder is producer or reseller",
+        "Check Tajer/Farm eligibility",
+        "Check food product registration requirement",
+        "Reserve trade name",
+        "Apply through TAMM",
+        "Open bank account"
+      ],
+      "concrete_next_action": "Classify the founder as producer or reseller first."
+    },
+    {
+      "id": "home_food_business",
+      "name": "Home Food Business",
+      "recommended_license_ids": [
+        "mobdea_licence",
+        "tajer_abu_dhabi",
+        "standard_economic_licence"
+      ],
+      "extra_authority_ids": [
+        "adafsa"
+      ],
+      "likely_bank_ids": [
+        "mbank_business",
+        "wio_business",
+        "adcb_business"
+      ],
+      "funding_or_investment_ids": [
+        "khalifa_fund_microfinance",
+        "khalifa_fund_operating_capital"
+      ],
+      "setup_and_year_1_cost_logic": {
+        "license_cost": "Mobdea AED 860 if eligible Emirati woman and activity fits; Tajer AED 790–5,500 for online/small trading; Standard base AED 1,200 if larger food setup.",
+        "food_approval_cost": "ADAFSA food safety/product registration requirements must be checked.",
+        "bank_cost": "Mbank Basic may be lowest-cost; Wio Essential AED 99/month; ADCB SmartStart AED 125+VAT/month."
+      },
+      "eligibility_summary": "Mobdea is limited to Emirati women residing in Abu Dhabi; Tajer may suit online trading; food-related approvals are likely important.",
+      "step_sequence": [
+        "Classify food as home-made, packaged, delivery, catering, or shop",
+        "Check Mobdea/Tajer/Standard eligibility",
+        "Check ADAFSA food safety/product registration",
+        "Reserve trade name",
+        "Apply through TAMM",
+        "Open bank account"
+      ],
+      "concrete_next_action": "Before licence selection, identify whether the food is cooked-to-order, packaged product, or catering."
+    },
+    {
+      "id": "tailoring_henna_craft",
+      "name": "Tailoring / Henna / Craft",
+      "recommended_license_ids": [
+        "mobdea_licence",
+        "freelancer_licence",
+        "tajer_abu_dhabi"
+      ],
+      "extra_authority_ids": [],
+      "likely_bank_ids": [
+        "mbank_business",
+        "wio_business"
+      ],
+      "funding_or_investment_ids": [
+        "khalifa_fund_microfinance",
+        "khalifa_fund_operating_capital"
+      ],
+      "setup_and_year_1_cost_logic": {
+        "license_cost": "Mobdea AED 860 if eligible Emirati woman; Freelancer AED 1,200 for service-based skilled work; Tajer AED 790–5,500 if selling products online.",
+        "bank_cost": "Mbank basic may be lowest-cost; Wio if digital-first."
+      },
+      "eligibility_summary": "Choose Mobdea if eligible and home-based creative activity; choose Freelancer for service skill; choose Tajer for selling products.",
+      "step_sequence": [
+        "Classify as service or product",
+        "Check Mobdea eligibility if applicable",
+        "Choose Freelancer if mainly service",
+        "Choose Tajer if mainly product selling",
+        "Open low-cost business bank account"
+      ],
+      "concrete_next_action": "Ask whether the founder earns by doing the service or by selling finished products."
+    },
+    {
+      "id": "livestock_related_service",
+      "name": "Livestock-related Service",
+      "recommended_license_ids": [
+        "farm_small_producers_licence",
+        "standard_economic_licence"
+      ],
+      "extra_authority_ids": [
+        "adafsa"
+      ],
+      "likely_bank_ids": [
+        "adcb_business",
+        "rakbank_business",
+        "mbank_business"
+      ],
+      "funding_or_investment_ids": [
+        "edb_agritech_loans",
+        "khalifa_fund_microfinance",
+        "khalifa_fund_machinery_equipment"
+      ],
+      "setup_and_year_1_cost_logic": {
+        "license_cost": "Farm Licence AED 790–5,500 if eligible; otherwise Standard Licence base AED 1,200 plus approvals.",
+        "approval_cost": "ADAFSA NOC or other approvals may be required depending on activity."
+      },
+      "eligibility_summary": "Farm Licence requires UAE citizen farm owner/lessee; livestock activities may require ADAFSA-related approvals.",
+      "step_sequence": [
+        "Identify livestock service type",
+        "Check whether it falls under Farm Licence or Standard Licence",
+        "Check ADAFSA NOC requirement",
+        "Apply through TAMM",
+        "Open bank account",
+        "Check funding eligibility"
+      ],
+      "concrete_next_action": "Check whether the service involves animal production, veterinary consultancy, training, transport, or trading."
+    },
+    {
+      "id": "small_retail_online_shop",
+      "name": "Small Retail / Online Shop",
+      "recommended_license_ids": [
+        "tajer_abu_dhabi",
+        "standard_economic_licence"
+      ],
+      "extra_authority_ids": [],
+      "likely_bank_ids": [
+        "mbank_business",
+        "wio_business",
+        "mashreq_neobiz"
+      ],
+      "funding_or_investment_ids": [
+        "khalifa_fund_ecommerce_inventory",
+        "khalifa_fund_operating_capital"
+      ],
+      "setup_and_year_1_cost_logic": {
+        "license_cost": "Tajer AED 790–5,500 for small/online trader; Standard base AED 1,200 if physical shop or wider setup.",
+        "bank_cost": "Mbank basic free/no minimum; Wio Essential AED 99/month; Mashreq NEOBiz Pro AED 99/month."
+      },
+      "eligibility_summary": "Tajer is likely the first path for online/social selling if activity is eligible.",
+      "step_sequence": [
+        "Choose product category",
+        "Search trade name",
+        "Choose Tajer if online/small trading",
+        "Use Standard Licence if physical shop/office required",
+        "Open business bank account"
+      ],
+      "concrete_next_action": "Start with Tajer activity search and trade name search."
+    },
+    {
+      "id": "agritech",
+      "name": "AgriTech",
+      "recommended_license_ids": [
+        "freelancer_licence",
+        "standard_economic_licence",
+        "farm_small_producers_licence"
+      ],
+      "extra_authority_ids": [
+        "adafsa"
+      ],
+      "likely_bank_ids": [
+        "wio_business",
+        "adcb_business",
+        "rakbank_business"
+      ],
+      "funding_or_investment_ids": [
+        "edb_agritech_loans",
+        "adio_innovation_programme",
+        "khalifa_fund_microfinance"
+      ],
+      "setup_and_year_1_cost_logic": {
+        "license_cost": "Freelancer AED 1,200 for solo technical services; Standard base AED 1,200 for company setup; Farm Licence AED 790–5,500 if eligible farm owner/producer.",
+        "funding_note": "EDB AgriTech programme may be relevant for farms, growers and food suppliers. ADIO may fit higher-growth innovation-led agritech companies."
+      },
+      "eligibility_summary": "Depends on whether the founder is selling technology service, running a farm project, or building a company.",
+      "step_sequence": [
+        "Classify as software/service, equipment, farm production, or food security project",
+        "Choose licence path",
+        "Check ADAFSA if food/agriculture activity is involved",
+        "Check EDB AgriTech loan eligibility",
+        "Open bank account"
+      ],
+      "concrete_next_action": "Decide whether the agritech idea is a service, product, farm operation, or technology supplier."
+    },
+    {
+      "id": "digital_service_freelance",
+      "name": "Digital Service / Freelance Work",
+      "recommended_license_ids": [
+        "freelancer_licence",
+        "tajer_abu_dhabi"
+      ],
+      "extra_authority_ids": [],
+      "likely_bank_ids": [
+        "wio_business",
+        "mashreq_neobiz",
+        "mbank_business"
+      ],
+      "funding_or_investment_ids": [
+        "adio_innovation_programme",
+        "khalifa_fund_microfinance"
+      ],
+      "setup_and_year_1_cost_logic": {
+        "license_cost": "Freelancer AED 1,200 if activity fits; Tajer AED 790–5,500 if selling digital products or online trading.",
+        "bank_cost": "Wio/Mashreq suit digital founders; Mbank suits low-cost beginner setup."
+      },
+      "eligibility_summary": "Suitable for UAE nationals and residents with skills; some activities may require certificates or NOC.",
+      "step_sequence": [
+        "Choose exact service activity",
+        "Check if professional certificate/NOC is required",
+        "Apply through TAMM",
+        "Open digital business account"
+      ],
+      "concrete_next_action": "Ask the founder to define the service clearly enough to match an ADRA activity."
+    },
+    {
+      "id": "repair_mobile_service",
+      "name": "Repair / Mobile Local Service",
+      "recommended_license_ids": [
+        "freelancer_licence",
+        "standard_economic_licence"
+      ],
+      "extra_authority_ids": [],
+      "likely_bank_ids": [
+        "mbank_business",
+        "adcb_business"
+      ],
+      "funding_or_investment_ids": [
+        "khalifa_fund_operating_capital",
+        "khalifa_fund_vehicles_logistics"
+      ],
+      "setup_and_year_1_cost_logic": {
+        "license_cost": "Freelancer AED 1,200 if the service activity fits; Standard base AED 1,200 if business needs shop/team/office.",
+        "bank_cost": "Mbank for low cost; ADCB SmartStart if established local bank is preferred."
+      },
+      "eligibility_summary": "Good generic archetype for phone repair, small maintenance, cleaning, setup, delivery coordination, or local services.",
+      "step_sequence": [
+        "Classify service type",
+        "Check Freelancer vs Standard Licence",
+        "Check if physical shop is needed",
+        "Apply through TAMM",
+        "Open bank account"
+      ],
+      "concrete_next_action": "Decide if the service is solo/mobile or requires a shop."
+    },
+    {
+      "id": "training_tutoring_workshop",
+      "name": "Training / Tutoring / Workshop",
+      "recommended_license_ids": [
+        "freelancer_licence",
+        "standard_economic_licence"
+      ],
+      "extra_authority_ids": [],
+      "likely_bank_ids": [
+        "wio_business",
+        "mbank_business"
+      ],
+      "funding_or_investment_ids": [
+        "khalifa_fund_microfinance",
+        "maan_social_incubator"
+      ],
+      "setup_and_year_1_cost_logic": {
+        "license_cost": "Freelancer AED 1,200 if solo professional activity fits; Standard base AED 1,200 or separate training licence route may apply for formal training centre.",
+        "bank_cost": "Wio for digital service; Mbank for low-cost AED account."
+      },
+      "eligibility_summary": "Depends on whether it is informal skill service, professional tutoring, or formal training centre.",
+      "step_sequence": [
+        "Classify as tutoring, workshop, or formal training centre",
+        "Check Freelancer activity first",
+        "Check if education/training approval is required",
+        "Apply through TAMM",
+        "Open bank account"
+      ],
+      "concrete_next_action": "Do not recommend licence until the app knows if it is one-person tutoring or a formal training centre."
+    }
+  ]
+}
