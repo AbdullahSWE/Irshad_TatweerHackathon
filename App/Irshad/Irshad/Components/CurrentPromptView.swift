@@ -4,7 +4,8 @@ struct CurrentPromptView: View {
     var currentPrompt: String?
     var framingMessage: String?
     var currentAssistantMessage: String?
-    var isBackendBusy: Bool
+    var language: AppLanguage = .en
+    var isServiceBusy: Bool
     var journeyStatus: JourneyStatus
 
     private var displayMessage: String {
@@ -25,11 +26,11 @@ struct CurrentPromptView: View {
 
     var body: some View {
         VStack(spacing: IrshadTheme.Layout.spacingStandard) {
-            if isBackendBusy {
+            if isServiceBusy {
                 ProgressView()
                     .controlSize(.small)
                     .tint(IrshadTheme.Colors.primaryAccent)
-                    .accessibilityLabel(Text("جار تحديث الرحلة"))
+                    .accessibilityLabel(Text(updatingAccessibilityLabel))
             }
 
             Text(displayMessage)
@@ -62,37 +63,69 @@ struct CurrentPromptView: View {
         .accessibilityElement(children: .combine)
         .transition(IrshadTheme.Animations.cardRevealTransition)
         .animation(IrshadTheme.Animations.cardReveal, value: displayMessage)
-        .animation(IrshadTheme.Animations.progressTransition, value: isBackendBusy)
+        .animation(IrshadTheme.Animations.progressTransition, value: isServiceBusy)
     }
 
     private var supportingMessage: String? {
-        guard isBackendBusy else {
+        guard isServiceBusy else {
             return nil
         }
 
-        return "نبقي خطوتك الحالية كما هي أثناء التحديث."
+        switch language {
+        case .ar:
+            return "نبقي خطوتك الحالية كما هي أثناء التحديث."
+        case .en:
+            return "We will keep your current step while updating."
+        }
     }
 
     private var fallbackMessage: String {
-        switch journeyStatus {
-        case .empty:
+        switch (journeyStatus, language) {
+        case (.empty, .ar):
             "أخبر إرشاد بما تريد بناءه في الإمارات."
-        case .preparing:
+        case (.empty, .en):
+            "Tell Irshad what you want to build in the UAE."
+        case (.preparing, .ar):
             "نجهز رحلتك."
-        case .collecting:
+        case (.preparing, .en):
+            "Preparing your journey."
+        case (.collecting, .ar):
             "إرشاد جاهز للتفصيل التالي."
-        case .processing:
+        case (.collecting, .en):
+            "Irshad is ready for the next detail."
+        case (.processing, .ar):
             "نراجع إجاباتك."
-        case .gateOpen:
+        case (.processing, .en):
+            "Reviewing your answers."
+        case (.gateOpen, .ar):
             "مدخلاتك جاهزة للإرشاد."
-        case .showingResults:
+        case (.gateOpen, .en):
+            "Your input is ready for guidance."
+        case (.showingResults, .ar):
             "إرشادك جاهز للمراجعة."
-        case .complete:
+        case (.showingResults, .en):
+            "Your guidance is ready to review."
+        case (.complete, .ar):
             "اكتملت خطتك."
-        case .partial:
+        case (.complete, .en):
+            "Your plan is complete."
+        case (.partial, .ar):
             "بعض الإرشادات جاهزة، وما زالت هناك تفاصيل قليلة معلقة."
-        case .failed:
+        case (.partial, .en):
+            "Some guidance is ready, and a few details are still pending."
+        case (.failed, .ar):
             "هناك ما يحتاج انتباهك. خطوتك الحالية ما زالت محفوظة."
+        case (.failed, .en):
+            "Something needs your attention. Your current step is still saved."
+        }
+    }
+
+    private var updatingAccessibilityLabel: String {
+        switch language {
+        case .ar:
+            return "جار تحديث الرحلة"
+        case .en:
+            return "Updating the journey"
         }
     }
 
@@ -107,7 +140,7 @@ struct CurrentPromptView: View {
         currentPrompt: "What kind of business are you planning to start?",
         framingMessage: nil,
         currentAssistantMessage: nil,
-        isBackendBusy: true,
+        isServiceBusy: true,
         journeyStatus: .collecting
     )
     .padding()

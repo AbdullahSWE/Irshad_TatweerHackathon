@@ -2,8 +2,8 @@ import SwiftUI
 
 /// Authority verification card. Separates confirmed facts from requirements that
 /// still need confirmation, and surfaces the official authority, the exact
-/// question to ask, and contact actions — but only when the backend supplied
-/// them. Contact details are never invented.
+/// question to ask, and contact actions — but only when verification has run.
+/// Contact details are never invented.
 struct VerificationCardView: View {
     var viewModel: JourneyViewModel
 
@@ -12,7 +12,7 @@ struct VerificationCardView: View {
     }
 
     private var hasContent: Bool {
-        summary != nil || !viewModel.verifiedFacts.isEmpty || !viewModel.unverifiedFacts.isEmpty
+        summary != nil
     }
 
     private var state: OutputStageState {
@@ -20,7 +20,7 @@ struct VerificationCardView: View {
             return .error
         }
         guard hasContent else {
-            return viewModel.isBackendBusy ? .loading : .empty
+            return viewModel.isServiceBusy ? .loading : .empty
         }
         return viewModel.unverifiedFacts.isEmpty ? .success : .partial
     }

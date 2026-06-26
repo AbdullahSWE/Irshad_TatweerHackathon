@@ -21,7 +21,7 @@ struct JourneyView: View {
     private var isBackgroundActive: Bool {
         viewModel.voiceState == .listening
             || viewModel.voiceState == .processing
-            || viewModel.isBackendBusy
+            || viewModel.isServiceBusy
     }
 
     @Environment(\.accessibilityReduceMotion) private var systemReduceMotion

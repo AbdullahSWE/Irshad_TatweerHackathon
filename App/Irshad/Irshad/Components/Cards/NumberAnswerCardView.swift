@@ -45,7 +45,7 @@ struct NumberAnswerCardView: View {
         QuestionCardContainer(
             card: card,
             validationMessage: viewModel.cardValidationMessage,
-            isBackendBusy: viewModel.isBackendBusy,
+            isServiceBusy: viewModel.isServiceBusy,
             showsConfirm: true,
             canSubmit: canSubmit,
             confirmTitle: card.confirmLabel,
@@ -64,7 +64,7 @@ struct NumberAnswerCardView: View {
                         .font(IrshadTheme.Typography.primaryBody)
                         .keyboardType(.decimalPad)
                         .textInputAutocapitalization(.never)
-                        .disabled(viewModel.isBackendBusy)
+                        .disabled(viewModel.isServiceBusy)
                 }
                 .padding(IrshadTheme.Layout.spacingStandard)
                 .frame(minHeight: IrshadTheme.Layout.minimumTapTarget)
@@ -84,7 +84,7 @@ struct NumberAnswerCardView: View {
                                 viewModel.updateCardNumber(cardID: card.cardId, value: range.value ?? range.title)
                             }
                             .buttonStyle(DynamicCardSecondaryButtonStyle())
-                            .disabled(viewModel.isBackendBusy)
+                            .disabled(viewModel.isServiceBusy)
                         }
                     }
                 }
@@ -104,7 +104,7 @@ struct NumberAnswerCardView: View {
                                 )
                             }
                             .buttonStyle(.plain)
-                            .disabled(viewModel.isBackendBusy)
+                            .disabled(viewModel.isServiceBusy)
                         }
                     }
                 }

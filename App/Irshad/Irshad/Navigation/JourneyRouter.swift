@@ -4,7 +4,7 @@ import UIKit
 struct JourneyRouter {
     nonisolated init() {}
 
-    func canOpenBackendProvidedURL(_ url: URL) -> Bool {
+    func canOpenTrustedURL(_ url: URL) -> Bool {
         guard let scheme = url.scheme?.lowercased(), !scheme.isEmpty else {
             return false
         }
@@ -22,8 +22,8 @@ struct JourneyRouter {
         }
     }
 
-    func makeTelephoneURL(from backendPhoneNumber: String) -> URL? {
-        let trimmed = backendPhoneNumber.trimmingCharacters(in: .whitespacesAndNewlines)
+    func makeTelephoneURL(from phoneNumber: String) -> URL? {
+        let trimmed = phoneNumber.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
             return nil
         }
@@ -43,7 +43,7 @@ struct JourneyRouter {
 
     @MainActor
     func open(_ url: URL) {
-        guard canOpenBackendProvidedURL(url) else {
+        guard canOpenTrustedURL(url) else {
             return
         }
 

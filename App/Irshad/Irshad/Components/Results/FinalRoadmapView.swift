@@ -20,7 +20,7 @@ struct FinalRoadmapView: View {
             return .error
         }
         guard let plan else {
-            return viewModel.isBackendBusy ? .loading : .empty
+            return viewModel.isServiceBusy ? .loading : .empty
         }
         return plan.unverified.isEmpty ? .success : .partial
     }

@@ -20,7 +20,7 @@ struct LicenseRecommendationCardView: View {
             return .error
         }
         guard hasContent else {
-            return viewModel.isBackendBusy ? .loading : .empty
+            return viewModel.isServiceBusy ? .loading : .empty
         }
         return recommendation?.best == nil ? .partial : .success
     }
@@ -74,6 +74,14 @@ private struct LicenseOptionView: View {
 
     private var verificationStatusLabel: String? {
         option.metadata.string(for: ["verification_status", "verificationStatus", "status_label", "statusLabel"])
+    }
+
+    private var authorityURL: URL? {
+        option.metadata.string(for: ["url"]).flatMap(URL.init(string:))
+    }
+
+    private var authorityPhone: String? {
+        option.metadata.string(for: ["phone"])
     }
 
     var body: some View {
@@ -146,6 +154,28 @@ private struct LicenseOptionView: View {
                     }
                     if let source = option.source, !source.isEmpty {
                         OutputDetailRow(label: "Source", value: source, systemImage: "link")
+                    }
+
+                    if authorityURL != nil || authorityPhone != nil {
+                        HStack(spacing: IrshadTheme.Layout.spacingTight) {
+                            if let authorityURL {
+                                Button {
+                                    viewModel.openURL(authorityURL)
+                                } label: {
+                                    Label("Authority page", systemImage: "safari")
+                                }
+                                .buttonStyle(DynamicCardSecondaryButtonStyle())
+                            }
+
+                            if let authorityPhone {
+                                Button {
+                                    viewModel.callPhoneNumber(authorityPhone)
+                                } label: {
+                                    Label(authorityPhone, systemImage: "phone.fill")
+                                }
+                                .buttonStyle(DynamicCardSecondaryButtonStyle())
+                            }
+                        }
                     }
                 }
                 .padding(IrshadTheme.Layout.spacingStandard)

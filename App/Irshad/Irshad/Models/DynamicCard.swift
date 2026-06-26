@@ -181,7 +181,7 @@ struct DynamicCard: Identifiable, Codable, Equatable, Sendable {
         options = try container.decodeIfPresent([DynamicCardOption].self, forKey: .options) ?? []
         slot = try container.decodeIfPresent(String.self, forKey: .slot)
         self.stage = stage
-        phase = JourneyPhase(backendValue: explicitPhase ?? stage)
+        phase = JourneyPhase(serviceValue: explicitPhase ?? stage)
         metadata = try container.decodeIfPresent([String: JSONValue].self, forKey: .metadata) ?? [:]
     }
 

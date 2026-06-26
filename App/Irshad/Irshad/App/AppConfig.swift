@@ -1,5 +1,10 @@
 import Foundation
 
 enum AppConfig {
-    static let baseURL = URL(string: "http://localhost:3001/")!
+    static let openRouterAPIKey = Bundle.main.object(forInfoDictionaryKey: "OPENROUTER_API_KEY") as? String ?? ""
+    static let openRouterModel = {
+        let configured = Bundle.main.object(forInfoDictionaryKey: "OPENROUTER_MODEL") as? String
+        let trimmed = configured?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return trimmed.isEmpty ? "google/gemini-2.5-flash-lite" : trimmed
+    }()
 }

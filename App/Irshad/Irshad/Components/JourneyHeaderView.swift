@@ -19,6 +19,11 @@ struct JourneyHeaderView: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.82)
 
+                    Text(viewModel.phaseHeadline)
+                        .font(IrshadTheme.Typography.secondaryLabelDynamic.weight(.semibold))
+                        .foregroundStyle(IrshadTheme.Colors.primaryAccent)
+                        .fixedSize(horizontal: false, vertical: true)
+
                     Text(framingText)
                         .font(IrshadTheme.Typography.statusMicrocopyDynamic)
                         .foregroundStyle(IrshadTheme.Colors.secondaryText)
@@ -31,13 +36,13 @@ struct JourneyHeaderView: View {
                     statusTitle,
                     systemImage: statusIcon,
                     tone: statusTone,
-                    showsSpinner: viewModel.isBackendBusy
+                    showsSpinner: viewModel.isServiceBusy
                 )
             }
 
             if shouldShowPhaseDetails {
                 VStack(spacing: IrshadTheme.Layout.spacingStandard) {
-                    PhaseProgressBar(progress: viewModel.progress, isBackendBusy: viewModel.isBackendBusy)
+                    PhaseProgressBar(progress: viewModel.progress, isServiceBusy: viewModel.isServiceBusy)
 
                     PhaseStepperView(
                         currentPhase: viewModel.currentPhase,
@@ -53,12 +58,12 @@ struct JourneyHeaderView: View {
             if shouldShowRecoveryActions {
                 HStack(spacing: IrshadTheme.Layout.spacingStandard) {
                     if let onRetry {
-                        Button("أعد المحاولة", action: onRetry)
+                        Button(retryButtonTitle, action: onRetry)
                             .buttonStyle(HeaderActionButtonStyle(tone: .primary))
                     }
 
                     if let onCancel {
-                        Button("إلغاء", action: onCancel)
+                        Button(cancelButtonTitle, action: onCancel)
                             .buttonStyle(HeaderActionButtonStyle(tone: .secondary))
                     }
                 }
@@ -76,10 +81,14 @@ struct JourneyHeaderView: View {
         )
         .accessibilityElement(children: .contain)
         .animation(IrshadTheme.Animations.progressTransition, value: viewModel.journeyStatus)
-        .animation(IrshadTheme.Animations.progressTransition, value: viewModel.isBackendBusy)
+        .animation(IrshadTheme.Animations.progressTransition, value: viewModel.isServiceBusy)
     }
 
     private var framingText: String {
+        if viewModel.isServiceBusy, let serviceAction = normalized(viewModel.serviceActionMessage) {
+            return serviceAction
+        }
+
         if let message = normalized(viewModel.framingMessage) {
             return message
         }
@@ -88,7 +97,12 @@ struct JourneyHeaderView: View {
             return sessionLabel
         }
 
-        return "ابدأ رحلة موجهة لتأسيس مشروعك."
+        switch viewModel.currentLanguage {
+        case .ar:
+            return "ابدأ رحلة موجهة لتأسيس مشروعك."
+        case .en:
+            return "Start a guided journey to set up your business."
+        }
     }
 
     private var sessionLabel: String? {
@@ -101,34 +115,71 @@ struct JourneyHeaderView: View {
     }
 
     private var statusTitle: String {
-        if viewModel.isBackendBusy {
-            return "جار التحديث"
+        if viewModel.isServiceBusy {
+            switch viewModel.currentLanguage {
+            case .ar:
+                return "جار التحديث"
+            case .en:
+                return "Updating"
+            }
         }
 
-        switch viewModel.journeyStatus {
-        case .empty:
+        switch (viewModel.journeyStatus, viewModel.currentLanguage) {
+        case (.empty, .ar), (.gateOpen, .ar):
             return "جاهز"
-        case .preparing:
+        case (.empty, .en), (.gateOpen, .en):
+            return "Ready"
+        case (.preparing, .ar):
             return "نجهز"
-        case .collecting:
+        case (.preparing, .en):
+            return "Preparing"
+        case (.collecting, .ar):
             return "نجمع التفاصيل"
-        case .processing:
+        case (.collecting, .en):
+            return "Collecting details"
+        case (.processing, .ar):
             return "نعالج"
-        case .gateOpen:
-            return "جاهز"
-        case .showingResults:
+        case (.processing, .en):
+            return "Processing"
+        case (.showingResults, .ar):
             return "النتائج"
-        case .complete:
+        case (.showingResults, .en):
+            return "Results"
+        case (.complete, .ar):
             return "مكتمل"
-        case .partial:
+        case (.complete, .en):
+            return "Complete"
+        case (.partial, .ar):
             return "جزئي"
-        case .failed:
+        case (.partial, .en):
+            return "Partial"
+        case (.failed, .ar):
             return "يحتاج إعادة"
+        case (.failed, .en):
+            return "Retry needed"
+        }
+    }
+
+    private var retryButtonTitle: String {
+        switch viewModel.currentLanguage {
+        case .ar:
+            return "أعد المحاولة"
+        case .en:
+            return "Retry"
+        }
+    }
+
+    private var cancelButtonTitle: String {
+        switch viewModel.currentLanguage {
+        case .ar:
+            return "إلغاء"
+        case .en:
+            return "Cancel"
         }
     }
 
     private var statusIcon: String? {
-        if viewModel.isBackendBusy {
+        if viewModel.isServiceBusy {
             return nil
         }
 
@@ -149,7 +200,7 @@ struct JourneyHeaderView: View {
     }
 
     private var statusTone: StatusPill.Tone {
-        if viewModel.isBackendBusy {
+        if viewModel.isServiceBusy {
             return .active
         }
 
@@ -165,12 +216,12 @@ struct JourneyHeaderView: View {
         case .partial:
             return .warning
         case .failed:
-            return .error
+            return viewModel.recoverableError == nil ? .error : .warning
         }
     }
 
     private var shouldShowRecoveryActions: Bool {
-        (viewModel.journeyStatus == .failed || viewModel.isBackendBusy) && (onRetry != nil || onCancel != nil)
+        (viewModel.journeyStatus == .failed || viewModel.isServiceBusy) && (onRetry != nil || onCancel != nil)
     }
 
     private func normalized(_ value: String?) -> String? {

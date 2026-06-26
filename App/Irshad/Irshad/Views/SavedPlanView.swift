@@ -27,7 +27,7 @@ struct SavedPlanView: View {
     }
 
     private var isPreparing: Bool {
-        viewModel.isBackendBusy && plan == nil
+        viewModel.isServiceBusy && plan == nil
     }
 
     var body: some View {

@@ -43,7 +43,8 @@ final class JourneyViewModel {
     var phases: [JourneyPhase]
     var completedPhases: Set<JourneyPhase>
     var progress: JourneyProgress?
-    var isBackendBusy: Bool
+    var isServiceBusy: Bool
+    var serviceActionMessage: String?
     var lastUpdatedAt: Date?
 
     var currentPrompt: String?
@@ -60,7 +61,7 @@ final class JourneyViewModel {
     var transcriptConfidence: Double?
     var textFallbackValue: String
     var canSubmitCurrentInput: Bool {
-        !isBackendBusy && (
+        !isServiceBusy && (
             !editableTranscript.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
             !textFallbackValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         )
@@ -78,6 +79,7 @@ final class JourneyViewModel {
     var licenseRecommendation: LicenseRecommendation?
     var bankingRecommendations: BankingRecommendations?
     var verificationSummary: VerificationSummary?
+    var isVerificationDecisionPending: Bool
     var nextStepChecklist: [NextStepChecklistItem]
     var finalPlan: FinalPlan?
     var savedPlanSummary: SavedPlanSummary?
@@ -132,7 +134,8 @@ final class JourneyViewModel {
         phases = JourneyPhase.visibleOrder
         completedPhases = []
         progress = nil
-        isBackendBusy = false
+        isServiceBusy = false
+        serviceActionMessage = nil
         lastUpdatedAt = nil
 
         currentPrompt = nil
@@ -161,6 +164,7 @@ final class JourneyViewModel {
         licenseRecommendation = nil
         bankingRecommendations = nil
         verificationSummary = nil
+        isVerificationDecisionPending = false
         nextStepChecklist = []
         finalPlan = nil
         savedPlanSummary = nil
@@ -205,6 +209,73 @@ extension JourneyViewModel {
         }
     }
 
+    var phaseHeadline: String {
+        let emoji = selectedVoicePersona.assistantEmoji
+        let title: String
+        switch (currentPhase, currentLanguage) {
+        case (.goal, .ar):
+            title = "ماذا تريد أن تبدأ؟"
+        case (.goal, .en):
+            title = "What do you want to start?"
+        case (.business, .ar):
+            title = "أخبرنا عن مشروعك"
+        case (.business, .en):
+            title = "Tell us about your business"
+        case (.founder, .ar):
+            title = "أخبرنا عنك"
+        case (.founder, .en):
+            title = "Tell us about you"
+        case (.details, .ar):
+            title = "تفاصيل المشروع"
+        case (.details, .en):
+            title = "Business details"
+        case (.budget, .ar):
+            title = "الميزانية والحجم"
+        case (.budget, .en):
+            title = "Budget and scale"
+        case (.documents, .ar):
+            title = "المستندات والأهلية"
+        case (.documents, .en):
+            title = "Documents and eligibility"
+        case (.analysis, .ar):
+            title = "تحليل إرشاد"
+        case (.analysis, .en):
+            title = "AI analysis"
+        case (.license, .ar):
+            title = "توصيات الرخصة"
+        case (.license, .en):
+            title = "License recommendations"
+        case (.banking, .ar):
+            title = "توصيات الحساب البنكي"
+        case (.banking, .en):
+            title = "Banking recommendations"
+        case (.verify, .ar):
+            title = "التحقق من الجهة الرسمية"
+        case (.verify, .en):
+            title = "Authority verification"
+        case (.nextSteps, .ar):
+            title = "المواعيد والخطوات التالية"
+        case (.nextSteps, .en):
+            title = "Appointments and next steps"
+        case (.plan, .ar):
+            title = "خطة إطلاق المشروع"
+        case (.plan, .en):
+            title = "Business launch plan"
+        case (.unknown, .ar):
+            title = "رحلة إرشاد"
+        case (.unknown, .en):
+            title = "Irshad journey"
+        }
+        return "\(title) \(emoji)"
+    }
+
+    var shouldShowVerificationDecision: Bool {
+        isVerificationDecisionPending
+            && bankingRecommendations != nil
+            && verificationSummary == nil
+            && finalPlan == nil
+    }
+
     func beginOnboarding() {
         guard !hasStartedOnboarding else {
             beginListening()
@@ -213,7 +284,12 @@ extension JourneyViewModel {
 
         hasStartedOnboarding = true
         currentPrompt = onboardingGreetingMessage
-        beginListening()
+        speechTask?.cancel()
+        speechTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+            await self.speakCurrentPrompt()
+            self.beginListening()
+        }
     }
 
     func startJourneyWithVoice() {
@@ -233,7 +309,7 @@ extension JourneyViewModel {
         let requestSessionID = sessionId.isEmpty ? UUID().uuidString : sessionId
         sessionId = requestSessionID
         pendingOperation = .startText(trimmedText)
-        launchBackendOperation(status: .preparing) { [weak self] in
+        launchServiceOperation(status: .preparing) { [weak self] in
             guard let self else { return }
             try await self.performStartJourney(text: trimmedText, sessionID: requestSessionID)
         }
@@ -252,15 +328,25 @@ extension JourneyViewModel {
 
         if activeSession == nil || currentCard == nil {
             startJourneyWithText(value)
-        } else if let cardID = currentCard?.cardId {
-            updateCardText(cardID: cardID, value: value)
-            submitCardAnswer(cardID)
+        } else if let card = currentCard {
+            do {
+                try applyTranscript(value, to: card)
+                submitCardAnswer(card.cardId)
+            } catch ViewModelError.invalidAnswer(let message) {
+                inputErrorMessage = message
+                cardValidationMessage = message
+                voiceState = .transcriptReady
+                transcriptState = .editing
+                isTextEntryExpanded = true
+            } catch {
+                handleRecoverableError(error)
+            }
         }
     }
 
     func submitCardAnswer(_ cardID: String) {
         pendingOperation = .nextCard(cardID: cardID)
-        launchBackendOperation(status: .collecting) { [weak self] in
+        launchServiceOperation(status: .collecting) { [weak self] in
             guard let self else { return }
             try await self.performNextCard(cardID: cardID, appendLocalAnswer: true)
         }
@@ -279,39 +365,39 @@ extension JourneyViewModel {
             startJourneyWithText(text)
         case .nextCard(let cardID):
             let answerAlreadyAppended = activeSession?.history.contains { $0.cardId == cardID } == true
-            launchBackendOperation(status: .collecting) { [weak self] in
+            launchServiceOperation(status: .collecting) { [weak self] in
                 guard let self else { return }
                 try await self.performNextCard(cardID: cardID, appendLocalAnswer: !answerAlreadyAppended)
             }
         case .analyze:
-            launchBackendOperation(status: .processing) { [weak self] in
+            launchServiceOperation(status: .processing) { [weak self] in
                 guard let self else { return }
                 try await self.runOutputChain(startingAt: .analyze)
             }
         case .verify:
-            launchBackendOperation(status: .processing) { [weak self] in
+            launchServiceOperation(status: .processing) { [weak self] in
                 guard let self else { return }
                 try await self.runOutputChain(startingAt: .verify)
             }
         case .license:
-            launchBackendOperation(status: .processing) { [weak self] in
+            launchServiceOperation(status: .processing) { [weak self] in
                 guard let self else { return }
                 try await self.runOutputChain(startingAt: .license)
             }
         case .banking:
-            launchBackendOperation(status: .processing) { [weak self] in
+            launchServiceOperation(status: .processing) { [weak self] in
                 guard let self else { return }
                 try await self.runOutputChain(startingAt: .banking)
             }
         case .finalPlan:
-            launchBackendOperation(status: .processing) { [weak self] in
+            launchServiceOperation(status: .processing) { [weak self] in
                 guard let self else { return }
                 try await self.runOutputChain(startingAt: .finalPlan)
             }
         case .loadSavedPlan:
             openSavedPlan()
         case .saveFinalPlan:
-            launchBackendOperation(status: .processing) { [weak self] in
+            launchServiceOperation(status: .processing) { [weak self] in
                 guard let self else { return }
                 try await self.saveCurrentPlan()
             }
@@ -323,14 +409,14 @@ extension JourneyViewModel {
     func cancelCurrentOperation() {
         activeTask?.cancel()
         activeTask = nil
-        isBackendBusy = false
+        isServiceBusy = false
         if journeyStatus == .preparing || journeyStatus == .processing {
             journeyStatus = activeSession == nil ? .empty : .collecting
         }
     }
 
     func beginListening() {
-        guard !isBackendBusy else {
+        guard !isServiceBusy else {
             return
         }
 
@@ -358,6 +444,16 @@ extension JourneyViewModel {
         transcriptState = editableTranscript.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? .empty : .final
     }
 
+    func stopListeningAndSubmit() {
+        speechTask?.cancel()
+        speechTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+            await self.speechRecognitionService.stopListening()
+            self.speechTask = nil
+            self.submitRecognizedSpeech()
+        }
+    }
+
     func retryListening() {
         inputErrorMessage = nil
         beginListening()
@@ -365,19 +461,26 @@ extension JourneyViewModel {
 
     func acceptTranscript() {
         stopListening()
-        let accepted = editableTranscript.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !accepted.isEmpty else {
-            inputErrorMessage = localizedInputError(.emptyTranscript)
-            return
-        }
-
-        transcriptState = .accepted
-        startJourneyWithText(accepted)
+        submitRecognizedSpeech()
     }
 
     func updateTranscript(_ value: String) {
         editableTranscript = value
         transcriptState = value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? .empty : .editing
+    }
+
+    func submitRecognizedSpeech() {
+        let accepted = editableTranscript.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !accepted.isEmpty else {
+            voiceState = .idle
+            transcriptState = .empty
+            inputErrorMessage = localizedInputError(.emptyTranscript)
+            return
+        }
+
+        voiceState = .idle
+        transcriptState = .accepted
+        submitCurrentAnswer()
     }
 
     func updateTextFallback(_ value: String) {
@@ -466,7 +569,7 @@ extension JourneyViewModel {
         if let slot = currentCard.slot, slot == correctionTarget.fieldID {
             submitCardAnswer(currentCard.cardId)
         } else {
-            toast = ToastState(id: UUID().uuidString, message: "تم حفظ التصحيح لهذه الجلسة.")
+            toast = ToastState(id: UUID().uuidString, message: localizedToast(.correctionSaved))
         }
         self.correctionTarget = nil
     }
@@ -481,15 +584,15 @@ extension JourneyViewModel {
 
     func savePreferredBank(_ id: String) {
         expandedRecommendationIDs.insert(id)
-        toast = ToastState(id: "preferred-bank-\(id)", message: "تم حفظ البنك كخيار مفضل.")
+        toast = ToastState(id: "preferred-bank-\(id)", message: localizedToast(.preferredBankSaved))
     }
 
     func openURL(_ url: URL) {
-        guard journeyRouter.canOpenBackendProvidedURL(url), isKnownBackendURL(url) else {
+        guard journeyRouter.canOpenTrustedURL(url), isKnownTrustedURL(url) else {
             recoverableError = RecoverableError(
                 id: UUID().uuidString,
-                title: "الرابط غير متاح",
-                message: "هذا الرابط غير وارد في نتيجة الرحلة الحالية.",
+                title: localizedRecoverableTitle(.linkUnavailable),
+                message: localizedRecoverableMessage(.linkUnavailable),
                 retryKey: nil
             )
             return
@@ -499,12 +602,12 @@ extension JourneyViewModel {
     }
 
     func callPhoneNumber(_ phoneNumber: String) {
-        guard isKnownBackendPhoneNumber(phoneNumber),
+        guard isKnownTrustedPhoneNumber(phoneNumber),
               let url = journeyRouter.makeTelephoneURL(from: phoneNumber) else {
             recoverableError = RecoverableError(
                 id: UUID().uuidString,
-                title: "رقم الهاتف غير متاح",
-                message: "هذا الرقم غير وارد في نتيجة الرحلة الحالية.",
+                title: localizedRecoverableTitle(.phoneUnavailable),
+                message: localizedRecoverableMessage(.phoneUnavailable),
                 retryKey: nil
             )
             return
@@ -516,7 +619,7 @@ extension JourneyViewModel {
     func copyText(_ text: String) {
         clipboardClient.copy(text)
         copiedItemID = text
-        toast = ToastState(id: UUID().uuidString, message: "تم النسخ.")
+        toast = ToastState(id: UUID().uuidString, message: localizedToast(.copied))
     }
 
     func markNextStepDone(_ id: String) {
@@ -531,7 +634,7 @@ extension JourneyViewModel {
     func openSavedPlan() {
         pendingOperation = .loadSavedPlan
         showSavedPlan = true
-        launchBackendOperation(status: journeyStatus) { [weak self] in
+        launchServiceOperation(status: journeyStatus) { [weak self] in
             guard let self else { return }
             try await self.performOpenSavedPlan()
         }
@@ -539,9 +642,35 @@ extension JourneyViewModel {
 
     func shareFinalPlan() {
         pendingOperation = .shareFinalPlan
-        launchBackendOperation(status: journeyStatus) { [weak self] in
+        launchServiceOperation(status: journeyStatus) { [weak self] in
             guard let self else { return }
             try await self.performShareFinalPlan()
+        }
+    }
+
+    func verifyBeforeFinalPlan() {
+        guard shouldShowVerificationDecision else {
+            return
+        }
+
+        isVerificationDecisionPending = false
+        pendingOperation = .verify
+        launchServiceOperation(status: .processing) { [weak self] in
+            guard let self else { return }
+            try await self.runOutputChain(startingAt: .verify)
+        }
+    }
+
+    func skipVerificationAndCreatePlan() {
+        guard bankingRecommendations != nil, finalPlan == nil else {
+            return
+        }
+
+        isVerificationDecisionPending = false
+        pendingOperation = .finalPlan
+        launchServiceOperation(status: .processing) { [weak self] in
+            guard let self else { return }
+            try await self.runOutputChain(startingAt: .finalPlan)
         }
     }
 
@@ -549,8 +678,8 @@ extension JourneyViewModel {
         guard let plan = finalPlan ?? savedPlanSummary?.plan else {
             recoverableError = RecoverableError(
                 id: UUID().uuidString,
-                title: "النسخ غير متاح",
-                message: "نحتاج إلى الخطة النهائية قبل نسخ الملخص.",
+                title: localizedRecoverableTitle(.copyUnavailable),
+                message: localizedRecoverableMessage(.copyUnavailable),
                 retryKey: nil
             )
             return
@@ -559,7 +688,7 @@ extension JourneyViewModel {
         let summary = shareService.makeCopySummary(plan, trustFacts: currentTrustFactBundle())
         clipboardClient.copy(summary)
         copiedItemID = "final-plan-summary"
-        toast = ToastState(id: UUID().uuidString, message: "تم نسخ ملخص الخطة.")
+        toast = ToastState(id: UUID().uuidString, message: localizedToast(.planSummaryCopied))
     }
 
     func continueWithAssistant() {
@@ -582,6 +711,37 @@ private extension JourneyViewModel {
         case emptyTranscript
         case voiceUnavailable
         case voiceRecognitionFailed
+    }
+
+    enum RecoverableTitleCopyKey {
+        case retryNeeded
+        case journeyPaused
+        case linkUnavailable
+        case phoneUnavailable
+        case copyUnavailable
+    }
+
+    enum RecoverableMessageCopyKey {
+        case timeout
+        case transport
+        case badStatus
+        case decoding
+        case noActiveSession
+        case cardUnavailable
+        case finalPlanUnavailable
+        case generic
+        case needsAnotherAnswer
+        case unexpectedJourneyUpdate
+        case linkUnavailable
+        case phoneUnavailable
+        case copyUnavailable
+    }
+
+    enum ToastCopyKey {
+        case correctionSaved
+        case preferredBankSaved
+        case copied
+        case planSummaryCopied
     }
 
     func localizedInputError(_ key: InputErrorCopyKey) -> String {
@@ -609,19 +769,180 @@ private extension JourneyViewModel {
         }
     }
 
-    func launchBackendOperation(
+    func localizedRecoverableTitle(_ key: RecoverableTitleCopyKey) -> String {
+        switch (key, currentLanguage) {
+        case (.retryNeeded, .ar):
+            return "يحتاج إرشاد إلى محاولة أخرى"
+        case (.retryNeeded, .en):
+            return "Irshad needs another try"
+        case (.journeyPaused, .ar):
+            return "توقفت الرحلة مؤقتاً"
+        case (.journeyPaused, .en):
+            return "Journey paused"
+        case (.linkUnavailable, .ar):
+            return "الرابط غير متاح"
+        case (.linkUnavailable, .en):
+            return "Link unavailable"
+        case (.phoneUnavailable, .ar):
+            return "رقم الهاتف غير متاح"
+        case (.phoneUnavailable, .en):
+            return "Phone number unavailable"
+        case (.copyUnavailable, .ar):
+            return "النسخ غير متاح"
+        case (.copyUnavailable, .en):
+            return "Copy unavailable"
+        }
+    }
+
+    func localizedRecoverableMessage(_ key: RecoverableMessageCopyKey) -> String {
+        switch (key, currentLanguage) {
+        case (.timeout, .ar):
+            return "استغرق الطلب وقتاً طويلاً. رحلتك الحالية محفوظة ويمكنك إعادة المحاولة."
+        case (.timeout, .en):
+            return "The request took too long. Your current journey is saved, and you can retry."
+        case (.transport, .ar):
+            return "تعذر على إرشاد الوصول إلى OpenRouter. رحلتك الحالية محفوظة ويمكنك إعادة المحاولة."
+        case (.transport, .en):
+            return "Irshad could not reach OpenRouter. Your current journey is saved, and you can retry."
+        case (.badStatus, .ar):
+            return "تعذر على إرشاد إكمال هذه الخطوة. رحلتك الحالية محفوظة ويمكنك إعادة المحاولة."
+        case (.badStatus, .en):
+            return "Irshad could not complete this step. Your current journey is saved, and you can retry."
+        case (.decoding, .ar):
+            return "وصلت استجابة لم يتمكن إرشاد من قراءتها بأمان. يمكنك إعادة هذه الخطوة."
+        case (.decoding, .en):
+            return "Irshad received a response it could not safely read. You can retry this step."
+        case (.noActiveSession, .ar):
+            return "ابدأ رحلة قبل المتابعة."
+        case (.noActiveSession, .en):
+            return "Start a journey before continuing."
+        case (.cardUnavailable, .ar):
+            return "هذا السؤال لم يعد متاحاً. يمكنك إعادة الخطوة الحالية."
+        case (.cardUnavailable, .en):
+            return "This question is no longer available. You can retry the current step."
+        case (.finalPlanUnavailable, .ar):
+            return "نحتاج إلى خطة نهائية قبل استخدام هذا الإجراء."
+        case (.finalPlanUnavailable, .en):
+            return "A final plan is needed before using this action."
+        case (.generic, .ar):
+            return "حدث ما أوقف هذه الخطوة. رحلتك الحالية محفوظة ويمكنك إعادة المحاولة."
+        case (.generic, .en):
+            return "Something stopped this step. Your current journey is saved, and you can retry."
+        case (.needsAnotherAnswer, .ar):
+            return "يحتاج إرشاد إلى إجابة أخرى قبل إعداد الخطة النهائية."
+        case (.needsAnotherAnswer, .en):
+            return "Irshad needs one more answer before preparing the final plan."
+        case (.unexpectedJourneyUpdate, .ar):
+            return "وصل تحديث غير متوقع للرحلة. يمكنك إعادة هذه الخطوة."
+        case (.unexpectedJourneyUpdate, .en):
+            return "An unexpected journey update arrived. You can retry this step."
+        case (.linkUnavailable, .ar):
+            return "هذا الرابط غير وارد في نتيجة الرحلة الحالية."
+        case (.linkUnavailable, .en):
+            return "This link is not part of the current journey result."
+        case (.phoneUnavailable, .ar):
+            return "هذا الرقم غير وارد في نتيجة الرحلة الحالية."
+        case (.phoneUnavailable, .en):
+            return "This phone number is not part of the current journey result."
+        case (.copyUnavailable, .ar):
+            return "نحتاج إلى الخطة النهائية قبل نسخ الملخص."
+        case (.copyUnavailable, .en):
+            return "A final plan is needed before copying the summary."
+        }
+    }
+
+    func localizedToast(_ key: ToastCopyKey) -> String {
+        switch (key, currentLanguage) {
+        case (.correctionSaved, .ar):
+            return "تم حفظ التصحيح لهذه الجلسة."
+        case (.correctionSaved, .en):
+            return "Correction saved for this session."
+        case (.preferredBankSaved, .ar):
+            return "تم حفظ البنك كخيار مفضل."
+        case (.preferredBankSaved, .en):
+            return "Bank saved as a preferred option."
+        case (.copied, .ar):
+            return "تم النسخ."
+        case (.copied, .en):
+            return "Copied."
+        case (.planSummaryCopied, .ar):
+            return "تم نسخ ملخص الخطة."
+        case (.planSummaryCopied, .en):
+            return "Plan summary copied."
+        }
+    }
+
+    func localizedServiceAction(for operation: PendingOperation?, status: JourneyStatus) -> String {
+        switch (operation, status, currentLanguage) {
+        case (.startText, _, .ar):
+            return "أجهز رحلتك"
+        case (.startText, _, .en):
+            return "I'm setting up your journey"
+        case (.nextCard, _, .ar):
+            return "أحفظ إجابتك وأجهز السؤال التالي"
+        case (.nextCard, _, .en):
+            return "I'm saving your answer"
+        case (.analyze, _, .ar):
+            return "أطابق نشاط مشروعك"
+        case (.analyze, _, .en):
+            return "I'm matching your business activity"
+        case (.license, _, .ar):
+            return "أبحث عن الرخص المناسبة"
+        case (.license, _, .en):
+            return "I'm looking for suitable licenses"
+        case (.banking, _, .ar):
+            return "أتحقق من ملاءمة البنوك"
+        case (.banking, _, .en):
+            return "I'm checking bank fit"
+        case (.verify, _, .ar):
+            return "أجهز التحقق من الجهة الرسمية"
+        case (.verify, _, .en):
+            return "I'm preparing authority verification"
+        case (.finalPlan, _, .ar):
+            return "أجهز خطة الإطلاق"
+        case (.finalPlan, _, .en):
+            return "I'm preparing your launch plan"
+        case (.saveFinalPlan, _, .ar):
+            return "أحفظ خطتك"
+        case (.saveFinalPlan, _, .en):
+            return "I'm saving your plan"
+        case (.shareFinalPlan, _, .ar):
+            return "أجهز المشاركة"
+        case (.shareFinalPlan, _, .en):
+            return "I'm preparing your share sheet"
+        case (.loadSavedPlan, _, .ar):
+            return "أفتح خطتك المحفوظة"
+        case (.loadSavedPlan, _, .en):
+            return "I'm opening your saved plan"
+        case (_, .preparing, .ar):
+            return "أجهز رحلتك"
+        case (_, .preparing, .en):
+            return "I'm setting up your journey"
+        case (_, .collecting, .ar):
+            return "أجهز السؤال التالي"
+        case (_, .collecting, .en):
+            return "I'm preparing the next question"
+        case (_, _, .ar):
+            return "أراجع إجاباتك"
+        case (_, _, .en):
+            return "I'm reviewing your answers"
+        }
+    }
+
+    func launchServiceOperation(
         status: JourneyStatus,
         operation: @MainActor @escaping () async throws -> Void
     ) {
-        guard !isBackendBusy else {
+        guard !isServiceBusy else {
             return
         }
 
         activeTask?.cancel()
-        isBackendBusy = true
+        isServiceBusy = true
         recoverableError = nil
         banner = nil
         journeyStatus = status
+        serviceActionMessage = localizedServiceAction(for: pendingOperation, status: status)
 
         activeTask = Task { @MainActor [weak self] in
             guard let self else { return }
@@ -629,20 +950,24 @@ private extension JourneyViewModel {
                 try Task.checkCancellation()
                 try await operation()
                 try Task.checkCancellation()
-                self.isBackendBusy = false
+                self.isServiceBusy = false
+                self.serviceActionMessage = nil
                 self.activeTask = nil
                 self.lastUpdatedAt = Date()
                 await self.track("journey_operation_success")
             } catch is CancellationError {
-                self.isBackendBusy = false
+                self.isServiceBusy = false
+                self.serviceActionMessage = nil
                 self.activeTask = nil
                 await self.track("journey_operation_cancelled")
             } catch APIError.cancelled {
-                self.isBackendBusy = false
+                self.isServiceBusy = false
+                self.serviceActionMessage = nil
                 self.activeTask = nil
                 await self.track("journey_operation_cancelled")
             } catch {
-                self.isBackendBusy = false
+                self.isServiceBusy = false
+                self.serviceActionMessage = nil
                 self.activeTask = nil
                 self.handleRecoverableError(error)
                 await self.track("journey_operation_failed")
@@ -662,7 +987,7 @@ private extension JourneyViewModel {
         sessionId = response.session?.sessionId ?? sessionID
         let phase = response.currentPhase
             ?? response.card?.phase
-            ?? JourneyPhase(backendValue: response.currentStage)
+            ?? JourneyPhase(serviceValue: response.currentStage)
         activeSession = response.session ?? JourneySession(
             sessionId: sessionId,
             goalText: text,
@@ -687,10 +1012,17 @@ private extension JourneyViewModel {
         currentPhase = normalizedPhase(phase, fallback: response.card?.phase ?? .goal)
         completedPhases = completedPhases(for: currentPhase)
         journeyStatus = .collecting
+        analysisSummary = nil
+        licenseRecommendation = nil
+        bankingRecommendations = nil
+        verificationSummary = nil
+        isVerificationDecisionPending = false
+        nextStepChecklist = []
+        finalPlan = nil
         cardAnswerDraft = .empty
         cardValidationMessage = nil
         inputErrorMessage = nil
-        textFallbackValue = ""
+        resetInputAfterSuccessfulSubmit()
         pendingOperation = nil
         refreshDerivedState()
         await speakCurrentPrompt()
@@ -736,17 +1068,17 @@ private extension JourneyViewModel {
         var session = response.session ?? fallbackSession
         session.currentStage = response.currentStage ?? session.currentStage
         session.currentPhase = response.currentPhase
-            ?? JourneyPhase(backendValue: response.currentStage)
+            ?? JourneyPhase(serviceValue: response.currentStage)
         activeSession = session
         progress = response.progress ?? progress
 
         let phase = response.currentPhase
             ?? response.card?.phase
-            ?? JourneyPhase(backendValue: response.currentStage)
+            ?? JourneyPhase(serviceValue: response.currentStage)
         currentPhase = normalizedPhase(phase, fallback: currentPhase)
 
         if let completed = response.stageJustCompleted {
-            completedPhases.insert(JourneyPhase(backendValue: completed))
+            completedPhases.insert(JourneyPhase(serviceValue: completed))
         }
 
         switch response.status {
@@ -762,6 +1094,7 @@ private extension JourneyViewModel {
             pendingOperation = nil
             cardAnswerDraft = .empty
             cardValidationMessage = nil
+            resetInputAfterSuccessfulSubmit()
             refreshDerivedState()
             speakCurrentPromptAfterResponse()
             return false
@@ -770,6 +1103,7 @@ private extension JourneyViewModel {
             renderableCards = response.card.map { [$0] } ?? []
             unsupportedCard = unsupportedCardIfNeeded(response.card)
             journeyStatus = .gateOpen
+            resetInputAfterSuccessfulSubmit()
             refreshDerivedState()
             pendingOperation = .analyze
             return true
@@ -779,6 +1113,7 @@ private extension JourneyViewModel {
                 renderableCards = []
                 unsupportedCard = nil
                 journeyStatus = .gateOpen
+                resetInputAfterSuccessfulSubmit()
                 refreshDerivedState()
                 pendingOperation = .analyze
                 return true
@@ -786,8 +1121,8 @@ private extension JourneyViewModel {
                 pendingOperation = .nextCard(cardID: currentCard?.cardId ?? "")
                 recoverableError = RecoverableError(
                     id: UUID().uuidString,
-                    title: "توقفت الرحلة مؤقتاً",
-                    message: "يحتاج إرشاد إلى إجابة أخرى قبل إعداد الخطة النهائية.",
+                    title: localizedRecoverableTitle(.journeyPaused),
+                    message: localizedRecoverableMessage(.needsAnotherAnswer),
                     retryKey: "next"
                 )
                 journeyStatus = .partial
@@ -796,8 +1131,8 @@ private extension JourneyViewModel {
         case .unknown:
             recoverableError = RecoverableError(
                 id: UUID().uuidString,
-                title: "توقفت الرحلة مؤقتاً",
-                message: "وصل تحديث غير متوقع للرحلة. يمكنك إعادة هذه الخطوة.",
+                title: localizedRecoverableTitle(.journeyPaused),
+                message: localizedRecoverableMessage(.unexpectedJourneyUpdate),
                 retryKey: "next"
             )
             journeyStatus = .partial
@@ -822,6 +1157,7 @@ private extension JourneyViewModel {
 
         if start == .analyze {
             pendingOperation = .analyze
+            serviceActionMessage = localizedServiceAction(for: .analyze, status: .processing)
             currentPhase = .analysis
             let response = try await apiService.analyze(
                 AnalyzeRequest(sessionId: session.sessionId, session: session)
@@ -832,8 +1168,9 @@ private extension JourneyViewModel {
             refreshDerivedState()
         }
 
-        if start == .analyze || start == .verify {
+        if start == .verify {
             pendingOperation = .verify
+            serviceActionMessage = localizedServiceAction(for: .verify, status: .processing)
             currentPhase = .verify
             let response = try await apiService.verify(
                 VerifyRequest(sessionId: session.sessionId, verifyTarget: verifyTarget())
@@ -844,8 +1181,9 @@ private extension JourneyViewModel {
             refreshDerivedState()
         }
 
-        if start == .analyze || start == .verify || start == .license {
+        if start == .analyze || start == .license {
             pendingOperation = .license
+            serviceActionMessage = localizedServiceAction(for: .license, status: .processing)
             currentPhase = .license
             let response = try await apiService.license(SessionOnlyRequest(sessionId: session.sessionId))
             try Task.checkCancellation()
@@ -854,22 +1192,35 @@ private extension JourneyViewModel {
             refreshDerivedState()
         }
 
-        if start == .analyze || start == .verify || start == .license || start == .banking {
+        if start == .analyze || start == .license || start == .banking {
             pendingOperation = .banking
+            serviceActionMessage = localizedServiceAction(for: .banking, status: .processing)
             currentPhase = .banking
             let response = try await apiService.banking(SessionOnlyRequest(sessionId: session.sessionId))
             try Task.checkCancellation()
             bankingRecommendations = response.banking
             completedPhases.insert(.banking)
             refreshDerivedState()
+
+            isVerificationDecisionPending = verificationSummary == nil
+            if shouldShowVerificationDecision {
+                pendingOperation = nil
+                currentPhase = .verify
+                journeyStatus = .showingResults
+                refreshDerivedState()
+                return
+            }
         }
 
         pendingOperation = .finalPlan
-        currentPhase = .plan
+        serviceActionMessage = localizedServiceAction(for: .finalPlan, status: .processing)
+        currentPhase = .nextSteps
         let response = try await apiService.finalPlan(SessionOnlyRequest(sessionId: session.sessionId))
         try Task.checkCancellation()
         finalPlan = response.plan
         nextStepChecklist = makeChecklist(from: response.plan)
+        completedPhases.insert(.nextSteps)
+        currentPhase = .plan
         completedPhases.insert(.plan)
         journeyStatus = .complete
         refreshDerivedState()
@@ -1000,6 +1351,170 @@ private extension JourneyViewModel {
         case cardUnavailable
         case invalidAnswer(String)
         case finalPlanUnavailable
+    }
+
+    func resetInputAfterSuccessfulSubmit() {
+        liveTranscript = ""
+        editableTranscript = ""
+        transcriptConfidence = nil
+        transcriptState = .empty
+        textFallbackValue = ""
+        inputErrorMessage = nil
+        if voiceState == .transcriptReady {
+            voiceState = .idle
+        }
+    }
+
+    func applyTranscript(_ value: String, to card: DynamicCard) throws {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            throw ViewModelError.invalidAnswer(localizedInputError(.missingAnswer))
+        }
+
+        switch card.type {
+        case .text:
+            updateCardText(cardID: card.cardId, value: trimmed)
+        case .number:
+            updateCardNumber(cardID: card.cardId, value: trimmed)
+        case .singleSelect:
+            guard let option = safelyMatchedOption(in: card, transcript: trimmed) else {
+                throw ViewModelError.invalidAnswer(reviewSpeechSelectionMessage())
+            }
+            selectSingleOption(cardID: card.cardId, optionID: option.id)
+        case .toggle:
+            if let option = safelyMatchedOption(in: card, transcript: trimmed) {
+                setToggleAnswer(cardID: card.cardId, value: toggleValue(for: option))
+            } else if let bool = boolFromSpeech(trimmed) {
+                setToggleAnswer(cardID: card.cardId, value: bool)
+            } else {
+                throw ViewModelError.invalidAnswer(reviewSpeechSelectionMessage())
+            }
+        case .multiSelect:
+            let options = safelyMatchedOptions(in: card, transcript: trimmed)
+            guard !options.isEmpty else {
+                throw ViewModelError.invalidAnswer(reviewSpeechSelectionMessage())
+            }
+            cardAnswerDraft = CardAnswerDraft(
+                cardID: card.cardId,
+                value: .multiOptions(selectedIDsRespectingNone(options)),
+                updatedAt: Date()
+            )
+        case .checklist:
+            let options = safelyMatchedOptions(in: card, transcript: trimmed)
+            guard !options.isEmpty else {
+                throw ViewModelError.invalidAnswer(reviewSpeechSelectionMessage())
+            }
+            cardAnswerDraft = CardAnswerDraft(
+                cardID: card.cardId,
+                value: .checklist(selectedIDsRespectingNone(options)),
+                updatedAt: Date()
+            )
+        case .info, .summary, .recommendation, .roadmap, .none, .unsupported:
+            if allowsEmptyAnswer(card) {
+                cardAnswerDraft = CardAnswerDraft(cardID: card.cardId, value: .toggle(true), updatedAt: Date())
+            } else {
+                throw ViewModelError.invalidAnswer(reviewSpeechSelectionMessage())
+            }
+        }
+    }
+
+    func safelyMatchedOption(in card: DynamicCard, transcript: String) -> DynamicCardOption? {
+        let matches = safelyMatchedOptions(in: card, transcript: transcript)
+        return matches.count == 1 ? matches[0] : nil
+    }
+
+    func safelyMatchedOptions(in card: DynamicCard, transcript: String) -> [DynamicCardOption] {
+        let normalizedTranscript = normalizedSpeech(transcript)
+        guard !normalizedTranscript.isEmpty else {
+            return []
+        }
+
+        return card.options.filter { option in
+            optionCandidates(option).contains { candidate in
+                let normalizedCandidate = normalizedSpeech(candidate)
+                guard !normalizedCandidate.isEmpty else {
+                    return false
+                }
+                if normalizedCandidate == normalizedTranscript {
+                    return true
+                }
+                if normalizedCandidate.count >= 3, normalizedTranscript.contains(normalizedCandidate) {
+                    return true
+                }
+                return false
+            }
+        }
+    }
+
+    func selectedIDsRespectingNone(_ options: [DynamicCardOption]) -> Set<String> {
+        if let noneOption = options.first(where: isNoneOption) {
+            return [noneOption.id]
+        }
+        return Set(options.map(\.id))
+    }
+
+    func optionCandidates(_ option: DynamicCardOption) -> [String] {
+        [option.label, option.value, option.id].compactMap { $0 }
+    }
+
+    func normalizedSpeech(_ value: String) -> String {
+        value
+            .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
+            .lowercased()
+            .components(separatedBy: CharacterSet.alphanumerics.inverted)
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
+    }
+
+    func boolFromSpeech(_ value: String) -> Bool? {
+        let normalized = normalizedSpeech(value)
+        if isAffirmative(normalized) {
+            return true
+        }
+        if isNegative(normalized) {
+            return false
+        }
+        return nil
+    }
+
+    func isAffirmative(_ normalized: String) -> Bool {
+        ["yes", "y", "true", "ok", "okay", "sure", "نعم", "اي", "أجل"].contains(normalized)
+    }
+
+    func isNegative(_ normalized: String) -> Bool {
+        ["no", "n", "false", "none", "not", "لا", "كلا", "بدون"].contains(normalized)
+            || containsNegativeCue(normalized)
+    }
+
+    func containsNegativeCue(_ normalized: String) -> Bool {
+        let tokens = Set(normalized.split(separator: " ").map(String.init))
+        return !tokens.intersection(["no", "not", "none", "without", "false", "لا", "كلا", "بدون"]).isEmpty
+    }
+
+    func isNoneOption(_ option: DynamicCardOption) -> Bool {
+        optionCandidates(option).map(normalizedSpeech).contains {
+            ["none", "no", "not applicable", "na", "n a", "لا", "بدون"].contains($0)
+        }
+    }
+
+    func toggleValue(for option: DynamicCardOption) -> Bool {
+        let normalizedCandidates = optionCandidates(option).map(normalizedSpeech)
+        if normalizedCandidates.contains(where: isAffirmative) {
+            return true
+        }
+        if normalizedCandidates.contains(where: containsNegativeCue) {
+            return false
+        }
+        return true
+    }
+
+    func reviewSpeechSelectionMessage() -> String {
+        switch currentLanguage {
+        case .ar:
+            return "راجع النص أو اختر إجابة من الخيارات قبل الإرسال."
+        case .en:
+            return "Review the transcript or choose one of the options before sending."
+        }
     }
 
     func answerJSON(for card: DynamicCard) throws -> JSONValue {
@@ -1195,7 +1710,7 @@ private extension JourneyViewModel {
 
         recoverableError = RecoverableError(
             id: UUID().uuidString,
-            title: "يحتاج إرشاد إلى محاولة أخرى",
+            title: localizedRecoverableTitle(.retryNeeded),
             message: userSafeMessage(for: error),
             retryKey: retryKey
         )
@@ -1212,21 +1727,21 @@ private extension JourneyViewModel {
     func userSafeMessage(for error: Error) -> String {
         switch error {
         case APIError.timeout:
-            return "استغرق الطلب وقتاً طويلاً. رحلتك الحالية محفوظة ويمكنك إعادة المحاولة."
+            return localizedRecoverableMessage(.timeout)
         case APIError.transport:
-            return "تعذر على إرشاد الوصول إلى الخدمة. رحلتك الحالية محفوظة ويمكنك إعادة المحاولة."
+            return localizedRecoverableMessage(.transport)
         case APIError.badStatus:
-            return "تعذر على إرشاد إكمال هذه الخطوة. رحلتك الحالية محفوظة ويمكنك إعادة المحاولة."
+            return localizedRecoverableMessage(.badStatus)
         case APIError.decoding:
-            return "وصلت استجابة لم يتمكن إرشاد من قراءتها بأمان. يمكنك إعادة هذه الخطوة."
+            return localizedRecoverableMessage(.decoding)
         case ViewModelError.noActiveSession:
-            return "ابدأ رحلة قبل المتابعة."
+            return localizedRecoverableMessage(.noActiveSession)
         case ViewModelError.cardUnavailable:
-            return "هذا السؤال لم يعد متاحاً. يمكنك إعادة الخطوة الحالية."
+            return localizedRecoverableMessage(.cardUnavailable)
         case ViewModelError.finalPlanUnavailable:
-            return "نحتاج إلى خطة نهائية قبل استخدام هذا الإجراء."
+            return localizedRecoverableMessage(.finalPlanUnavailable)
         default:
-            return "حدث ما أوقف هذه الخطوة. رحلتك الحالية محفوظة ويمكنك إعادة المحاولة."
+            return localizedRecoverableMessage(.generic)
         }
     }
 
@@ -1563,20 +2078,20 @@ private extension JourneyViewModel {
 }
 
 private extension JourneyViewModel {
-    func isKnownBackendURL(_ url: URL) -> Bool {
-        knownBackendURLs().contains(normalizedURLString(url))
+    func isKnownTrustedURL(_ url: URL) -> Bool {
+        knownTrustedURLs().contains(normalizedURLString(url))
     }
 
-    func isKnownBackendPhoneNumber(_ phoneNumber: String) -> Bool {
+    func isKnownTrustedPhoneNumber(_ phoneNumber: String) -> Bool {
         let normalized = normalizedPhone(phoneNumber)
         guard !normalized.isEmpty else {
             return false
         }
 
-        return knownBackendPhoneNumbers().contains(normalized)
+        return knownTrustedPhoneNumbers().contains(normalized)
     }
 
-    func knownBackendURLs() -> Set<String> {
+    func knownTrustedURLs() -> Set<String> {
         var urls: Set<String> = []
 
         if let contactURL = verificationSummary?.contactURL {
@@ -1588,9 +2103,11 @@ private extension JourneyViewModel {
         if let url = licenseRecommendation?.best?.source.flatMap(URL.init(string:)) {
             urls.insert(normalizedURLString(url))
         }
+        licenseRecommendation?.best.map { collectURLs(from: $0.metadata, into: &urls) }
         licenseRecommendation?.alternatives.compactMap { $0.source }.compactMap(URL.init(string:)).forEach {
             urls.insert(normalizedURLString($0))
         }
+        licenseRecommendation?.alternatives.forEach { collectURLs(from: $0.metadata, into: &urls) }
         bankingRecommendations?.banks.forEach { bank in
             if let url = bank.source.flatMap(URL.init(string:)) {
                 urls.insert(normalizedURLString(url))
@@ -1604,7 +2121,7 @@ private extension JourneyViewModel {
         return urls
     }
 
-    func knownBackendPhoneNumbers() -> Set<String> {
+    func knownTrustedPhoneNumbers() -> Set<String> {
         var phones: Set<String> = []
 
         if let phone = verificationSummary?.phone {
@@ -1633,7 +2150,7 @@ private extension JourneyViewModel {
     func collectURLs(from value: JSONValue, into urls: inout Set<String>) {
         switch value {
         case .string(let string):
-            if let url = URL(string: string), journeyRouter.canOpenBackendProvidedURL(url) {
+            if let url = URL(string: string), journeyRouter.canOpenTrustedURL(url) {
                 urls.insert(normalizedURLString(url))
             }
         case .object(let object):

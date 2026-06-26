@@ -20,7 +20,7 @@ struct DynamicCardRendererView: View {
             if let unsupportedCard = viewModel.unsupportedCard {
                 UnsupportedCardView(card: unsupportedCard, viewModel: viewModel)
             } else if cardsToRender.isEmpty {
-                if viewModel.isBackendBusy {
+                if viewModel.isServiceBusy {
                     DynamicCardLoadingView()
                 }
             } else {
@@ -33,18 +33,18 @@ struct DynamicCardRendererView: View {
                 InfoBannerView(
                     message: recoverableError.message,
                     systemImage: "exclamationmark.triangle.fill",
-                    tone: .error,
+                    tone: .warning,
                     actionTitle: "Retry",
                     onAction: { viewModel.retryCurrentStep() }
                 )
-            } else if viewModel.isBackendBusy && !cardsToRender.isEmpty {
+            } else if viewModel.isServiceBusy && !cardsToRender.isEmpty {
                 StatusPill("Updating", systemImage: "arrow.triangle.2.circlepath", tone: .active, showsSpinner: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .animation(
             IrshadTheme.Animations.resolved(IrshadTheme.Animations.progressTransition, reduceMotion: viewModel.reduceMotionPreferred),
-            value: viewModel.isBackendBusy
+            value: viewModel.isServiceBusy
         )
     }
 

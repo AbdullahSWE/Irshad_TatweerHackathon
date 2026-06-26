@@ -17,7 +17,7 @@ struct MultiSelectCardView: View {
         QuestionCardContainer(
             card: card,
             validationMessage: viewModel.cardValidationMessage,
-            isBackendBusy: viewModel.isBackendBusy,
+            isServiceBusy: viewModel.isServiceBusy,
             showsConfirm: true,
             canSubmit: !selectedOptionIDs.isEmpty,
             confirmTitle: card.confirmLabel,
@@ -38,7 +38,7 @@ struct MultiSelectCardView: View {
                         )
                     }
                     .buttonStyle(.plain)
-                    .disabled(viewModel.isBackendBusy)
+                    .disabled(viewModel.isServiceBusy)
                 }
             }
         }

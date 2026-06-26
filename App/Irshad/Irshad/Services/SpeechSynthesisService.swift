@@ -8,10 +8,18 @@ protocol SpeechSynthesisServiceProtocol: AnyObject {
 
 final class SpeechSynthesisService: NSObject, SpeechSynthesisServiceProtocol {
     private let synthesizer: AVSpeechSynthesizer
+    private let audioSession: AVAudioSession
+    private var speechContinuation: CheckedContinuation<Void, Never>?
+    private weak var activeUtterance: AVSpeechUtterance?
 
-    init(synthesizer: AVSpeechSynthesizer = AVSpeechSynthesizer()) {
+    init(
+        synthesizer: AVSpeechSynthesizer = AVSpeechSynthesizer(),
+        audioSession: AVAudioSession = .sharedInstance()
+    ) {
         self.synthesizer = synthesizer
+        self.audioSession = audioSession
         super.init()
+        self.synthesizer.delegate = self
     }
 
     func speak(_ text: String, language: AppLanguage, voice: VoicePersona?) async {
@@ -24,16 +32,55 @@ final class SpeechSynthesisService: NSObject, SpeechSynthesisServiceProtocol {
         utterance.pitchMultiplier = 1.0
         utterance.volume = 1.0
 
+        configureAudioSessionForSpeech()
+
         if synthesizer.isSpeaking {
+            speechContinuation?.resume()
+            speechContinuation = nil
+            activeUtterance = nil
             synthesizer.stopSpeaking(at: .immediate)
         }
 
-        synthesizer.speak(utterance)
+        await withCheckedContinuation { continuation in
+            speechContinuation = continuation
+            activeUtterance = utterance
+            synthesizer.speak(utterance)
+        }
     }
 
     func stopSpeaking() async {
         guard synthesizer.isSpeaking else { return }
+        speechContinuation?.resume()
+        speechContinuation = nil
+        activeUtterance = nil
         synthesizer.stopSpeaking(at: .immediate)
+    }
+}
+
+private extension SpeechSynthesisService {
+    func configureAudioSessionForSpeech() {
+        do {
+            try audioSession.setCategory(.playback, mode: .spokenAudio, options: [.duckOthers])
+            try audioSession.setActive(true)
+        } catch {
+            assertionFailure("Unable to configure audio session for speech: \(error.localizedDescription)")
+        }
+    }
+}
+
+extension SpeechSynthesisService: AVSpeechSynthesizerDelegate {
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        guard utterance === activeUtterance else { return }
+        speechContinuation?.resume()
+        speechContinuation = nil
+        activeUtterance = nil
+    }
+
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
+        guard utterance === activeUtterance else { return }
+        speechContinuation?.resume()
+        speechContinuation = nil
+        activeUtterance = nil
     }
 }
 

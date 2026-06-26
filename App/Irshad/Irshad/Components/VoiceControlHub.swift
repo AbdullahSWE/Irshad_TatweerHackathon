@@ -7,6 +7,7 @@ struct VoiceControlHub: View {
     var reduceMotion: Bool
     var beginListening: () -> Void
     var stopListening: () -> Void
+    var submitTranscript: () -> Void
     var retryListening: () -> Void
 
     @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
@@ -175,7 +176,9 @@ struct VoiceControlHub: View {
             stopListening()
         case .processing:
             break
-        case .transcriptReady, .failed:
+        case .transcriptReady:
+            submitTranscript()
+        case .failed:
             retryListening()
         }
     }

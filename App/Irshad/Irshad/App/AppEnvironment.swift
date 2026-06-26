@@ -10,7 +10,7 @@ struct AppEnvironment: Sendable {
 
     static var live: AppEnvironment {
         AppEnvironment(
-            apiService: JourneyAPIService(),
+            apiService: LocalJourneyAPIService(),
             speechRecognitionService: SpeechRecognitionService(),
             speechSynthesisService: SpeechSynthesisService(),
             localPlanStore: LocalPlanStore(),

@@ -22,7 +22,7 @@ struct PlanShareToolbar: View {
     }
 
     private var isPreparing: Bool {
-        viewModel.isBackendBusy && viewModel.sharePayload == nil
+        viewModel.isServiceBusy && viewModel.sharePayload == nil
     }
 
     private var isSummaryCopied: Bool {

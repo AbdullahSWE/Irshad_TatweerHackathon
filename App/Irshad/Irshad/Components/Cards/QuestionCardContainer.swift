@@ -3,7 +3,7 @@ import SwiftUI
 struct QuestionCardContainer<Content: View>: View {
     let card: DynamicCard
     var validationMessage: String?
-    var isBackendBusy: Bool
+    var isServiceBusy: Bool
     var showsConfirm: Bool
     var canSubmit: Bool
     var confirmTitle: String?
@@ -26,7 +26,7 @@ struct QuestionCardContainer<Content: View>: View {
             if showsConfirm {
                 Button(action: onConfirm) {
                     HStack(spacing: IrshadTheme.Layout.spacingTight) {
-                        if isBackendBusy {
+                        if isServiceBusy {
                             ProgressView()
                                 .controlSize(.small)
                                 .tint(.white)
@@ -41,7 +41,7 @@ struct QuestionCardContainer<Content: View>: View {
                     .frame(minHeight: IrshadTheme.Layout.minimumTapTarget)
                 }
                 .buttonStyle(DynamicCardPrimaryButtonStyle())
-                .disabled(!canSubmit || isBackendBusy)
+                .disabled(!canSubmit || isServiceBusy)
                 .accessibilityHint(Text("Submits this answer."))
             }
         }

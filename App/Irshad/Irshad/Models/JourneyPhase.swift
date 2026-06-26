@@ -32,13 +32,13 @@ enum JourneyPhase: String, Codable, CaseIterable, Sendable {
         ]
     }
 
-    init(backendValue: String?) {
-        guard let backendValue else {
+    init(serviceValue: String?) {
+        guard let serviceValue else {
             self = .unknown
             return
         }
 
-        switch backendValue.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() {
+        switch serviceValue.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() {
         case "goal":
             self = .goal
         case "business":

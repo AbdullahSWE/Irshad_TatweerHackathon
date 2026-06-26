@@ -2,7 +2,7 @@ import SwiftUI
 
 struct PhaseProgressBar: View {
     let progress: JourneyProgress?
-    var isBackendBusy: Bool = false
+    var isServiceBusy: Bool = false
 
     private var fractionComplete: CGFloat {
         guard let progress, progress.required > 0 else {
@@ -14,7 +14,7 @@ struct PhaseProgressBar: View {
 
     private var accessibilityValue: String {
         guard let progress, progress.required > 0 else {
-            return isBackendBusy ? "Preparing progress" : "No progress yet"
+            return isServiceBusy ? "Preparing progress" : "No progress yet"
         }
 
         return "\(progress.filled) of \(progress.required) required details complete"
@@ -30,7 +30,7 @@ struct PhaseProgressBar: View {
                     .fill(IrshadTheme.Colors.primaryAccent)
                     .frame(width: max(proxy.size.width * fractionComplete, fillMinimumWidth))
 
-                if isBackendBusy && progress == nil {
+                if isServiceBusy && progress == nil {
                     Capsule(style: .continuous)
                         .fill(IrshadTheme.Colors.primaryAccent.opacity(0.28))
                         .frame(width: proxy.size.width * 0.28)
@@ -39,7 +39,7 @@ struct PhaseProgressBar: View {
                 }
             }
             .animation(IrshadTheme.Animations.progressTransition, value: fractionComplete)
-            .animation(IrshadTheme.Animations.progressTransition, value: isBackendBusy)
+            .animation(IrshadTheme.Animations.progressTransition, value: isServiceBusy)
         }
         .frame(height: 6)
         .accessibilityElement(children: .ignore)
@@ -55,7 +55,7 @@ struct PhaseProgressBar: View {
 #Preview {
     VStack(spacing: IrshadTheme.Layout.spacingSection) {
         PhaseProgressBar(progress: JourneyProgress(filled: 3, required: 7, stagesDone: 2, stagesTotal: 12))
-        PhaseProgressBar(progress: nil, isBackendBusy: true)
+        PhaseProgressBar(progress: nil, isServiceBusy: true)
     }
     .padding()
 }

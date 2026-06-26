@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Ordered, practical next-step checklist. Items can be marked done locally
-/// through the ViewModel; the view never holds authoritative backend state.
+/// through the ViewModel; the view never holds authoritative service state.
 struct NextStepChecklistView: View {
     var viewModel: JourneyViewModel
 
@@ -14,7 +14,7 @@ struct NextStepChecklistView: View {
             return .error
         }
         guard !items.isEmpty else {
-            return viewModel.isBackendBusy ? .loading : .empty
+            return viewModel.isServiceBusy ? .loading : .empty
         }
         return .success
     }

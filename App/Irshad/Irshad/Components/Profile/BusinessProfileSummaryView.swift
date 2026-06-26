@@ -45,7 +45,7 @@ struct BusinessProfileSummaryView: View {
                     ProfileSectionCardView(
                         section: section,
                         isInitiallyExpanded: viewModel.isProfileExpanded || index == 0,
-                        isUpdating: viewModel.isBackendBusy,
+                        isUpdating: viewModel.isServiceBusy,
                         correctionTarget: viewModel.correctionTarget,
                         beginCorrection: viewModel.beginCorrection(fieldID:),
                         submitCorrection: viewModel.submitCorrection(_:),
@@ -57,7 +57,7 @@ struct BusinessProfileSummaryView: View {
                 MissingInfoCardView(
                     missingFields: viewModel.missingFields,
                     unknownFields: viewModel.unknownFields,
-                    isUpdating: viewModel.isBackendBusy,
+                    isUpdating: viewModel.isServiceBusy,
                     correctionTarget: viewModel.correctionTarget,
                     beginCorrection: viewModel.beginCorrection(fieldID:),
                     submitCorrection: viewModel.submitCorrection(_:),
@@ -79,7 +79,7 @@ struct BusinessProfileSummaryView: View {
             )
             .animation(
                 IrshadTheme.Animations.resolved(IrshadTheme.Animations.progressTransition, reduceMotion: viewModel.reduceMotionPreferred),
-                value: viewModel.isBackendBusy
+                value: viewModel.isServiceBusy
             )
         }
     }

@@ -57,7 +57,7 @@ struct IrshadErrorStateView: View {
                         .frame(minHeight: IrshadTheme.Layout.minimumTapTarget)
                 }
                 .buttonStyle(DynamicCardPrimaryButtonStyle())
-                .disabled(viewModel.isBackendBusy)
+                .disabled(viewModel.isServiceBusy)
 
                 if let safeCopy = error?.message {
                     Button {
@@ -73,7 +73,7 @@ struct IrshadErrorStateView: View {
                 TextFallbackInputView(
                     text: textBinding,
                     isExpanded: false,
-                    isProcessing: viewModel.isBackendBusy,
+                    isProcessing: viewModel.isServiceBusy,
                     submitTitle: "Send answer"
                 ) {
                     viewModel.submitCurrentAnswer()

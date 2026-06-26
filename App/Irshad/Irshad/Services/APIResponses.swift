@@ -72,6 +72,11 @@ struct VerifyResponse: Decodable, Sendable {
         case nextStage
     }
 
+    init(verification: VerificationSummary, nextStage: String?) {
+        self.verification = verification
+        self.nextStage = nextStage
+    }
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         if let verification = try container.decodeIfPresent(VerificationSummary.self, forKey: .verification) {

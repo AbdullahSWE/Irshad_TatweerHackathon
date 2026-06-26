@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Active-progress state shown once the backend wait threshold passes.
+/// Active-progress state shown once the service wait threshold passes.
 /// Any `preservedContent` (e.g. the prior card or answer) stays visible
 /// above the indicator so the screen never blanks out while work happens.
 struct IrshadLoadingStateView<PreservedContent: View>: View {

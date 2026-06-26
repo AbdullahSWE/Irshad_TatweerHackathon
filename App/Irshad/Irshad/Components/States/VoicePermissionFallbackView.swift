@@ -55,7 +55,7 @@ struct VoicePermissionFallbackView: View {
             TextFallbackInputView(
                 text: textBinding,
                 isExpanded: false,
-                isProcessing: viewModel.isBackendBusy,
+                isProcessing: viewModel.isServiceBusy,
                 submitTitle: "Send answer"
             ) {
                 viewModel.submitCurrentAnswer()

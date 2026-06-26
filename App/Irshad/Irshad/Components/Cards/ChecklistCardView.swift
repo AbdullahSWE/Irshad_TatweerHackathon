@@ -21,7 +21,7 @@ struct ChecklistCardView: View {
         QuestionCardContainer(
             card: card,
             validationMessage: viewModel.cardValidationMessage,
-            isBackendBusy: viewModel.isBackendBusy,
+            isServiceBusy: viewModel.isServiceBusy,
             showsConfirm: showsConfirm,
             canSubmit: !showsConfirm || !checkedItemIDs.isEmpty || card.metadata.bool(for: ["allow_empty", "allowEmpty"]) == true,
             confirmTitle: card.confirmLabel,
@@ -41,11 +41,11 @@ struct ChecklistCardView: View {
                             leadingSystemImage: iconName(for: item),
                             trailingText: item.trailingLabel ?? item.status,
                             isSelected: checkedItemIDs.contains(item.id) || item.status?.lowercased() == "completed" || item.status?.lowercased() == "complete",
-                            isEnabled: item.isLocallyMarkable || !viewModel.isBackendBusy
+                            isEnabled: item.isLocallyMarkable || !viewModel.isServiceBusy
                         )
                     }
                     .buttonStyle(.plain)
-                    .disabled(viewModel.isBackendBusy || !item.isLocallyMarkable)
+                    .disabled(viewModel.isServiceBusy || !item.isLocallyMarkable)
                 }
             }
         }

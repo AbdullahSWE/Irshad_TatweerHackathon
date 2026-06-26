@@ -2,11 +2,11 @@ import SwiftUI
 
 /// Banking recommendations stage: a simple at-a-glance comparison first, then a
 /// detailed card per bank. Preferred selection is highlighted locally for
-/// feedback only; authoritative state stays in the ViewModel/backend.
+/// feedback only; authoritative state stays in the ViewModel/service.
 struct BankRecommendationListView: View {
     var viewModel: JourneyViewModel
 
-    /// Local optimistic highlight only — not authoritative backend state.
+    /// Local optimistic highlight only — not authoritative service state.
     @State private var preferredBankID: String?
 
     private var banks: [BankRecommendation] {
@@ -18,7 +18,7 @@ struct BankRecommendationListView: View {
             return .error
         }
         guard !banks.isEmpty else {
-            return viewModel.isBackendBusy ? .loading : .empty
+            return viewModel.isServiceBusy ? .loading : .empty
         }
         return .success
     }

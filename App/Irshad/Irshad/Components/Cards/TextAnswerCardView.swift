@@ -24,7 +24,7 @@ struct TextAnswerCardView: View {
         QuestionCardContainer(
             card: card,
             validationMessage: viewModel.cardValidationMessage,
-            isBackendBusy: viewModel.isBackendBusy,
+            isServiceBusy: viewModel.isServiceBusy,
             showsConfirm: true,
             canSubmit: !textValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
             confirmTitle: card.confirmLabel,

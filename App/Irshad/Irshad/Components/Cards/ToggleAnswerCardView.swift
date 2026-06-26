@@ -31,7 +31,7 @@ struct ToggleAnswerCardView: View {
         QuestionCardContainer(
             card: card,
             validationMessage: viewModel.cardValidationMessage,
-            isBackendBusy: viewModel.isBackendBusy,
+            isServiceBusy: viewModel.isServiceBusy,
             showsConfirm: true,
             canSubmit: selectedValue != nil,
             confirmTitle: card.confirmLabel,
@@ -67,7 +67,7 @@ struct ToggleAnswerCardView: View {
                         )
                     }
                     .buttonStyle(.plain)
-                    .disabled(viewModel.isBackendBusy)
+                    .disabled(viewModel.isServiceBusy)
                     .accessibilityValue(Text(selectedValue == choice.value ? "Selected" : "Not selected"))
                 }
             }

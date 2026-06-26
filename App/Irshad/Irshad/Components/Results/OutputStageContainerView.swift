@@ -3,7 +3,7 @@ import SwiftUI
 /// Lifecycle state for a mature-journey output stage (analysis, license,
 /// banking, verification, plan). Drives the consistent surface chrome.
 enum OutputStageState: Equatable {
-    /// Stage locked or pending: required backend state does not exist yet.
+    /// Stage locked or pending: required service state does not exist yet.
     case empty
     /// Stage is generating; previous content (if any) stays visible.
     case loading
@@ -216,7 +216,7 @@ struct OutputStageSkeletonView: View {
 /// an `OutputStageContainerView`.
 struct OutputConfidenceView: View {
     let confidence: Double?
-    var caption: String = "Backend confidence"
+    var caption: String = "AI confidence"
 
     private var normalized: Double {
         guard let confidence else { return 0 }

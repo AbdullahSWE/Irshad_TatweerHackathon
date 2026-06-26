@@ -42,7 +42,7 @@ struct JourneySession: Identifiable, Codable, Equatable, Sendable {
         sessionId = try container.decode(String.self, forKey: .sessionId)
         goalText = try container.decodeIfPresent(String.self, forKey: .goalText) ?? ""
         self.currentStage = currentStage
-        currentPhase = JourneyPhase(backendValue: currentStage ?? phaseValue)
+        currentPhase = JourneyPhase(serviceValue: currentStage ?? phaseValue)
         filledSlots = try container.decodeIfPresent([String: JSONValue].self, forKey: .filledSlots) ?? [:]
         history = try container.decodeIfPresent([JourneyHistoryItem].self, forKey: .history) ?? []
     }

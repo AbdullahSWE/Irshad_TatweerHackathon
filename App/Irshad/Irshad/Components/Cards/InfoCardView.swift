@@ -45,7 +45,7 @@ struct OutputCardActions: View {
                         viewModel.submitCardAnswer(card.cardId)
                     }
                     .buttonStyle(DynamicCardPrimaryButtonStyle())
-                    .disabled(viewModel.isBackendBusy)
+                    .disabled(viewModel.isServiceBusy)
                 }
             }
         }

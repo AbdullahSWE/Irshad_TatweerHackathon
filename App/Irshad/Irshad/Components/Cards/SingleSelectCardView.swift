@@ -21,7 +21,7 @@ struct SingleSelectCardView: View {
         QuestionCardContainer(
             card: card,
             validationMessage: viewModel.cardValidationMessage,
-            isBackendBusy: viewModel.isBackendBusy,
+            isServiceBusy: viewModel.isServiceBusy,
             showsConfirm: !shouldAutoSubmit,
             canSubmit: selectedOptionID != nil,
             confirmTitle: card.confirmLabel,
@@ -46,7 +46,7 @@ struct SingleSelectCardView: View {
                         )
                     }
                     .buttonStyle(.plain)
-                    .disabled(viewModel.isBackendBusy)
+                    .disabled(viewModel.isServiceBusy)
                 }
             }
         }

@@ -65,7 +65,7 @@ struct UnsupportedContentStateView: View {
                         .frame(minHeight: IrshadTheme.Layout.minimumTapTarget)
                 }
                 .buttonStyle(DynamicCardPrimaryButtonStyle())
-                .disabled(viewModel.isBackendBusy)
+                .disabled(viewModel.isServiceBusy)
 
                 if let fallbackText {
                     Button {
@@ -81,7 +81,7 @@ struct UnsupportedContentStateView: View {
                 TextFallbackInputView(
                     text: textBinding,
                     isExpanded: false,
-                    isProcessing: viewModel.isBackendBusy,
+                    isProcessing: viewModel.isServiceBusy,
                     submitTitle: "Send answer"
                 ) {
                     viewModel.submitCurrentAnswer()

@@ -94,7 +94,7 @@ struct ConfidenceMeterView: View {
                 }
         )
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(Text("Backend confidence"))
+        .accessibilityLabel(Text("AI confidence"))
         .accessibilityValue(Text("\(label), \(detail)"))
         .animation(IrshadTheme.Animations.progressTransition, value: normalizedConfidence)
     }

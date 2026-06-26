@@ -5,7 +5,7 @@ struct InputDockView: View {
     var isWelcome: Bool
 
     private var isProcessing: Bool {
-        viewModel.journeyStatus == .processing || viewModel.voiceState == .processing || viewModel.isBackendBusy
+        viewModel.journeyStatus == .processing || viewModel.voiceState == .processing || viewModel.isServiceBusy
     }
 
     private var allowsCustomInput: Bool {
@@ -21,7 +21,7 @@ struct InputDockView: View {
     }
 
     private var shouldShowTranscript: Bool {
-        guard allowsCustomInput else {
+        guard isWelcome || allowsCustomInput else {
             return false
         }
 
@@ -77,6 +77,7 @@ struct InputDockView: View {
                 reduceMotion: viewModel.reduceMotionPreferred,
                 beginListening: viewModel.beginListening,
                 stopListening: viewModel.stopListening,
+                submitTranscript: viewModel.submitRecognizedSpeech,
                 retryListening: viewModel.retryListening
             )
 

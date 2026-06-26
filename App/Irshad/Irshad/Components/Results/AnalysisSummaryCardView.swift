@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Scannable summary of the backend analysis: matched activity, setup cost
+/// Scannable summary of the service analysis: matched activity, setup cost
 /// estimate, candidate license names, confidence, and unverified items.
 struct AnalysisSummaryCardView: View {
     var viewModel: JourneyViewModel
@@ -14,7 +14,7 @@ struct AnalysisSummaryCardView: View {
             return .error
         }
         guard let summary else {
-            return viewModel.isBackendBusy ? .loading : .empty
+            return viewModel.isServiceBusy ? .loading : .empty
         }
         return summary.unverified.isEmpty ? .success : .partial
     }

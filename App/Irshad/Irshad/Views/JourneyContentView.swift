@@ -1,9 +1,9 @@
 import SwiftUI
 
-/// Scrolling spine of the journey: header for orientation, the backend-provided
+/// Scrolling spine of the journey: header for orientation, the service-provided
 /// card at the centre of attention, progressive profile context, and the output
 /// stage. Keeps the active card reachable and moves VoiceOver focus to it
-/// whenever the backend supplies a new step.
+/// whenever the service supplies a new step.
 struct JourneyContentView: View {
     var viewModel: JourneyViewModel
 

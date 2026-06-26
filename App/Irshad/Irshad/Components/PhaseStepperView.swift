@@ -8,8 +8,8 @@ struct PhaseStepperView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     private var visiblePhases: [JourneyPhase] {
-        let backendPhases = phases.filter { $0 != .unknown }
-        return backendPhases.isEmpty ? JourneyPhase.visibleOrder : backendPhases
+        let servicePhases = phases.filter { $0 != .unknown }
+        return servicePhases.isEmpty ? JourneyPhase.visibleOrder : servicePhases
     }
 
     var body: some View {
