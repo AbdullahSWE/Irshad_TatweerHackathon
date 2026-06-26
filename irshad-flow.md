@@ -1,4 +1,4 @@
-# Awwal — Guided Adaptive Journey Spec (Swift ↔ Next.js)
+# Irshad — Guided Adaptive Journey Spec (Swift ↔ Next.js)
 
 **Model:** the journey follows a **defined path** (an ordered backbone of stages), but the AI adapts *within* it. The server is a journey engine: it walks the fixed stage backbone, and inside each collection stage it generates the specific questions that matter for *this* activity, skips what's irrelevant, and stops asking once the stage is satisfied. When all collection stages are done — the **completeness gate** — it runs the output stages (analyze → license → banking → verify → plan), each separate.
 
