@@ -6,19 +6,19 @@ import UIKit
 
 extension IrshadTheme {
     enum Colors {
-        static let primaryAccent = Color.blue
-        static let supportingAccent = Color.indigo
-        static let softHighlight = Color.cyan
+        static let primaryAccent = Color(red: 0.05, green: 0.32, blue: 0.72)
+        static let supportingAccent = Color(red: 0.04, green: 0.49, blue: 0.82)
+        static let softHighlight = Color(red: 0.43, green: 0.72, blue: 0.96)
 
         static let success = Color.green
         static let warning = Color.orange
-        static let secondaryStatus = Color.purple
+        static let secondaryStatus = Color(red: 0.39, green: 0.57, blue: 0.50)
 
         static let canvas = Color(.systemBackground)
         static let surface = Color(.systemBackground)
         static let surfaceElevated = Color(.secondarySystemBackground)
-        static let surfaceTint = Color.blue.opacity(0.06)
-        static let indigoTint = Color.indigo.opacity(0.05)
+        static let surfaceTint = primaryAccent.opacity(0.07)
+        static let indigoTint = supportingAccent.opacity(0.06)
 
         static let primaryText = Color.primary
         static let secondaryText = Color.secondary
@@ -55,9 +55,9 @@ extension IrshadTheme {
 
         static let analysisGlowGradient = LinearGradient(
             gradient: Gradient(colors: [
-                Color.blue.opacity(0.22),
-                Color.indigo.opacity(0.14),
-                Color.cyan.opacity(0.08)
+                primaryAccent.opacity(0.18),
+                supportingAccent.opacity(0.12),
+                softHighlight.opacity(0.08)
             ]),
             startPoint: .topLeading,
             endPoint: .bottomTrailing
@@ -96,31 +96,31 @@ extension IrshadTheme {
 
         static let glassSurface = Color(.systemBackground).opacity(0.82)
         static let elevatedGlassSurface = Color(.secondarySystemBackground).opacity(0.88)
-        static let voiceHalo = Color.blue.opacity(0.24)
-        static let listeningHalo = Color.cyan.opacity(0.18)
+        static let voiceHalo = primaryAccent.opacity(0.22)
+        static let listeningHalo = softHighlight.opacity(0.20)
 
         private static let backgroundTop = adaptiveColor(light: .white, dark: .systemBackground)
         private static let backgroundMiddle = adaptiveColor(
-            light: .systemBlue.withAlphaComponent(0.055),
-            dark: .systemBlue.withAlphaComponent(0.13)
+            light: UIColor(red: 0.43, green: 0.72, blue: 0.96, alpha: 0.12),
+            dark: UIColor(red: 0.04, green: 0.49, blue: 0.82, alpha: 0.16)
         )
         private static let backgroundBottom = adaptiveColor(light: .white, dark: .systemBackground)
         private static let voiceRadialCenter = adaptiveColor(light: .white, dark: .secondarySystemBackground)
         private static let voiceRadialBlue = adaptiveColor(
-            light: .systemBlue.withAlphaComponent(0.18),
-            dark: .systemBlue.withAlphaComponent(0.28)
+            light: UIColor(red: 0.05, green: 0.32, blue: 0.72, alpha: 0.18),
+            dark: UIColor(red: 0.04, green: 0.49, blue: 0.82, alpha: 0.28)
         )
         private static let voiceRadialIndigo = adaptiveColor(
-            light: .systemIndigo.withAlphaComponent(0.10),
-            dark: .systemIndigo.withAlphaComponent(0.20)
+            light: UIColor(red: 0.43, green: 0.72, blue: 0.96, alpha: 0.16),
+            dark: UIColor(red: 0.43, green: 0.72, blue: 0.96, alpha: 0.20)
         )
 
         private static let darkBackgroundTop = Color(.systemBackground)
-        private static let darkBackgroundMiddle = Color.blue.opacity(0.13)
+        private static let darkBackgroundMiddle = supportingAccent.opacity(0.14)
         private static let darkBackgroundBottom = Color(.systemBackground)
         private static let darkVoiceRadialCenter = Color(.secondarySystemBackground)
-        private static let darkVoiceRadialBlue = Color.blue.opacity(0.28)
-        private static let darkVoiceRadialIndigo = Color.indigo.opacity(0.20)
+        private static let darkVoiceRadialBlue = primaryAccent.opacity(0.28)
+        private static let darkVoiceRadialIndigo = softHighlight.opacity(0.20)
     }
 }
 

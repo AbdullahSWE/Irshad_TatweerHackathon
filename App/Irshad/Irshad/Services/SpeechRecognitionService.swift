@@ -99,15 +99,6 @@ final class SpeechRecognitionService: NSObject, SpeechRecognitionServiceProtocol
 
 private extension SpeechRecognitionService {
     func requestMicrophoneAccess() async -> Bool {
-        if #available(iOS 17.0, *) {
-            return await requestCurrentMicrophoneAccess()
-        }
-
-        return await requestLegacyMicrophoneAccess()
-    }
-
-    @available(iOS 17.0, *)
-    func requestCurrentMicrophoneAccess() async -> Bool {
         switch AVAudioApplication.shared.recordPermission {
         case .granted:
             return true
@@ -116,24 +107,6 @@ private extension SpeechRecognitionService {
         case .undetermined:
             return await withCheckedContinuation { continuation in
                 AVAudioApplication.requestRecordPermission { granted in
-                    continuation.resume(returning: granted)
-                }
-            }
-        @unknown default:
-            return false
-        }
-    }
-
-    @available(iOS, introduced: 7.0, deprecated: 17.0)
-    func requestLegacyMicrophoneAccess() async -> Bool {
-        switch audioSession.recordPermission {
-        case .granted:
-            return true
-        case .denied:
-            return false
-        case .undetermined:
-            return await withCheckedContinuation { continuation in
-                audioSession.requestRecordPermission { granted in
                     continuation.resume(returning: granted)
                 }
             }

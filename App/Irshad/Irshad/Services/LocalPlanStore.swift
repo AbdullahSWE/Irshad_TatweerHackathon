@@ -6,7 +6,7 @@ protocol LocalPlanStoreProtocol: Sendable {
     func deleteSavedPlan() async throws
 }
 
-actor LocalPlanStore: LocalPlanStoreProtocol {
+nonisolated actor LocalPlanStore: LocalPlanStoreProtocol {
     private let storageDirectory: URL
     private let fileManager: FileManager
     private let encoder: JSONEncoder
@@ -86,7 +86,7 @@ actor LocalPlanStore: LocalPlanStoreProtocol {
         storageDirectory.appendingPathComponent(filename, isDirectory: false)
     }
 
-    private static func defaultStorageDirectory(fileManager: FileManager) -> URL {
+    nonisolated private static func defaultStorageDirectory(fileManager: FileManager) -> URL {
         if let url = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
             return url.appendingPathComponent("Irshad", isDirectory: true)
         }
@@ -109,7 +109,7 @@ actor LocalPlanStore: LocalPlanStoreProtocol {
 }
 
 private extension String {
-    var trimmedForStorageTitle: String {
+    nonisolated var trimmedForStorageTitle: String {
         trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

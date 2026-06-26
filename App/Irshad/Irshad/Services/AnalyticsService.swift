@@ -21,7 +21,7 @@ struct AnalyticsService: AnalyticsServiceProtocol {
         logger(event)
     }
 
-    private static func defaultLogger(_ event: AnalyticsEvent) {
+    nonisolated private static func defaultLogger(_ event: AnalyticsEvent) {
         #if DEBUG
         let properties = event.properties
             .sorted { $0.key < $1.key }

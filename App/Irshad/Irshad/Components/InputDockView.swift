@@ -8,7 +8,23 @@ struct InputDockView: View {
         viewModel.journeyStatus == .processing || viewModel.voiceState == .processing || viewModel.isBackendBusy
     }
 
+    private var allowsCustomInput: Bool {
+        viewModel.currentCard?.allowsCustomInput == true
+    }
+
+    private var shouldShowTextFallback: Bool {
+        guard let currentCard = viewModel.currentCard, currentCard.allowsCustomInput else {
+            return false
+        }
+
+        return currentCard.type != .text
+    }
+
     private var shouldShowTranscript: Bool {
+        guard allowsCustomInput else {
+            return false
+        }
+
         if viewModel.voiceState == .transcriptReady {
             return true
         }
@@ -70,14 +86,16 @@ struct InputDockView: View {
                     .transition(.opacity)
             }
 
-            TextFallbackInputView(
-                text: textBinding,
-                isExpanded: viewModel.isTextEntryExpanded || viewModel.voiceState.isFailed,
-                isProcessing: isProcessing,
-                language: viewModel.currentLanguage,
-                submitTitle: submitTitle,
-                submit: submitTypedInput
-            )
+            if shouldShowTextFallback {
+                TextFallbackInputView(
+                    text: textBinding,
+                    isExpanded: viewModel.isTextEntryExpanded || viewModel.voiceState.isFailed,
+                    isProcessing: isProcessing,
+                    language: viewModel.currentLanguage,
+                    submitTitle: submitTitle,
+                    submit: submitTypedInput
+                )
+            }
         }
         .padding(.horizontal, IrshadTheme.Layout.outerMarginCompact)
         .padding(.top, IrshadTheme.Layout.spacingComfortable)

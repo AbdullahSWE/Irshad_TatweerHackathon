@@ -21,6 +21,8 @@ The demo target is one polished end-to-end journey, especially a rural Abu Dhabi
 
 This repo is the Swift iOS client. The Next.js backend is separate. Do not add backend journey logic to Swift.
 
+Minimum supported iOS version is iOS 18. Prefer current iOS 18-compatible Apple APIs and avoid adding legacy availability fallbacks for older iOS releases unless explicitly requested.
+
 ## Run, Build, Test
 
 Open in Xcode:

@@ -300,6 +300,23 @@ extension DynamicCard {
         metadata.bool(for: ["auto_submit", "autoSubmit"]) ?? false
     }
 
+    var allowsCustomInput: Bool {
+        if type == .text {
+            return true
+        }
+
+        return metadata.bool(
+            for: [
+                "allows_custom_input",
+                "allowsCustomInput",
+                "allow_custom_input",
+                "allowCustomInput",
+                "custom_input",
+                "customInput"
+            ]
+        ) ?? false
+    }
+
     var requiresAction: Bool {
         metadata.bool(for: ["requires_action", "requiresAction", "needs_action", "needsAction"]) ?? false
     }
