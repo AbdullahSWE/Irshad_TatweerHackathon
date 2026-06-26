@@ -91,8 +91,14 @@ struct InputDockView: View {
                 }
                 .ignoresSafeArea(edges: .bottom)
         }
-        .animation(IrshadTheme.Animations.cardReveal, value: shouldShowTranscript)
-        .animation(IrshadTheme.Animations.buttonFeedback, value: viewModel.voiceState)
+        .animation(
+            IrshadTheme.Animations.resolved(IrshadTheme.Animations.cardReveal, reduceMotion: viewModel.reduceMotionPreferred),
+            value: shouldShowTranscript
+        )
+        .animation(
+            IrshadTheme.Animations.resolved(IrshadTheme.Animations.buttonFeedback, reduceMotion: viewModel.reduceMotionPreferred),
+            value: viewModel.voiceState
+        )
     }
 
     private func confirmTranscript() {

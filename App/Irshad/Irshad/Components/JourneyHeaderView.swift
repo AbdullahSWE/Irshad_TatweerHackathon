@@ -14,13 +14,13 @@ struct JourneyHeaderView: View {
             HStack(alignment: .top, spacing: IrshadTheme.Layout.spacingStandard) {
                 VStack(alignment: .leading, spacing: IrshadTheme.Layout.spacingTight) {
                     Text(viewModel.appTitle)
-                        .font(IrshadTheme.Typography.stepIndicator)
+                        .font(IrshadTheme.Typography.stepIndicatorDynamic)
                         .foregroundStyle(IrshadTheme.Colors.primaryText)
                         .lineLimit(1)
                         .minimumScaleFactor(0.82)
 
                     Text(framingText)
-                        .font(IrshadTheme.Typography.statusMicrocopy)
+                        .font(IrshadTheme.Typography.statusMicrocopyDynamic)
                         .foregroundStyle(IrshadTheme.Colors.secondaryText)
                         .lineLimit(2)
                         .fixedSize(horizontal: false, vertical: true)
@@ -45,6 +45,8 @@ struct JourneyHeaderView: View {
                         completedPhases: viewModel.completedPhases
                     )
                 }
+                .accessibilityElement(children: .contain)
+                .accessibilityLabel(Text(IrshadTheme.Accessibility.Label.phaseProgress))
                 .transition(.opacity.combined(with: .move(edge: .top)))
             }
 
@@ -187,7 +189,7 @@ private struct HeaderActionButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(IrshadTheme.Typography.statusMicrocopy)
+            .font(IrshadTheme.Typography.statusMicrocopyDynamic)
             .foregroundStyle(foreground)
             .padding(.horizontal, IrshadTheme.Layout.spacingComfortable)
             .frame(minHeight: IrshadTheme.Layout.minimumTapTarget)

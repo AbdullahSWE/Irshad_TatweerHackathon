@@ -107,13 +107,14 @@ struct SavedPlanView: View {
                 ForEach(Array(steps.enumerated()), id: \.offset) { index, step in
                     HStack(alignment: .top, spacing: IrshadTheme.Layout.spacingStandard) {
                         Text("\(index + 1)")
-                            .font(IrshadTheme.Typography.statusMicrocopy)
+                            .font(IrshadTheme.Typography.statusMicrocopyDynamic)
                             .foregroundStyle(.white)
-                            .frame(width: 28, height: 28)
+                            .frame(minWidth: 28, minHeight: 28)
                             .background(Circle().fill(IrshadTheme.Colors.primaryAccent))
+                            .accessibilityHidden(true)
 
                         Text(step)
-                            .font(IrshadTheme.Typography.primaryBody)
+                            .font(IrshadTheme.Typography.primaryBodyDynamic)
                             .foregroundStyle(IrshadTheme.Colors.primaryText)
                             .fixedSize(horizontal: false, vertical: true)
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -123,6 +124,8 @@ struct SavedPlanView: View {
                         RoundedRectangle(cornerRadius: IrshadTheme.Layout.controlRadius, style: .continuous)
                             .fill(IrshadTheme.Colors.surfaceElevated)
                     )
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel(Text("Step \(index + 1): \(step)"))
                 }
             }
         }
@@ -142,14 +145,14 @@ struct SavedPlanView: View {
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text("\(index + 1). \(item.title)")
-                                .font(IrshadTheme.Typography.secondaryLabel)
+                                .font(IrshadTheme.Typography.secondaryLabelDynamic)
                                 .foregroundStyle(IrshadTheme.Colors.primaryText)
                                 .strikethrough(item.isDone, color: IrshadTheme.Colors.secondaryText)
                                 .fixedSize(horizontal: false, vertical: true)
 
                             if let detail = item.detail, !detail.isEmpty {
                                 Text(detail)
-                                    .font(IrshadTheme.Typography.statusMicrocopy)
+                                    .font(IrshadTheme.Typography.statusMicrocopyDynamic)
                                     .foregroundStyle(IrshadTheme.Colors.secondaryText)
                                     .fixedSize(horizontal: false, vertical: true)
                             }
@@ -170,7 +173,7 @@ struct SavedPlanView: View {
 
     private func sectionHeader(_ title: String, systemImage: String) -> some View {
         Label(title, systemImage: systemImage)
-            .font(IrshadTheme.Typography.sectionTitle)
+            .font(IrshadTheme.Typography.sectionTitleDynamic)
             .foregroundStyle(IrshadTheme.Colors.primaryText)
     }
 
@@ -225,12 +228,12 @@ struct SavedPlanView: View {
             }
 
             Text(title)
-                .font(IrshadTheme.Typography.cardTitle)
+                .font(IrshadTheme.Typography.cardTitleDynamic)
                 .foregroundStyle(IrshadTheme.Colors.primaryText)
                 .multilineTextAlignment(.center)
 
             Text(message)
-                .font(IrshadTheme.Typography.secondaryLabel)
+                .font(IrshadTheme.Typography.secondaryLabelDynamic)
                 .foregroundStyle(IrshadTheme.Colors.secondaryText)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)

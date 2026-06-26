@@ -61,12 +61,12 @@ struct WelcomeView: View {
                 .irshadShadow(IrshadTheme.Shadows.ambientBlueShadow)
 
             Text(viewModel.appTitle)
-                .font(IrshadTheme.Typography.largeTitle)
+                .font(IrshadTheme.Typography.largeTitleDynamic)
                 .foregroundStyle(IrshadTheme.Colors.primaryText)
                 .multilineTextAlignment(.center)
 
             Text(promiseText)
-                .font(IrshadTheme.Typography.primaryBody)
+                .font(IrshadTheme.Typography.primaryBodyDynamic)
                 .foregroundStyle(IrshadTheme.Colors.secondaryText)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
@@ -82,7 +82,7 @@ struct WelcomeView: View {
                 .tint(IrshadTheme.Colors.primaryAccent)
 
             Text("نجهز تجربة الصوت")
-                .font(IrshadTheme.Typography.secondaryLabel)
+                .font(IrshadTheme.Typography.secondaryLabelDynamic)
                 .foregroundStyle(IrshadTheme.Colors.primaryText)
 
             Spacer(minLength: 0)
@@ -97,7 +97,7 @@ struct WelcomeView: View {
     private var promptExamples: some View {
         VStack(alignment: .leading, spacing: IrshadTheme.Layout.spacingStandard) {
             Text("أمثلة سريعة")
-                .font(IrshadTheme.Typography.statusMicrocopy)
+                .font(IrshadTheme.Typography.statusMicrocopyDynamic)
                 .foregroundStyle(IrshadTheme.Colors.secondaryText)
 
             VStack(spacing: IrshadTheme.Layout.spacingStandard) {
@@ -112,11 +112,12 @@ struct WelcomeView: View {
                                 .frame(width: IrshadTheme.Layout.minimumTapTarget, height: IrshadTheme.Layout.minimumTapTarget)
 
                             Text(prompt)
-                                .font(IrshadTheme.Typography.secondaryLabel)
+                                .font(IrshadTheme.Typography.secondaryLabelDynamic)
                                 .foregroundStyle(IrshadTheme.Colors.primaryText)
                                 .multilineTextAlignment(.leading)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
+                        .frame(minHeight: IrshadTheme.Accessibility.minimumTapTarget)
                         .padding(.trailing, IrshadTheme.Layout.spacingComfortable)
                         .background {
                             RoundedRectangle(cornerRadius: IrshadTheme.Layout.controlRadius, style: .continuous)
@@ -128,6 +129,7 @@ struct WelcomeView: View {
                         }
                     }
                     .buttonStyle(.plain)
+                    .accessibilityHint(Text("يملأ مربع النص بهذا المثال"))
                 }
             }
         }

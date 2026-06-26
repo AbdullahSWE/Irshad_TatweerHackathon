@@ -1,11 +1,123 @@
 import type { CollectionStage } from './types';
+import knowledge from '@/kb/knowledge.json';
+
+// ---------------------------------------------------------------------------
+// Raw JSON shapes (Backend/kb/knowledge.json)
+// ---------------------------------------------------------------------------
+
+interface RawAuthority {
+  id: string;
+  name: string;
+  short_name?: string;
+  role?: string;
+  phone?: string;
+  secondary_phone?: string;
+  email?: string;
+  main_website?: string;
+  service_platform?: string;
+  source_url?: string;
+}
+
+interface RawLicenseCosts {
+  base_cost_aed?: number;
+  official_max_range_aed?: number;
+  extra_activity_fee_aed_each?: number;
+  fee_warning?: string;
+}
+
+interface RawLicense {
+  id: string;
+  name: string;
+  issuing_authority_id: string;
+  best_for?: string[];
+  information_source?: string;
+  official_application_source?: string;
+  costs?: RawLicenseCosts;
+  office_requirement?: { office_required?: boolean; note?: string };
+  required_documents?: string[];
+  step_sequence?: string[];
+  concrete_next_action?: string;
+}
+
+interface RawBankPlan {
+  plan_id?: string;
+  account_name?: string;
+  monthly_fee_aed?: number;
+  best_for?: string;
+  included_features?: string[];
+}
+
+interface RawBank {
+  id: string;
+  bank_name: string;
+  best_for?: string[];
+  website?: string;
+  source_url?: string;
+  plan_options?: RawBankPlan[];
+  notes?: string;
+}
+
+interface RawArchetype {
+  id: string;
+  name: string;
+  recommended_license_ids: string[];
+  extra_authority_ids?: string[];
+  likely_bank_ids?: string[];
+  funding_or_investment_ids?: string[];
+  eligibility_summary?: string;
+  step_sequence?: string[];
+  concrete_next_action?: string;
+}
+
+interface RawBankLoan {
+  id: string;
+  provider: string;
+  type?: string;
+  best_for?: string[];
+  required_documents?: string[];
+  website?: string;
+  source_url?: string;
+  important_note?: string;
+}
+
+interface RawFund {
+  id: string;
+  provider: string;
+  type?: string;
+  product_name: string;
+  best_for?: string[];
+  funding_up_to_aed?: number;
+  project_cost_coverage?: string;
+  repayment_period_months?: number;
+  grace_period_months?: number;
+  eligibility_note?: string;
+  website?: string;
+  source_url?: string;
+  concrete_next_action?: string;
+}
+
+interface KnowledgeFile {
+  authorities: RawAuthority[];
+  licenses: RawLicense[];
+  banks: RawBank[];
+  bank_loans: RawBankLoan[];
+  government_investments_and_funds: RawFund[];
+  archetypes: RawArchetype[];
+}
+
+const KB = knowledge as unknown as KnowledgeFile;
+
+// ---------------------------------------------------------------------------
+// Public interfaces (consumed by lib/llm.ts, lib/journey.ts, API routes)
+// ---------------------------------------------------------------------------
 
 export interface ActivityArchetype {
   id: string;
   label: string;
-  keywords: string[];
   stageSlots: Partial<Record<CollectionStage, string[]>>;
   candidateLicenseIds: string[];
+  likelyBankIds: string[];
+  fundingIds: string[];
 }
 
 export interface Authority {
@@ -21,332 +133,261 @@ export interface LicenseKBEntry {
   type: string;
   issuer: string;
   authorityId: string;
-  pros: string[];
-  cons: string[];
-  timeline: string;
-  approvals: string[];
+  bestFor: string[];
   estCost: string;
+  officeRequired?: string;
+  approvals: string[];
+  stepSequence: string[];
   source: string;
   activityIds: string[];
 }
 
-export interface BankKBEntry {
+export interface BankPlan {
   name: string;
-  minBalance: string;
-  minBalanceAED: number;
-  requirements: string[];
-  docsNeeded: string[];
+  monthlyFee: string;
+  bestFor: string;
+  features: string[];
+}
+
+export interface BankKBEntry {
+  id: string;
+  name: string;
+  bestFor: string[];
+  plans: BankPlan[];
+  notes: string;
   source: string;
 }
 
-export const AUTHORITIES: Record<string, Authority> = {
-  dct: {
-    id: 'dct',
-    name: 'DCT Abu Dhabi',
-    phone: '+971 2 444 0444',
-    contactUrl: 'https://dctabudhabi.ae/en/contact',
-    website: 'dctabudhabi.ae',
-  },
-  added: {
-    id: 'added',
-    name: 'ADDED (Abu Dhabi Department of Economic Development)',
-    phone: '+971 2 619 1555',
-    contactUrl: 'https://www.added.gov.ae/en/contact',
-    website: 'added.gov.ae',
-  },
-  adafsa: {
-    id: 'adafsa',
-    name: 'ADAFSA (Abu Dhabi Agriculture and Food Safety Authority)',
-    phone: '+971 2 813 6000',
-    contactUrl: 'https://www.adafsa.gov.ae/en/contact',
-    website: 'adafsa.gov.ae',
-  },
-  tamm: {
-    id: 'tamm',
-    name: 'TAMM (Abu Dhabi Government Services)',
-    phone: '+971 2 666 9999',
-    contactUrl: 'https://www.tamm.abudhabi',
-    website: 'tamm.abudhabi',
-  },
+export interface BankLoanKBEntry {
+  id: string;
+  provider: string;
+  bestFor: string[];
+  requiredDocuments: string[];
+  note: string;
+  source: string;
+}
+
+export interface FundingKBEntry {
+  id: string;
+  provider: string;
+  productName: string;
+  bestFor: string[];
+  fundingUpTo: string;
+  coverage: string;
+  repayment: string;
+  eligibility: string;
+  nextAction: string;
+  source: string;
+}
+
+// ---------------------------------------------------------------------------
+// Journey question-flow config (slots collected per stage). This is app flow,
+// not business KB — knowledge.json holds facts, not the interview script.
+// ---------------------------------------------------------------------------
+
+const STAGE_SLOTS: Partial<Record<CollectionStage, string[]>> = {
+  business: ['activity', 'businessStage', 'operatingModel'],
+  founder: ['founderType', 'residency', 'hasExistingBusiness', 'language'],
+  details: ['location', 'jurisdictionPref', 'channel', 'needsOffice'],
+  budget: ['capital', 'expectedRevenue', 'employees', 'growth'],
+  documents: ['docs', 'assets', 'permitsHeld'],
 };
 
-export const ARCHETYPES: ActivityArchetype[] = [
-  {
-    id: 'astro_tourism',
-    label: 'Desert / astro tourism (overnight, private land)',
-    keywords: ['stargazing', 'desert', 'tourism', 'overnight', 'camping', 'astro', 'telescope', 'stars', 'sky'],
-    stageSlots: {
-      business: ['activity', 'businessStage', 'hostingType', 'landOwnership'],
-      founder: ['founderType', 'residency', 'hasExistingBusiness', 'language'],
-      details: ['location', 'jurisdictionPref', 'channel', 'needsOffice'],
-      budget: ['capital', 'expectedRevenue', 'employees', 'growth'],
-      documents: ['docs', 'assets', 'permitsHeld'],
-    },
-    candidateLicenseIds: ['tourism_activity_license', 'tajer_abu_dhabi'],
-  },
-  {
-    id: 'home_food',
-    label: 'Home food business (cooking, catering, baking)',
-    keywords: ['food', 'cooking', 'catering', 'home kitchen', 'baking', 'meal', 'chef', 'cake', 'restaurant', 'eat'],
-    stageSlots: {
-      business: ['activity', 'businessStage', 'kitchenType', 'foodSafetyReg'],
-      founder: ['founderType', 'residency', 'hasExistingBusiness', 'language'],
-      details: ['location', 'jurisdictionPref', 'channel', 'needsOffice'],
-      budget: ['capital', 'expectedRevenue', 'employees', 'growth'],
-      documents: ['docs', 'assets', 'permitsHeld'],
-    },
-    candidateLicenseIds: ['home_business_license', 'food_business_license'],
-  },
-  {
-    id: 'online_retail',
-    label: 'Online retail / e-commerce',
-    keywords: ['online', 'e-commerce', 'sell', 'shop', 'store', 'products', 'dropship', 'instagram', 'tiktok'],
-    stageSlots: {
-      business: ['activity', 'businessStage', 'productType', 'fulfillmentMethod'],
-      founder: ['founderType', 'residency', 'hasExistingBusiness', 'language'],
-      details: ['location', 'jurisdictionPref', 'channel', 'needsOffice'],
-      budget: ['capital', 'expectedRevenue', 'employees', 'growth'],
-      documents: ['docs', 'assets', 'permitsHeld'],
-    },
-    candidateLicenseIds: ['tajer_abu_dhabi', 'ecommerce_license'],
-  },
-  {
-    id: 'freelance_services',
-    label: 'Freelance / professional services',
-    keywords: ['freelance', 'consulting', 'services', 'design', 'writing', 'coding', 'photography', 'marketing', 'skills'],
-    stageSlots: {
-      business: ['activity', 'businessStage', 'serviceType', 'clientBase'],
-      founder: ['founderType', 'residency', 'hasExistingBusiness', 'language'],
-      details: ['location', 'jurisdictionPref', 'channel', 'needsOffice'],
-      budget: ['capital', 'expectedRevenue', 'employees', 'growth'],
-      documents: ['docs', 'assets', 'permitsHeld'],
-    },
-    candidateLicenseIds: ['freelancer_permit', 'tajer_abu_dhabi'],
-  },
-  {
-    id: 'camel_farm',
-    label: 'Camel farm / agri-business',
-    keywords: ['camel', 'farm', 'livestock', 'animal', 'agriculture', 'dairy', 'milk', 'breeding', 'racing'],
-    stageSlots: {
-      business: ['activity', 'businessStage', 'farmType', 'landOwnership'],
-      founder: ['founderType', 'residency', 'hasExistingBusiness', 'language'],
-      details: ['location', 'jurisdictionPref', 'channel', 'needsOffice'],
-      budget: ['capital', 'expectedRevenue', 'employees', 'growth'],
-      documents: ['docs', 'assets', 'permitsHeld'],
-    },
-    candidateLicenseIds: ['agricultural_license', 'tajer_abu_dhabi'],
-  },
-  {
-    id: 'general_trade',
-    label: 'General trading / retail',
-    keywords: ['trading', 'import', 'export', 'wholesale', 'retail', 'goods', 'items', 'merchandise'],
-    stageSlots: {
-      business: ['activity', 'businessStage', 'tradeType', 'storefront'],
-      founder: ['founderType', 'residency', 'hasExistingBusiness', 'language'],
-      details: ['location', 'jurisdictionPref', 'channel', 'needsOffice'],
-      budget: ['capital', 'expectedRevenue', 'employees', 'growth'],
-      documents: ['docs', 'assets', 'permitsHeld'],
-    },
-    candidateLicenseIds: ['commercial_license', 'tajer_abu_dhabi'],
-  },
-];
+// ---------------------------------------------------------------------------
+// Adapters: raw JSON -> public interfaces
+// ---------------------------------------------------------------------------
 
-export const LICENSES: Record<string, LicenseKBEntry> = {
-  tourism_activity_license: {
-    id: 'tourism_activity_license',
-    type: 'Tourism Activity License',
-    issuer: 'DCT Abu Dhabi',
-    authorityId: 'dct',
-    pros: ['Covers guest-hosting and tourism legally', 'Recognized by partners and booking platforms', 'Enables legal marketing of tours'],
-    cons: ['Requires DCT activity approval', 'Annual renewal required', 'Site inspection may be required for overnight hosting'],
-    timeline: '2–4 weeks',
-    approvals: ['DCT activity approval', 'Emirates ID or passport'],
-    estCost: 'AED 1,500 – 3,000',
-    source: 'dctabudhabi.ae',
-    activityIds: ['astro_tourism'],
-  },
-  tajer_abu_dhabi: {
-    id: 'tajer_abu_dhabi',
-    type: 'Tajer Abu Dhabi',
-    issuer: 'ADDED',
-    authorityId: 'added',
-    pros: ['Very low cost', 'Phone/online application — no office visit', 'Fast approval (1–3 days)', 'Covers many home-based and small activities'],
-    cons: ['May not cover guest hosting or food service', 'Limited to specific activity categories', 'UAE residents only'],
-    timeline: '1–3 days',
-    approvals: ['Emirates ID'],
-    estCost: 'AED 200 – 600',
-    source: 'added.gov.ae',
-    activityIds: ['astro_tourism', 'online_retail', 'freelance_services', 'home_food', 'general_trade', 'camel_farm'],
-  },
-  home_business_license: {
-    id: 'home_business_license',
-    type: 'Home Business License',
-    issuer: 'ADDED',
-    authorityId: 'added',
-    pros: ['Designed for home-based businesses', 'Affordable', 'No separate office needed'],
-    cons: ['Restricted to non-hazardous activities', 'Cannot employ workers at home premises'],
-    timeline: '3–7 days',
-    approvals: ['Emirates ID', 'Tenancy agreement or property ownership proof'],
-    estCost: 'AED 500 – 1,500',
-    source: 'added.gov.ae',
-    activityIds: ['home_food', 'freelance_services'],
-  },
-  food_business_license: {
-    id: 'food_business_license',
-    type: 'Food Business License',
-    issuer: 'ADAFSA',
-    authorityId: 'adafsa',
-    pros: ['Legally required for any food sale in Abu Dhabi', 'Adds credibility with customers', 'Covers home kitchen operations'],
-    cons: ['Kitchen inspection required', 'Food handler safety certificate needed', 'Renewal with re-inspection'],
-    timeline: '2–6 weeks',
-    approvals: ['Kitchen inspection', 'Food safety certificate', 'Emirates ID'],
-    estCost: 'AED 1,000 – 3,000',
-    source: 'adafsa.gov.ae',
-    activityIds: ['home_food'],
-  },
-  freelancer_permit: {
-    id: 'freelancer_permit',
-    type: 'Freelancer Permit',
-    issuer: 'ADDED',
-    authorityId: 'added',
-    pros: ['Official permit to invoice clients legally', 'No physical office required', 'Covers wide range of professional services'],
-    cons: ['Restricted to listed professional categories', 'Annual renewal', 'Qualification proof may be needed'],
-    timeline: '1–2 weeks',
-    approvals: ['Emirates ID', 'Professional qualification proof (if applicable)'],
-    estCost: 'AED 1,000 – 2,000',
-    source: 'added.gov.ae',
-    activityIds: ['freelance_services'],
-  },
-  ecommerce_license: {
-    id: 'ecommerce_license',
-    type: 'E-commerce License',
-    issuer: 'ADDED',
-    authorityId: 'added',
-    pros: ['Covers online sales legally', 'Allows payment gateway integration', 'Growing category with government support'],
-    cons: ['Physical address required', 'Annual renewal'],
-    timeline: '1–2 weeks',
-    approvals: ['Emirates ID', 'Business plan'],
-    estCost: 'AED 2,000 – 5,000',
-    source: 'added.gov.ae',
-    activityIds: ['online_retail'],
-  },
-  agricultural_license: {
-    id: 'agricultural_license',
-    type: 'Agricultural Activity License',
-    issuer: 'ADDED / Abu Dhabi Agriculture Authority',
-    authorityId: 'added',
-    pros: ['Covers farming and livestock legally', 'Government support programs available', 'Eligible for subsidies'],
-    cons: ['Land registration may be required', 'Activity-specific permits needed per livestock type'],
-    timeline: '2–4 weeks',
-    approvals: ['Emirates ID', 'Land ownership or lease', 'Activity description'],
-    estCost: 'AED 500 – 2,000',
-    source: 'added.gov.ae',
-    activityIds: ['camel_farm'],
-  },
-  commercial_license: {
-    id: 'commercial_license',
-    type: 'Commercial License',
-    issuer: 'ADDED',
-    authorityId: 'added',
-    pros: ['Full trading rights', 'Can employ staff legally', 'Easier bank account opening'],
-    cons: ['Higher cost', 'Physical office or warehouse required', 'More documentation'],
-    timeline: '1–3 weeks',
-    approvals: ['Emirates ID', 'Trade name approval', 'Office tenancy contract'],
-    estCost: 'AED 3,000 – 10,000',
-    source: 'added.gov.ae',
-    activityIds: ['general_trade'],
-  },
-};
+function formatAED(n: number): string {
+  return n.toLocaleString('en-US');
+}
 
-export const BANKS: BankKBEntry[] = [
-  {
-    name: 'Wio Bank (digital, SME-friendly)',
-    minBalance: 'AED 0 (no minimum balance)',
-    minBalanceAED: 0,
-    requirements: ['Trade license', 'Emirates ID'],
-    docsNeeded: ['Trade license', 'Emirates ID'],
-    source: 'wio.io',
-  },
-  {
-    name: 'Mashreq Neo Business',
-    minBalance: 'AED 3,000',
-    minBalanceAED: 3000,
-    requirements: ['Trade license', 'Emirates ID'],
-    docsNeeded: ['Trade license', 'Emirates ID', 'Passport'],
-    source: 'mashreq.com',
-  },
-  {
-    name: 'Abu Dhabi Commercial Bank (ADCB)',
-    minBalance: 'AED 5,000 – 10,000',
-    minBalanceAED: 5000,
-    requirements: ['Trade license', 'Emirates ID'],
-    docsNeeded: ['Trade license', 'Emirates ID', 'Passport', 'Lease agreement (if applicable)'],
-    source: 'adcb.com',
-  },
-  {
-    name: 'First Abu Dhabi Bank (FAB)',
-    minBalance: 'AED 10,000',
-    minBalanceAED: 10000,
-    requirements: ['Trade license', 'Emirates ID', 'Passport copy'],
-    docsNeeded: ['Trade license', 'Emirates ID', 'Passport', 'Residence visa', 'Business profile'],
-    source: 'bankfab.com',
-  },
-  {
-    name: 'Emirates NBD',
-    minBalance: 'AED 10,000',
-    minBalanceAED: 10000,
-    requirements: ['Trade license', 'Emirates ID', 'Company documents'],
-    docsNeeded: ['Trade license', 'Emirates ID', 'Passport', 'Company memorandum'],
-    source: 'emiratesnbd.com',
-  },
-];
+function licenseCostRange(costs?: RawLicenseCosts): string {
+  if (!costs || costs.base_cost_aed === undefined) return 'Verify current fee with authority';
+  const base = costs.base_cost_aed;
+  if (costs.official_max_range_aed && costs.official_max_range_aed > base) {
+    return `AED ${formatAED(base)} – ${formatAED(costs.official_max_range_aed)}`;
+  }
+  return `AED ${formatAED(base)}+`;
+}
+
+// archetypeId -> license.id is in archetype.recommended_license_ids.
+// Invert once so each license knows which archetypes recommend it.
+const LICENSE_TO_ARCHETYPES: Record<string, string[]> = (() => {
+  const map: Record<string, string[]> = {};
+  for (const arch of KB.archetypes) {
+    for (const licId of arch.recommended_license_ids) {
+      (map[licId] ??= []).push(arch.id);
+    }
+  }
+  return map;
+})();
+
+function adaptAuthority(a: RawAuthority): Authority {
+  return {
+    id: a.id,
+    name: a.short_name ? `${a.name} (${a.short_name})` : a.name,
+    phone: a.phone,
+    contactUrl: a.source_url ?? a.service_platform ?? a.main_website ?? '',
+    website: (a.main_website ?? '').replace(/^https?:\/\//, ''),
+  };
+}
+
+function adaptLicense(l: RawLicense): LicenseKBEntry {
+  const auth = AUTHORITIES[l.issuing_authority_id];
+  return {
+    id: l.id,
+    type: l.name,
+    issuer: auth?.name ?? l.issuing_authority_id,
+    authorityId: l.issuing_authority_id,
+    bestFor: l.best_for ?? [],
+    estCost: licenseCostRange(l.costs),
+    officeRequired:
+      l.office_requirement?.office_required === undefined
+        ? undefined
+        : l.office_requirement.office_required
+        ? l.office_requirement.note ?? 'Office required'
+        : 'No office required',
+    approvals: l.required_documents ?? [],
+    stepSequence: l.step_sequence ?? [],
+    source: l.information_source ?? l.official_application_source ?? '',
+    activityIds: LICENSE_TO_ARCHETYPES[l.id] ?? [],
+  };
+}
+
+function adaptBank(b: RawBank): BankKBEntry {
+  return {
+    id: b.id,
+    name: b.bank_name,
+    bestFor: b.best_for ?? [],
+    plans: (b.plan_options ?? []).map(p => ({
+      name: p.account_name ?? p.plan_id ?? 'Plan',
+      monthlyFee: p.monthly_fee_aed !== undefined ? `AED ${formatAED(p.monthly_fee_aed)}/mo` : 'see bank',
+      bestFor: p.best_for ?? '',
+      features: p.included_features ?? [],
+    })),
+    notes: b.notes ?? '',
+    source: (b.source_url ?? b.website ?? '').replace(/^https?:\/\//, ''),
+  };
+}
+
+function adaptArchetype(a: RawArchetype): ActivityArchetype {
+  return {
+    id: a.id,
+    label: a.name,
+    stageSlots: STAGE_SLOTS,
+    candidateLicenseIds: a.recommended_license_ids,
+    likelyBankIds: a.likely_bank_ids ?? [],
+    fundingIds: a.funding_or_investment_ids ?? [],
+  };
+}
+
+function adaptBankLoan(l: RawBankLoan): BankLoanKBEntry {
+  return {
+    id: l.id,
+    provider: l.provider,
+    bestFor: l.best_for ?? [],
+    requiredDocuments: l.required_documents ?? [],
+    note: l.important_note ?? '',
+    source: (l.source_url ?? l.website ?? '').replace(/^https?:\/\//, ''),
+  };
+}
+
+function adaptFund(f: RawFund): FundingKBEntry {
+  return {
+    id: f.id,
+    provider: f.provider,
+    productName: f.product_name,
+    bestFor: f.best_for ?? [],
+    fundingUpTo: f.funding_up_to_aed !== undefined ? `AED ${formatAED(f.funding_up_to_aed)}` : 'see provider',
+    coverage: f.project_cost_coverage ?? '',
+    repayment:
+      f.repayment_period_months !== undefined
+        ? `${f.repayment_period_months}mo${f.grace_period_months ? ` (+${f.grace_period_months}mo grace)` : ''}`
+        : '',
+    eligibility: f.eligibility_note ?? '',
+    nextAction: f.concrete_next_action ?? '',
+    source: (f.source_url ?? f.website ?? '').replace(/^https?:\/\//, ''),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Built lookups
+// ---------------------------------------------------------------------------
+
+export const AUTHORITIES: Record<string, Authority> = Object.fromEntries(
+  KB.authorities.map(a => [a.id, adaptAuthority(a)])
+);
+
+export const LICENSES: Record<string, LicenseKBEntry> = Object.fromEntries(
+  KB.licenses.map(l => [l.id, adaptLicense(l)])
+);
+
+export const BANKS: BankKBEntry[] = KB.banks.map(adaptBank);
+
+export const BANK_LOANS: BankLoanKBEntry[] = KB.bank_loans.map(adaptBankLoan);
+
+export const FUNDS: Record<string, FundingKBEntry> = Object.fromEntries(
+  KB.government_investments_and_funds.map(f => [f.id, adaptFund(f)])
+);
+
+export const ARCHETYPES: ActivityArchetype[] = KB.archetypes.map(adaptArchetype);
+
+// ---------------------------------------------------------------------------
+// Accessors (stable API for consumers)
+// ---------------------------------------------------------------------------
 
 export function getArchetype(id: string): ActivityArchetype | undefined {
   return ARCHETYPES.find(a => a.id === id);
 }
 
-export function findArchetypeByGoal(goalText: string): ActivityArchetype {
-  const lower = goalText.toLowerCase();
-  let best = ARCHETYPES[0];
-  let bestScore = 0;
-  for (const arch of ARCHETYPES) {
-    const score = arch.keywords.filter(k => lower.includes(k)).length;
-    if (score > bestScore) {
-      bestScore = score;
-      best = arch;
-    }
-  }
-  return best;
-}
-
 export function getLicensesForArchetype(archetypeId: string): LicenseKBEntry[] {
-  return Object.values(LICENSES).filter(l => l.activityIds.includes(archetypeId));
+  const arch = getArchetype(archetypeId);
+  if (!arch) return [];
+  return arch.candidateLicenseIds
+    .map(id => LICENSES[id])
+    .filter((l): l is LicenseKBEntry => l !== undefined);
 }
 
-export function getBanksForCapital(capitalRange?: string | string[] | number): BankKBEntry[] {
-  const str = String(capitalRange ?? '').toLowerCase();
-  if (!str || str.includes('less') || str.includes('under') || str.includes('5k') || str.includes('10k')) {
-    return BANKS.filter(b => b.minBalanceAED <= 3000);
-  }
-  return BANKS;
+export function getBanksForArchetype(archetypeId: string): BankKBEntry[] {
+  const arch = getArchetype(archetypeId);
+  if (!arch || arch.likelyBankIds.length === 0) return BANKS;
+  const ranked = arch.likelyBankIds.map(id => BANKS.find(b => b.id === id)).filter((b): b is BankKBEntry => !!b);
+  return ranked.length ? ranked : BANKS;
 }
 
 export function getAuthority(id: string): Authority | undefined {
   return AUTHORITIES[id];
 }
 
+export function getFundingForArchetype(archetypeId: string): FundingKBEntry[] {
+  const arch = getArchetype(archetypeId);
+  if (!arch) return [];
+  return arch.fundingIds.map(id => FUNDS[id]).filter((f): f is FundingKBEntry => f !== undefined);
+}
+
+export function getBankLoans(): BankLoanKBEntry[] {
+  return BANK_LOANS;
+}
+
 export function getArchetypeList(): string {
   return ARCHETYPES.map(a => `- ${a.id}: ${a.label}`).join('\n');
 }
 
+// ---------------------------------------------------------------------------
+// LLM formatters
+// ---------------------------------------------------------------------------
+
 export function formatLicenseForLLM(l: LicenseKBEntry): string {
-  return `### ${l.type} (issued by ${l.issuer})
-- **Estimated cost:** ${l.estCost}
-- **Timeline:** ${l.timeline}
-- **Approvals required:** ${l.approvals.join(', ')}
-- **Pros:** ${l.pros.join(' · ')}
-- **Cons:** ${l.cons.join(' · ')}
-- **Source:** ${l.source}`;
+  const lines = [
+    `### ${l.type} (issued by ${l.issuer})`,
+    `- **Estimated cost:** ${l.estCost}`,
+    `- **Best for:** ${l.bestFor.join(' · ') || 'general'}`,
+  ];
+  if (l.officeRequired) lines.push(`- **Office:** ${l.officeRequired}`);
+  if (l.approvals.length) lines.push(`- **Required documents:** ${l.approvals.join(', ')}`);
+  if (l.stepSequence.length) lines.push(`- **Steps:** ${l.stepSequence.join(' → ')}`);
+  if (l.source) lines.push(`- **Source:** ${l.source}`);
+  return lines.join('\n');
 }
 
 export function formatLicensesForLLM(archetypeId: string): string {
@@ -354,15 +395,47 @@ export function formatLicensesForLLM(archetypeId: string): string {
 }
 
 export function formatBankForLLM(b: BankKBEntry): string {
-  return `### ${b.name}
-- **Minimum balance:** ${b.minBalance}
-- **Requirements:** ${b.requirements.join(', ')}
-- **Documents needed:** ${b.docsNeeded.join(', ')}
-- **Source:** ${b.source}`;
+  const lines = [`### ${b.name}`, `- **Best for:** ${b.bestFor.join(' · ') || 'general'}`];
+  for (const p of b.plans) {
+    lines.push(`- **${p.name}** (${p.monthlyFee})${p.bestFor ? ` — ${p.bestFor}` : ''}`);
+  }
+  if (b.notes) lines.push(`- **Notes:** ${b.notes}`);
+  if (b.source) lines.push(`- **Source:** ${b.source}`);
+  return lines.join('\n');
 }
 
-export function formatBanksForLLM(capitalRange?: string | string[] | number): string {
-  return getBanksForCapital(capitalRange).map(formatBankForLLM).join('\n\n');
+export function formatBanksForLLM(archetypeId?: string): string {
+  const banks = archetypeId ? getBanksForArchetype(archetypeId) : BANKS;
+  return banks.map(formatBankForLLM).join('\n\n');
+}
+
+export function formatFundForLLM(f: FundingKBEntry): string {
+  const lines = [
+    `### ${f.productName} — ${f.provider}`,
+    `- **Funding up to:** ${f.fundingUpTo}${f.coverage ? ` (covers ${f.coverage})` : ''}`,
+  ];
+  if (f.repayment) lines.push(`- **Repayment:** ${f.repayment}`);
+  if (f.bestFor.length) lines.push(`- **Best for:** ${f.bestFor.join(' · ')}`);
+  if (f.eligibility) lines.push(`- **Eligibility:** ${f.eligibility}`);
+  if (f.source) lines.push(`- **Source:** ${f.source}`);
+  return lines.join('\n');
+}
+
+export function formatBankLoanForLLM(l: BankLoanKBEntry): string {
+  const lines = [`### ${l.provider} business loan`];
+  if (l.bestFor.length) lines.push(`- **Best for:** ${l.bestFor.join(' · ')}`);
+  if (l.note) lines.push(`- **Note:** ${l.note}`);
+  if (l.source) lines.push(`- **Source:** ${l.source}`);
+  return lines.join('\n');
+}
+
+export function formatFundingForLLM(archetypeId: string): string {
+  const funds = getFundingForArchetype(archetypeId).map(formatFundForLLM);
+  const loans = BANK_LOANS.map(formatBankLoanForLLM);
+  const sections: string[] = [];
+  if (funds.length) sections.push(`**Government funds / grants (matched to activity):**\n${funds.join('\n\n')}`);
+  if (loans.length) sections.push(`**Bank loans (post-licence financing):**\n${loans.join('\n\n')}`);
+  return sections.join('\n\n') || 'No specific funding matched.';
 }
 
 export function formatArchetypeForLLM(a: ActivityArchetype): string {

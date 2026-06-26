@@ -24,6 +24,8 @@ struct JourneyView: View {
             || viewModel.isBackendBusy
     }
 
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+
     var body: some View {
         Group {
             if isWelcome {
@@ -32,7 +34,18 @@ struct JourneyView: View {
                 journeyExperience
             }
         }
-        .environment(\.layoutDirection, viewModel.layoutDirection)
+        // Arabic-first: drive RTL from the resolved journey direction so the
+        // whole screen (header, cards, dock) mirrors as one.
+        .irshadLayoutDirection(viewModel.layoutDirection)
+        // Keep the largest Dynamic Type sizes usable without clipping cards or
+        // pushing primary actions off-screen.
+        .irshadClampedDynamicType()
+        // Mirror the system Reduce Motion setting into the ViewModel so every
+        // child animation falls back to static emphasis together.
+        .onAppear { viewModel.reduceMotionPreferred = systemReduceMotion }
+        .onChange(of: systemReduceMotion) { _, newValue in
+            viewModel.reduceMotionPreferred = newValue
+        }
         .sheet(isPresented: savedPlanBinding) {
             SavedPlanView(viewModel: viewModel)
         }

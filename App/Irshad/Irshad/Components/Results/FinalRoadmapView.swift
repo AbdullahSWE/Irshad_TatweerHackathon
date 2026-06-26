@@ -86,7 +86,7 @@ struct FinalRoadmapView: View {
         VStack(alignment: .leading, spacing: IrshadTheme.Layout.spacingComfortable) {
             if let businessSummary, !businessSummary.isEmpty {
                 Text(businessSummary)
-                    .font(IrshadTheme.Typography.primaryBody)
+                    .font(IrshadTheme.Typography.primaryBodyDynamic)
                     .foregroundStyle(IrshadTheme.Colors.primaryText)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -154,13 +154,14 @@ struct FinalRoadmapView: View {
             ForEach(Array(steps.enumerated()), id: \.offset) { index, step in
                 HStack(alignment: .top, spacing: IrshadTheme.Layout.spacingStandard) {
                     Text("\(index + 1)")
-                        .font(IrshadTheme.Typography.statusMicrocopy)
+                        .font(IrshadTheme.Typography.statusMicrocopyDynamic)
                         .foregroundStyle(.white)
-                        .frame(width: 28, height: 28)
+                        .frame(minWidth: 28, minHeight: 28)
                         .background(Circle().fill(IrshadTheme.Colors.primaryAccent))
+                        .accessibilityHidden(true)
 
                     Text(step)
-                        .font(IrshadTheme.Typography.primaryBody)
+                        .font(IrshadTheme.Typography.primaryBodyDynamic)
                         .foregroundStyle(IrshadTheme.Colors.primaryText)
                         .fixedSize(horizontal: false, vertical: true)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -170,6 +171,8 @@ struct FinalRoadmapView: View {
                     RoundedRectangle(cornerRadius: IrshadTheme.Layout.controlRadius, style: .continuous)
                         .fill(IrshadTheme.Colors.surfaceElevated)
                 )
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(Text("Step \(index + 1): \(step)"))
             }
         }
     }
@@ -184,13 +187,18 @@ struct FinalRoadmapView: View {
                         .frame(maxWidth: .infinity, minHeight: IrshadTheme.Layout.minimumTapTarget)
                 }
                 .buttonStyle(DynamicCardPrimaryButtonStyle())
+                .accessibilityHint(Text(IrshadTheme.Accessibility.Hint.sharePlan))
+                .help(IrshadTheme.Accessibility.Label.sharePlan)
 
                 Button {
                     viewModel.copyFinalPlanSummary()
                 } label: {
                     Label(isSummaryCopied ? "Copied" : "Copy summary", systemImage: "doc.on.doc")
+                        .frame(minHeight: IrshadTheme.Layout.minimumTapTarget)
                 }
                 .buttonStyle(DynamicCardSecondaryButtonStyle())
+                .accessibilityHint(Text(IrshadTheme.Accessibility.Hint.copySummary))
+                .help(IrshadTheme.Accessibility.Label.copySummary)
             }
 
             Button {

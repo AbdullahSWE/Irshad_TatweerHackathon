@@ -42,7 +42,10 @@ struct DynamicCardRendererView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .animation(IrshadTheme.Animations.progressTransition, value: viewModel.isBackendBusy)
+        .animation(
+            IrshadTheme.Animations.resolved(IrshadTheme.Animations.progressTransition, reduceMotion: viewModel.reduceMotionPreferred),
+            value: viewModel.isBackendBusy
+        )
     }
 
     @ViewBuilder

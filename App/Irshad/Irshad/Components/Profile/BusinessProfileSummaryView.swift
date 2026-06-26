@@ -73,8 +73,14 @@ struct BusinessProfileSummaryView: View {
                 )
             }
             .transition(IrshadTheme.Animations.cardRevealTransition)
-            .animation(IrshadTheme.Animations.cardReveal, value: viewModel.profileSections)
-            .animation(IrshadTheme.Animations.progressTransition, value: viewModel.isBackendBusy)
+            .animation(
+                IrshadTheme.Animations.resolved(IrshadTheme.Animations.cardReveal, reduceMotion: viewModel.reduceMotionPreferred),
+                value: viewModel.profileSections
+            )
+            .animation(
+                IrshadTheme.Animations.resolved(IrshadTheme.Animations.progressTransition, reduceMotion: viewModel.reduceMotionPreferred),
+                value: viewModel.isBackendBusy
+            )
         }
     }
 
@@ -82,11 +88,11 @@ struct BusinessProfileSummaryView: View {
         HStack(alignment: .top, spacing: IrshadTheme.Layout.spacingStandard) {
             VStack(alignment: .leading, spacing: 6) {
                 Text("Business profile")
-                    .font(IrshadTheme.Typography.cardTitle)
+                    .font(IrshadTheme.Typography.cardTitleDynamic)
                     .foregroundStyle(IrshadTheme.Colors.primaryText)
 
                 Text("Details Irshad has captured so far")
-                    .font(IrshadTheme.Typography.secondaryLabel)
+                    .font(IrshadTheme.Typography.secondaryLabelDynamic)
                     .foregroundStyle(IrshadTheme.Colors.secondaryText)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -101,6 +107,8 @@ struct BusinessProfileSummaryView: View {
             .buttonStyle(.plain)
             .foregroundStyle(IrshadTheme.Colors.tertiaryText)
             .accessibilityLabel(Text("Copy business profile summary"))
+            .accessibilityHint(Text(IrshadTheme.Accessibility.Hint.copySummary))
+            .help("Copy business profile summary")
             .disabled(profileSummaryText.isEmpty)
         }
     }

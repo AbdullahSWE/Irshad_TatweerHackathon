@@ -65,9 +65,13 @@ struct VoiceControlHub: View {
             .disabled(isProcessing)
             .accessibilityLabel(Text(accessibilityTitle))
             .accessibilityHint(Text(accessibilityHint))
+            // Announce the live spoken status so VoiceOver users hear the same
+            // state the visible microcopy conveys.
+            .accessibilityValue(Text(statusText))
+            .help(accessibilityTitle)
 
             Text(statusText)
-                .font(IrshadTheme.Typography.statusMicrocopy)
+                .font(IrshadTheme.Typography.statusMicrocopyDynamic)
                 .foregroundStyle(isFailed ? IrshadTheme.Colors.warning : IrshadTheme.Colors.secondaryText)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
@@ -79,7 +83,7 @@ struct VoiceControlHub: View {
         .onChange(of: isListening) { _, newValue in
             pulse = newValue
         }
-        .animation(shouldReduceMotion ? IrshadTheme.Animations.reducedMotion : IrshadTheme.Animations.listeningPulse, value: pulse)
+        .animation(IrshadTheme.Animations.resolved(IrshadTheme.Animations.listeningPulse, reduceMotion: shouldReduceMotion), value: pulse)
         .animation(IrshadTheme.Animations.buttonFeedback, value: voiceState)
     }
 

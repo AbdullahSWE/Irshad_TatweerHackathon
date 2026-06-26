@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { getArchetypeList, getAuthority, getLicensesForArchetype, formatLicensesForLLM, formatBanksForLLM } from './kb';
+import { getArchetypeList, getAuthority, getLicensesForArchetype, formatLicensesForLLM, formatBanksForLLM, formatFundingForLLM } from './kb';
 import type {
   Session,
   Card,
@@ -263,7 +263,7 @@ export async function runBankingRec(session: Session): Promise<BankingResult> {
 Activity: ${session.archetypeId}
 
 ## Available banks
-${formatBanksForLLM(session.filledSlots.capital)}
+${formatBanksForLLM(session.archetypeId)}
 
 Rank by likelihood of approval. Set likelyToApprove: true if capital meets minimum balance AND profile is straightforward.
 
@@ -299,7 +299,11 @@ Verify: ${verifyResult.status === 'verified' ? 'facts confirmed' : 'not verified
 Confidence: ${analysisResult.confidence}
 Unverified: ${analysisResult.unverified.join(', ') || 'none'}
 
+## Funding options (use ONLY these — do not invent grants or loans)
+${formatFundingForLLM(session.archetypeId)}
+
 Create 4–7 step roadmap. Steps must be concrete and ordered. nextAction = first thing they can do today.
+If a government fund or loan from the KB above fits this founder, include a funding step in the roadmap and list matches in "funding". Government funds usually require an Emirati founder — respect the eligibility notes.
 
 Return JSON:
 {
@@ -307,6 +311,7 @@ Return JSON:
   "totalEstCost": "AED X – Y",
   "totalTimeline": "X–Y weeks",
   "nextAction": "<one clear action they can take today>",
+  "funding": [{ "name": "<product name>", "provider": "<provider>", "fundingUpTo": "AED ...", "note": "<eligibility/fit, 1 line>" }],
   "confidence": <from analysis>,
   "unverified": ["..."]
 }`,

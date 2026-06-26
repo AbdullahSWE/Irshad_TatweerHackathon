@@ -96,11 +96,19 @@ export interface BankingResult {
   banks: BankOption[];
 }
 
+export interface FundingOption {
+  name: string;
+  provider: string;
+  fundingUpTo: string;
+  note: string;
+}
+
 export interface PlanResult {
   roadmap: string[];
   totalEstCost: string;
   totalTimeline: string;
   nextAction: string;
+  funding?: FundingOption[];
   confidence: number;
   unverified: string[];
 }
