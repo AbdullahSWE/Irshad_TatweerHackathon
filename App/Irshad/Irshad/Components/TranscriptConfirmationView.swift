@@ -5,6 +5,7 @@ struct TranscriptConfirmationView: View {
     var confidence: Double?
     var isProcessing: Bool
     var errorMessage: String?
+    var language: AppLanguage = .en
     var confirmTitle: String
     var retryListening: () -> Void
     var confirm: () -> Void
@@ -19,16 +20,26 @@ struct TranscriptConfirmationView: View {
         }
 
         if confidence < 0.62 {
-            return "الثقة منخفضة. عدل النص أو أعد التسجيل"
+            switch language {
+            case .ar:
+                return "الثقة منخفضة. عدل النص أو أعد التسجيل"
+            case .en:
+                return "Low confidence. Edit the text or record again"
+            }
         }
 
-        return "الثقة \(Int((confidence * 100).rounded()))%"
+        switch language {
+        case .ar:
+            return "الثقة \(Int((confidence * 100).rounded()))%"
+        case .en:
+            return "\(Int((confidence * 100).rounded()))% confidence"
+        }
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: IrshadTheme.Layout.spacingStandard) {
             HStack(alignment: .center) {
-                Text("راجع ما سمعناه")
+                Text(reviewTitle)
                     .font(IrshadTheme.Typography.secondaryLabel)
                     .foregroundStyle(IrshadTheme.Colors.primaryText)
 
@@ -52,7 +63,7 @@ struct TranscriptConfirmationView: View {
                     }
 
                 if transcript.wrappedValue.isEmpty {
-                    Text("سيظهر النص هنا ويمكنك تعديله")
+                    Text(placeholder)
                         .font(IrshadTheme.Typography.secondaryLabel)
                         .foregroundStyle(IrshadTheme.Colors.secondaryText)
                         .padding(IrshadTheme.Layout.spacingComfortable)
@@ -77,7 +88,7 @@ struct TranscriptConfirmationView: View {
 
             HStack(spacing: IrshadTheme.Layout.spacingStandard) {
                 Button(action: retryListening) {
-                    Label("أعد", systemImage: "arrow.counterclockwise")
+                    Label(retryTitle, systemImage: "arrow.counterclockwise")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(SecondaryInputButtonStyle())
@@ -107,6 +118,33 @@ struct TranscriptConfirmationView: View {
 
     private var isLowConfidence: Bool {
         (confidence ?? 1) < 0.62
+    }
+
+    private var reviewTitle: String {
+        switch language {
+        case .ar:
+            return "راجع ما سمعناه"
+        case .en:
+            return "Review what we heard"
+        }
+    }
+
+    private var placeholder: String {
+        switch language {
+        case .ar:
+            return "سيظهر النص هنا ويمكنك تعديله"
+        case .en:
+            return "The transcript appears here and you can edit it"
+        }
+    }
+
+    private var retryTitle: String {
+        switch language {
+        case .ar:
+            return "أعد"
+        case .en:
+            return "Retry"
+        }
     }
 }
 
@@ -145,4 +183,3 @@ struct SecondaryInputButtonStyle: ButtonStyle {
             .animation(IrshadTheme.Animations.buttonFeedback, value: configuration.isPressed)
     }
 }
-

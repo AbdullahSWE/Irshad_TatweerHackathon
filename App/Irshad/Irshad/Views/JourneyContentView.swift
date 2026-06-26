@@ -1,18 +1,18 @@
 import SwiftUI
 
-/// Scrolling spine of the journey: header for orientation, the current prompt and
-/// active card at the centre of attention, progressive profile context, and the
-/// output stage. Keeps the active prompt/card reachable and moves VoiceOver focus
-/// to it whenever the backend supplies a new step.
+/// Scrolling spine of the journey: header for orientation, the backend-provided
+/// card at the centre of attention, progressive profile context, and the output
+/// stage. Keeps the active card reachable and moves VoiceOver focus to it
+/// whenever the backend supplies a new step.
 struct JourneyContentView: View {
     var viewModel: JourneyViewModel
 
     private enum AnchorID: Hashable {
-        case prompt
+        case card
         case output
     }
 
-    @AccessibilityFocusState private var promptFocused: Bool
+    @AccessibilityFocusState private var cardFocused: Bool
 
     /// Bottom inset so the anchored input dock never covers scrolling content.
     private var bottomInset: CGFloat {
@@ -29,18 +29,9 @@ struct JourneyContentView: View {
                         onCancel: { viewModel.cancelCurrentOperation() }
                     )
 
-                    CurrentPromptView(
-                        currentPrompt: viewModel.currentPrompt,
-                        framingMessage: viewModel.framingMessage,
-                        currentAssistantMessage: viewModel.currentAssistantMessage,
-                        isBackendBusy: viewModel.isBackendBusy,
-                        journeyStatus: viewModel.journeyStatus
-                    )
-                    .id(AnchorID.prompt)
-                    .accessibilityFocused($promptFocused)
-                    .accessibilityAddTraits(.isHeader)
-
                     DynamicCardRendererView(viewModel: viewModel)
+                        .id(AnchorID.card)
+                        .accessibilityFocused($cardFocused)
 
                     BusinessProfileSummaryView(viewModel: viewModel)
 
@@ -55,10 +46,10 @@ struct JourneyContentView: View {
             }
             .scrollDismissesKeyboard(.interactively)
             .onChange(of: viewModel.currentPrompt) { _, _ in
-                focusActivePrompt(using: proxy)
+                focusActiveCard(using: proxy)
             }
             .onChange(of: viewModel.currentCard?.id) { _, _ in
-                focusActivePrompt(using: proxy)
+                focusActiveCard(using: proxy)
             }
             .onChange(of: viewModel.journeyStatus) { _, newValue in
                 revealOutputIfNeeded(for: newValue, using: proxy)
@@ -66,13 +57,13 @@ struct JourneyContentView: View {
         }
     }
 
-    /// Keep the freshly supplied prompt/card in view and hand VoiceOver focus to
-    /// its title so users always land on the current step.
-    private func focusActivePrompt(using proxy: ScrollViewProxy) {
+    /// Keep the freshly supplied card in view and hand VoiceOver focus to its
+    /// rendered surface so users always land on the current step.
+    private func focusActiveCard(using proxy: ScrollViewProxy) {
         withAnimation(IrshadTheme.Animations.cardReveal) {
-            proxy.scrollTo(AnchorID.prompt, anchor: .top)
+            proxy.scrollTo(AnchorID.card, anchor: .top)
         }
-        promptFocused = true
+        cardFocused = true
     }
 
     private func revealOutputIfNeeded(for status: JourneyStatus, using proxy: ScrollViewProxy) {

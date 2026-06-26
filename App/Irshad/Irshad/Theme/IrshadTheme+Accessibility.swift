@@ -51,13 +51,13 @@ extension IrshadTheme.Typography {
     // Scalable counterparts of the fixed-size tokens above. `Font.system(size:)`
     // does NOT respond to Dynamic Type; these `.system(_ style:)` fonts do, while
     // staying close to the design sizes. Use these in user-facing copy.
-    static let largeTitleDynamic = Font.system(.largeTitle, design: .default).weight(.bold)
-    static let sectionTitleDynamic = Font.system(.title, design: .default).weight(.semibold)
-    static let stepIndicatorDynamic = Font.system(.title3, design: .default).weight(.semibold)
-    static let primaryBodyDynamic = Font.system(.body, design: .default)
-    static let cardTitleDynamic = Font.system(.headline, design: .default)
-    static let secondaryLabelDynamic = Font.system(.subheadline, design: .default)
-    static let statusMicrocopyDynamic = Font.system(.footnote, design: .default).weight(.medium)
+    static let largeTitleDynamic = appDynamic(.largeTitle, weight: .bold)
+    static let sectionTitleDynamic = appDynamic(.title, weight: .semibold)
+    static let stepIndicatorDynamic = appDynamic(.title3, weight: .semibold)
+    static let primaryBodyDynamic = appDynamic(.body)
+    static let cardTitleDynamic = appDynamic(.headline, weight: .semibold)
+    static let secondaryLabelDynamic = appDynamic(.subheadline)
+    static let statusMicrocopyDynamic = appDynamic(.footnote, weight: .medium)
 }
 
 // MARK: - Reduced motion

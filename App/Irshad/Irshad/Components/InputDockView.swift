@@ -47,7 +47,8 @@ struct InputDockView: View {
                     confidence: viewModel.transcriptConfidence,
                     isProcessing: isProcessing,
                     errorMessage: viewModel.inputErrorMessage,
-                    confirmTitle: isWelcome ? "اعتمد" : "أرسل",
+                    language: viewModel.currentLanguage,
+                    confirmTitle: confirmTitle,
                     retryListening: viewModel.retryListening,
                     confirm: confirmTranscript
                 )
@@ -56,6 +57,7 @@ struct InputDockView: View {
             VoiceControlHub(
                 voiceState: viewModel.voiceState,
                 transcriptState: viewModel.transcriptState,
+                language: viewModel.currentLanguage,
                 reduceMotion: viewModel.reduceMotionPreferred,
                 beginListening: viewModel.beginListening,
                 stopListening: viewModel.stopListening,
@@ -72,7 +74,8 @@ struct InputDockView: View {
                 text: textBinding,
                 isExpanded: viewModel.isTextEntryExpanded || viewModel.voiceState.isFailed,
                 isProcessing: isProcessing,
-                submitTitle: isWelcome ? "ابدأ بالنص" : "أرسل الإجابة",
+                language: viewModel.currentLanguage,
+                submitTitle: submitTitle,
                 submit: submitTypedInput
             )
         }
@@ -121,6 +124,32 @@ struct InputDockView: View {
             viewModel.submitCurrentAnswer()
         }
     }
+
+    private var confirmTitle: String {
+        switch (isWelcome, viewModel.currentLanguage) {
+        case (true, .ar):
+            return "اعتمد"
+        case (true, .en):
+            return "Use transcript"
+        case (false, .ar):
+            return "أرسل"
+        case (false, .en):
+            return "Send"
+        }
+    }
+
+    private var submitTitle: String {
+        switch (isWelcome, viewModel.currentLanguage) {
+        case (true, .ar):
+            return "ابدأ بالنص"
+        case (true, .en):
+            return "Start with text"
+        case (false, .ar):
+            return "أرسل الإجابة"
+        case (false, .en):
+            return "Send answer"
+        }
+    }
 }
 
 private extension VoiceState {
@@ -131,4 +160,3 @@ private extension VoiceState {
         return false
     }
 }
-

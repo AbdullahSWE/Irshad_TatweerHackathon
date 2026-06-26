@@ -35,6 +35,8 @@ final class JourneyViewModel {
     var layoutDirection: LayoutDirection {
         currentLanguage == .ar ? .rightToLeft : .leftToRight
     }
+    var selectedVoicePersona: VoicePersona
+    var hasStartedOnboarding: Bool
     var sessionId: String
     var journeyStatus: JourneyStatus
     var currentPhase: JourneyPhase
@@ -121,7 +123,9 @@ final class JourneyViewModel {
         self.clipboardClient = clipboardClient ?? ClipboardClient()
 
         appTitle = "Irshad"
-        currentLanguage = .ar
+        currentLanguage = .en
+        selectedVoicePersona = .female
+        hasStartedOnboarding = false
         sessionId = ""
         journeyStatus = .empty
         currentPhase = .goal
@@ -182,20 +186,50 @@ final class JourneyViewModel {
 }
 
 extension JourneyViewModel {
-    func startJourneyWithVoice() {
+    func selectLanguage(_ language: AppLanguage) {
+        currentLanguage = language
+    }
+
+    func selectVoicePersona(_ persona: VoicePersona) {
+        selectedVoicePersona = persona
+    }
+
+    var onboardingGreetingMessage: String {
+        let name = selectedVoicePersona.displayName(in: currentLanguage)
+
+        switch currentLanguage {
+        case .ar:
+            return "السلام عليكم، أنا \(name) وسأساعدك في إعداد مشروعك. أخبرني ما نوع المشروع الذي تريد تأسيسه."
+        case .en:
+            return "Assalamu Alaikum, I'm \(name) and I'm here to help you set up your business. Please share what business you'd like to set up."
+        }
+    }
+
+    func beginOnboarding() {
+        guard !hasStartedOnboarding else {
+            beginListening()
+            return
+        }
+
+        hasStartedOnboarding = true
+        currentPrompt = onboardingGreetingMessage
         beginListening()
+    }
+
+    func startJourneyWithVoice() {
+        beginOnboarding()
     }
 
     func startJourneyWithText(_ text: String) {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedText.isEmpty else {
-            inputErrorMessage = "Tell Irshad what you want to set up first."
+            inputErrorMessage = localizedInputError(.missingBusinessIdea)
             isTextEntryExpanded = true
             return
         }
 
         stopListening()
-        currentLanguage = inferredLanguage(for: trimmedText)
+        hasStartedOnboarding = true
         let requestSessionID = sessionId.isEmpty ? UUID().uuidString : sessionId
         sessionId = requestSessionID
         pendingOperation = .startText(trimmedText)
@@ -211,7 +245,7 @@ extension JourneyViewModel {
         let value = acceptedText.isEmpty ? fallbackText : acceptedText
 
         guard !value.isEmpty else {
-            inputErrorMessage = "Add a short answer first."
+            inputErrorMessage = localizedInputError(.missingAnswer)
             isTextEntryExpanded = true
             return
         }
@@ -333,7 +367,7 @@ extension JourneyViewModel {
         stopListening()
         let accepted = editableTranscript.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !accepted.isEmpty else {
-            inputErrorMessage = "We did not catch enough speech. You can type your answer instead."
+            inputErrorMessage = localizedInputError(.emptyTranscript)
             return
         }
 
@@ -432,7 +466,7 @@ extension JourneyViewModel {
         if let slot = currentCard.slot, slot == correctionTarget.fieldID {
             submitCardAnswer(currentCard.cardId)
         } else {
-            toast = ToastState(id: UUID().uuidString, message: "Correction saved locally for this session.")
+            toast = ToastState(id: UUID().uuidString, message: "تم حفظ التصحيح لهذه الجلسة.")
         }
         self.correctionTarget = nil
     }
@@ -447,15 +481,15 @@ extension JourneyViewModel {
 
     func savePreferredBank(_ id: String) {
         expandedRecommendationIDs.insert(id)
-        toast = ToastState(id: "preferred-bank-\(id)", message: "Bank marked as preferred.")
+        toast = ToastState(id: "preferred-bank-\(id)", message: "تم حفظ البنك كخيار مفضل.")
     }
 
     func openURL(_ url: URL) {
         guard journeyRouter.canOpenBackendProvidedURL(url), isKnownBackendURL(url) else {
             recoverableError = RecoverableError(
                 id: UUID().uuidString,
-                title: "Link unavailable",
-                message: "This link was not provided by the current journey response.",
+                title: "الرابط غير متاح",
+                message: "هذا الرابط غير وارد في نتيجة الرحلة الحالية.",
                 retryKey: nil
             )
             return
@@ -469,8 +503,8 @@ extension JourneyViewModel {
               let url = journeyRouter.makeTelephoneURL(from: phoneNumber) else {
             recoverableError = RecoverableError(
                 id: UUID().uuidString,
-                title: "Phone unavailable",
-                message: "This phone number was not provided by the current journey response.",
+                title: "رقم الهاتف غير متاح",
+                message: "هذا الرقم غير وارد في نتيجة الرحلة الحالية.",
                 retryKey: nil
             )
             return
@@ -482,7 +516,7 @@ extension JourneyViewModel {
     func copyText(_ text: String) {
         clipboardClient.copy(text)
         copiedItemID = text
-        toast = ToastState(id: UUID().uuidString, message: "Copied.")
+        toast = ToastState(id: UUID().uuidString, message: "تم النسخ.")
     }
 
     func markNextStepDone(_ id: String) {
@@ -515,8 +549,8 @@ extension JourneyViewModel {
         guard let plan = finalPlan ?? savedPlanSummary?.plan else {
             recoverableError = RecoverableError(
                 id: UUID().uuidString,
-                title: "Copy unavailable",
-                message: "A final plan is needed before copying a summary.",
+                title: "النسخ غير متاح",
+                message: "نحتاج إلى الخطة النهائية قبل نسخ الملخص.",
                 retryKey: nil
             )
             return
@@ -525,7 +559,7 @@ extension JourneyViewModel {
         let summary = shareService.makeCopySummary(plan, trustFacts: currentTrustFactBundle())
         clipboardClient.copy(summary)
         copiedItemID = "final-plan-summary"
-        toast = ToastState(id: UUID().uuidString, message: "Plan summary copied.")
+        toast = ToastState(id: UUID().uuidString, message: "تم نسخ ملخص الخطة.")
     }
 
     func continueWithAssistant() {
@@ -542,6 +576,39 @@ extension JourneyViewModel {
 }
 
 private extension JourneyViewModel {
+    enum InputErrorCopyKey {
+        case missingBusinessIdea
+        case missingAnswer
+        case emptyTranscript
+        case voiceUnavailable
+        case voiceRecognitionFailed
+    }
+
+    func localizedInputError(_ key: InputErrorCopyKey) -> String {
+        switch (key, currentLanguage) {
+        case (.missingBusinessIdea, .ar):
+            return "اكتب فكرة مشروعك أولاً."
+        case (.missingBusinessIdea, .en):
+            return "Type your business idea first."
+        case (.missingAnswer, .ar):
+            return "أضف إجابة قصيرة أولاً."
+        case (.missingAnswer, .en):
+            return "Add a short answer first."
+        case (.emptyTranscript, .ar):
+            return "لم نلتقط كلاماً كافياً. يمكنك كتابة الإجابة بدلاً من ذلك."
+        case (.emptyTranscript, .en):
+            return "We did not catch enough speech. You can type instead."
+        case (.voiceUnavailable, .ar):
+            return "إذن الصوت غير متاح. يمكنك الكتابة بدلاً من ذلك."
+        case (.voiceUnavailable, .en):
+            return "Voice permission is unavailable. You can type instead."
+        case (.voiceRecognitionFailed, .ar):
+            return "توقف التعرف على الصوت. يمكنك المحاولة مرة أخرى أو الكتابة."
+        case (.voiceRecognitionFailed, .en):
+            return "Speech recognition stopped. You can try again or type."
+        }
+    }
+
     func launchBackendOperation(
         status: JourneyStatus,
         operation: @MainActor @escaping () async throws -> Void
@@ -626,6 +693,7 @@ private extension JourneyViewModel {
         textFallbackValue = ""
         pendingOperation = nil
         refreshDerivedState()
+        await speakCurrentPrompt()
     }
 
     func performNextCard(cardID: String, appendLocalAnswer: Bool) async throws {
@@ -695,6 +763,7 @@ private extension JourneyViewModel {
             cardAnswerDraft = .empty
             cardValidationMessage = nil
             refreshDerivedState()
+            speakCurrentPromptAfterResponse()
             return false
         case .gateOpen:
             currentCard = response.card
@@ -717,8 +786,8 @@ private extension JourneyViewModel {
                 pendingOperation = .nextCard(cardID: currentCard?.cardId ?? "")
                 recoverableError = RecoverableError(
                     id: UUID().uuidString,
-                    title: "Journey paused",
-                    message: "Irshad needs one more response before preparing the final plan.",
+                    title: "توقفت الرحلة مؤقتاً",
+                    message: "يحتاج إرشاد إلى إجابة أخرى قبل إعداد الخطة النهائية.",
                     retryKey: "next"
                 )
                 journeyStatus = .partial
@@ -727,8 +796,8 @@ private extension JourneyViewModel {
         case .unknown:
             recoverableError = RecoverableError(
                 id: UUID().uuidString,
-                title: "Journey paused",
-                message: "Irshad received an unexpected journey update. You can retry this step.",
+                title: "توقفت الرحلة مؤقتاً",
+                message: "وصل تحديث غير متوقع للرحلة. يمكنك إعادة هذه الخطوة.",
                 retryKey: "next"
             )
             journeyStatus = .partial
@@ -824,7 +893,7 @@ private extension JourneyViewModel {
 
     func performOpenSavedPlan() async throws {
         guard let summary = try await localPlanStore.loadSavedPlan() else {
-            toast = ToastState(id: UUID().uuidString, message: "No saved plan found.")
+            toast = ToastState(id: UUID().uuidString, message: "لم يتم العثور على خطة محفوظة.")
             pendingOperation = nil
             return
         }
@@ -858,9 +927,10 @@ private extension JourneyViewModel {
     func performListening() async {
         let authorization = await speechRecognitionService.requestAuthorization()
         guard authorization == .authorized else {
-            voiceState = .failed("Speech permission is not available. You can type instead.")
+            let message = localizedInputError(.voiceUnavailable)
+            voiceState = .failed(message)
             transcriptState = .empty
-            inputErrorMessage = "Speech permission is not available. You can type instead."
+            inputErrorMessage = message
             isTextEntryExpanded = true
             speechTask = nil
             return
@@ -889,16 +959,38 @@ private extension JourneyViewModel {
         } catch is CancellationError {
             await speechRecognitionService.cancelListening()
         } catch SpeechError.permissionDenied {
-            voiceState = .failed("Speech permission is not available. You can type instead.")
-            inputErrorMessage = "Speech permission is not available. You can type instead."
+            let message = localizedInputError(.voiceUnavailable)
+            voiceState = .failed(message)
+            inputErrorMessage = message
             isTextEntryExpanded = true
         } catch {
-            voiceState = .failed("Speech recognition stopped. You can try again or type instead.")
-            inputErrorMessage = "Speech recognition stopped. You can try again or type instead."
+            let message = localizedInputError(.voiceRecognitionFailed)
+            voiceState = .failed(message)
+            inputErrorMessage = message
             isTextEntryExpanded = true
         }
 
         speechTask = nil
+    }
+
+    func speakCurrentPrompt() async {
+        let text = [
+            currentPrompt,
+            currentAssistantMessage,
+            framingMessage
+        ]
+        .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+        .first { !$0.isEmpty }
+
+        guard let text else { return }
+        await speechSynthesisService.speak(text, language: currentLanguage, voice: selectedVoicePersona)
+    }
+
+    func speakCurrentPromptAfterResponse() {
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            await self.speakCurrentPrompt()
+        }
     }
 }
 
@@ -915,7 +1007,7 @@ private extension JourneyViewModel {
             if allowsEmptyAnswer(card) {
                 return .bool(true)
             }
-            throw ViewModelError.invalidAnswer("Choose or type an answer before continuing.")
+            throw ViewModelError.invalidAnswer("اختر أو اكتب إجابة قبل المتابعة.")
         }
 
         switch cardAnswerDraft.value {
@@ -923,10 +1015,10 @@ private extension JourneyViewModel {
             if allowsEmptyAnswer(card) {
                 return .bool(true)
             }
-            throw ViewModelError.invalidAnswer("Choose or type an answer before continuing.")
+            throw ViewModelError.invalidAnswer("اختر أو اكتب إجابة قبل المتابعة.")
         case .singleOption(let optionID):
             guard let option = card.options.first(where: { $0.id == optionID }) else {
-                throw ViewModelError.invalidAnswer("Choose an available option.")
+                throw ViewModelError.invalidAnswer("اختر خياراً متاحاً.")
             }
             return .string(option.value ?? option.label)
         case .multiOptions(let optionIDs):
@@ -934,19 +1026,19 @@ private extension JourneyViewModel {
                 .filter { optionIDs.contains($0.id) }
                 .map { JSONValue.string($0.value ?? $0.label) }
             guard !values.isEmpty else {
-                throw ViewModelError.invalidAnswer("Choose at least one option.")
+                throw ViewModelError.invalidAnswer("اختر خياراً واحداً على الأقل.")
             }
             return .array(values)
         case .text(let value):
             let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !trimmed.isEmpty else {
-                throw ViewModelError.invalidAnswer("Type an answer before continuing.")
+                throw ViewModelError.invalidAnswer("اكتب إجابة قبل المتابعة.")
             }
             return .string(trimmed)
         case .numberString(let value):
             let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !trimmed.isEmpty else {
-                throw ViewModelError.invalidAnswer("Add a number before continuing.")
+                throw ViewModelError.invalidAnswer("أضف رقماً قبل المتابعة.")
             }
             if let number = Double(trimmed) {
                 return .number(number)
@@ -959,7 +1051,7 @@ private extension JourneyViewModel {
                 .filter { itemIDs.contains($0.id) }
                 .map { JSONValue.string($0.value ?? $0.label) }
             guard !values.isEmpty || allowsEmptyAnswer(card) else {
-                throw ViewModelError.invalidAnswer("Choose at least one item.")
+                throw ViewModelError.invalidAnswer("اختر عنصراً واحداً على الأقل.")
             }
             return .array(values)
         }
@@ -1103,7 +1195,7 @@ private extension JourneyViewModel {
 
         recoverableError = RecoverableError(
             id: UUID().uuidString,
-            title: "Irshad needs another try",
+            title: "يحتاج إرشاد إلى محاولة أخرى",
             message: userSafeMessage(for: error),
             retryKey: retryKey
         )
@@ -1120,21 +1212,21 @@ private extension JourneyViewModel {
     func userSafeMessage(for error: Error) -> String {
         switch error {
         case APIError.timeout:
-            return "The request took too long. Your current journey is still here, and you can retry."
+            return "استغرق الطلب وقتاً طويلاً. رحلتك الحالية محفوظة ويمكنك إعادة المحاولة."
         case APIError.transport:
-            return "Irshad could not reach the service. Your current journey is still here, and you can retry."
+            return "تعذر على إرشاد الوصول إلى الخدمة. رحلتك الحالية محفوظة ويمكنك إعادة المحاولة."
         case APIError.badStatus:
-            return "Irshad could not complete this step. Your current journey is still here, and you can retry."
+            return "تعذر على إرشاد إكمال هذه الخطوة. رحلتك الحالية محفوظة ويمكنك إعادة المحاولة."
         case APIError.decoding:
-            return "Irshad received a response it could not read safely. You can retry this step."
+            return "وصلت استجابة لم يتمكن إرشاد من قراءتها بأمان. يمكنك إعادة هذه الخطوة."
         case ViewModelError.noActiveSession:
-            return "Start a journey before continuing."
+            return "ابدأ رحلة قبل المتابعة."
         case ViewModelError.cardUnavailable:
-            return "This question is no longer available. You can retry the current step."
+            return "هذا السؤال لم يعد متاحاً. يمكنك إعادة الخطوة الحالية."
         case ViewModelError.finalPlanUnavailable:
-            return "A final plan is needed before using this action."
+            return "نحتاج إلى خطة نهائية قبل استخدام هذا الإجراء."
         default:
-            return "Something interrupted this step. Your current journey is still here, and you can retry."
+            return "حدث ما أوقف هذه الخطوة. رحلتك الحالية محفوظة ويمكنك إعادة المحاولة."
         }
     }
 

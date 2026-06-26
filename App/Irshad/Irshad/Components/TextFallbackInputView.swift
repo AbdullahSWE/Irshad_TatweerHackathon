@@ -4,6 +4,7 @@ struct TextFallbackInputView: View {
     var text: Binding<String>
     var isExpanded: Bool
     var isProcessing: Bool
+    var language: AppLanguage = .en
     var submitTitle: String
     var submit: () -> Void
 
@@ -14,7 +15,7 @@ struct TextFallbackInputView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: IrshadTheme.Layout.spacingStandard) {
             HStack {
-                Label("أو اكتب", systemImage: "keyboard")
+                Label(inputLabel, systemImage: "keyboard")
                     .font(IrshadTheme.Typography.statusMicrocopy)
                     .foregroundStyle(IrshadTheme.Colors.secondaryText)
 
@@ -31,7 +32,7 @@ struct TextFallbackInputView: View {
                         }
 
                     if text.wrappedValue.isEmpty {
-                        Text("اكتب فكرتك أو إجابتك")
+                        Text(placeholder)
                             .font(IrshadTheme.Typography.secondaryLabel)
                             .foregroundStyle(IrshadTheme.Colors.secondaryText)
                             .padding(.horizontal, IrshadTheme.Layout.spacingComfortable)
@@ -74,5 +75,22 @@ struct TextFallbackInputView: View {
                 }
         }
     }
-}
 
+    private var inputLabel: String {
+        switch language {
+        case .ar:
+            return "أو اكتب"
+        case .en:
+            return "Or type"
+        }
+    }
+
+    private var placeholder: String {
+        switch language {
+        case .ar:
+            return "اكتب فكرتك أو إجابتك"
+        case .en:
+            return "Type your idea or answer"
+        }
+    }
+}

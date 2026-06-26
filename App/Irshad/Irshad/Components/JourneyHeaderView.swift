@@ -53,12 +53,12 @@ struct JourneyHeaderView: View {
             if shouldShowRecoveryActions {
                 HStack(spacing: IrshadTheme.Layout.spacingStandard) {
                     if let onRetry {
-                        Button("Retry", action: onRetry)
+                        Button("أعد المحاولة", action: onRetry)
                             .buttonStyle(HeaderActionButtonStyle(tone: .primary))
                     }
 
                     if let onCancel {
-                        Button("Cancel", action: onCancel)
+                        Button("إلغاء", action: onCancel)
                             .buttonStyle(HeaderActionButtonStyle(tone: .secondary))
                     }
                 }
@@ -88,7 +88,7 @@ struct JourneyHeaderView: View {
             return sessionLabel
         }
 
-        return "Start a guided business setup journey."
+        return "ابدأ رحلة موجهة لتأسيس مشروعك."
     }
 
     private var sessionLabel: String? {
@@ -102,28 +102,28 @@ struct JourneyHeaderView: View {
 
     private var statusTitle: String {
         if viewModel.isBackendBusy {
-            return "Updating"
+            return "جار التحديث"
         }
 
         switch viewModel.journeyStatus {
         case .empty:
-            return "Ready"
+            return "جاهز"
         case .preparing:
-            return "Preparing"
+            return "نجهز"
         case .collecting:
-            return "Collecting"
+            return "نجمع التفاصيل"
         case .processing:
-            return "Processing"
+            return "نعالج"
         case .gateOpen:
-            return "Ready"
+            return "جاهز"
         case .showingResults:
-            return "Results"
+            return "النتائج"
         case .complete:
-            return "Complete"
+            return "مكتمل"
         case .partial:
-            return "Partial"
+            return "جزئي"
         case .failed:
-            return "Needs retry"
+            return "يحتاج إعادة"
         }
     }
 

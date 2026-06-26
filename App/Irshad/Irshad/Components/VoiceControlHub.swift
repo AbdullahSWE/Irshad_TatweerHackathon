@@ -3,6 +3,7 @@ import SwiftUI
 struct VoiceControlHub: View {
     var voiceState: VoiceState
     var transcriptState: TranscriptState
+    var language: AppLanguage = .en
     var reduceMotion: Bool
     var beginListening: () -> Void
     var stopListening: () -> Void
@@ -118,17 +119,27 @@ struct VoiceControlHub: View {
     }
 
     private var statusText: String {
-        switch voiceState {
-        case .idle:
+        switch (voiceState, language) {
+        case (.idle, .ar):
             return transcriptState == .accepted ? "تم حفظ الإجابة" : "اضغط وتحدث"
-        case .listening:
+        case (.idle, .en):
+            return transcriptState == .accepted ? "Answer saved" : "Tap and speak"
+        case (.listening, .ar):
             return "نستمع الآن"
-        case .processing:
+        case (.listening, .en):
+            return "Listening now"
+        case (.processing, .ar):
             return "جاري التحضير"
-        case .transcriptReady:
+        case (.processing, .en):
+            return "Getting ready"
+        case (.transcriptReady, .ar):
             return "راجع النص ثم أرسله"
-        case .failed(let message):
+        case (.transcriptReady, .en):
+            return "Review the text, then send"
+        case (.failed(let message), .ar):
             return message.isEmpty ? "تعذر التسجيل. حاول مرة أخرى" : message
+        case (.failed(let message), .en):
+            return message.isEmpty ? "Recording failed. Try again" : message
         }
     }
 
@@ -169,4 +180,3 @@ struct VoiceControlHub: View {
         }
     }
 }
-

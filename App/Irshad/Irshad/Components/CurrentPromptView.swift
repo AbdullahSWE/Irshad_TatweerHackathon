@@ -29,7 +29,7 @@ struct CurrentPromptView: View {
                 ProgressView()
                     .controlSize(.small)
                     .tint(IrshadTheme.Colors.primaryAccent)
-                    .accessibilityLabel(Text("Updating journey"))
+                    .accessibilityLabel(Text("جار تحديث الرحلة"))
             }
 
             Text(displayMessage)
@@ -70,29 +70,29 @@ struct CurrentPromptView: View {
             return nil
         }
 
-        return "Keeping your current step in place while Irshad updates."
+        return "نبقي خطوتك الحالية كما هي أثناء التحديث."
     }
 
     private var fallbackMessage: String {
         switch journeyStatus {
         case .empty:
-            "Tell Irshad what you want to build in the UAE."
+            "أخبر إرشاد بما تريد بناءه في الإمارات."
         case .preparing:
-            "Preparing your journey."
+            "نجهز رحلتك."
         case .collecting:
-            "Irshad is ready for the next detail."
+            "إرشاد جاهز للتفصيل التالي."
         case .processing:
-            "Reviewing your answers."
+            "نراجع إجاباتك."
         case .gateOpen:
-            "Your inputs are ready for guidance."
+            "مدخلاتك جاهزة للإرشاد."
         case .showingResults:
-            "Your guidance is ready to review."
+            "إرشادك جاهز للمراجعة."
         case .complete:
-            "Your plan is complete."
+            "اكتملت خطتك."
         case .partial:
-            "Some guidance is ready, with a few details still pending."
+            "بعض الإرشادات جاهزة، وما زالت هناك تفاصيل قليلة معلقة."
         case .failed:
-            "Something needs attention. Your current step is still here."
+            "هناك ما يحتاج انتباهك. خطوتك الحالية ما زالت محفوظة."
         }
     }
 
