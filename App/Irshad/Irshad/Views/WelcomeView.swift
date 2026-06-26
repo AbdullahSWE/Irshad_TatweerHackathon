@@ -30,6 +30,8 @@ struct WelcomeView: View {
                         preparingBanner
                     }
 
+                    BusinessProfileSummaryView(viewModel: viewModel)
+
                     promptExamples
                 }
                 .padding(.horizontal, IrshadTheme.Layout.outerMarginCompact)
@@ -136,4 +138,3 @@ struct WelcomeView: View {
 #Preview {
     WelcomeView(viewModel: AppEnvironment.live.makeJourneyViewModel())
 }
-
