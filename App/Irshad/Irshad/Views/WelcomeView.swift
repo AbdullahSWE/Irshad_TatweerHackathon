@@ -27,25 +27,35 @@ struct WelcomeView: View {
         )
     }
 
+    /// Spacers between each group (instead of a single fixed-spacing stack
+    /// centered in the available height) so any extra room on taller screens
+    /// gets distributed across the composition instead of piling up as dead
+    /// margins at the very top and very bottom.
     private var introExperience: some View {
         GeometryReader { proxy in
             let isCompact = proxy.size.height < 680
             let isTight = proxy.size.height < 780
 
-            VStack(spacing: isTight ? IrshadTheme.Layout.spacingStandard : IrshadTheme.Layout.spacingComfortable) {
+            VStack(spacing: 0) {
+                Spacer(minLength: isCompact ? 8 : 14)
+
                 introHeader(isCompact: isCompact)
 
-                WelcomeSceneIllustration(
-                    isCompact: isCompact,
-                    reduceMotion: viewModel.reduceMotionPreferred
-                )
+                Spacer(minLength: isCompact ? 16 : 26)
+
+                AppStoryRow(isCompact: isCompact, reduceMotion: viewModel.reduceMotionPreferred)
+
+                Spacer(minLength: isCompact ? 16 : 26)
 
                 optionPanel(isTight: isTight)
 
+                Spacer(minLength: isCompact ? 14 : 22)
+
                 startButton
+
+                Spacer(minLength: isCompact ? 8 : 14)
             }
             .padding(.horizontal, IrshadTheme.Layout.outerMarginCompact)
-            .padding(.vertical, isCompact ? IrshadTheme.Layout.spacingStandard : IrshadTheme.Layout.spacingSection)
             .frame(maxWidth: 560)
             .frame(maxWidth: .infinity, minHeight: proxy.size.height, alignment: .center)
         }
@@ -86,41 +96,44 @@ struct WelcomeView: View {
         }
     }
 
+    /// Brand mark > title > subtitle, in that visual weight order, so the eye
+    /// has a single clear entry point instead of competing headlines.
     private func introHeader(isCompact: Bool) -> some View {
-        VStack(spacing: isCompact ? IrshadTheme.Layout.spacingTight : IrshadTheme.Layout.spacingStandard) {
+        VStack(spacing: IrshadTheme.Layout.spacingTight) {
             introBrandBar
 
-            VStack(spacing: isCompact ? IrshadTheme.Layout.spacingTight : IrshadTheme.Layout.spacingStandard) {
+            VStack(spacing: IrshadTheme.Layout.spacingTight) {
                 Text(introTitle)
-                    .font(IrshadTheme.Typography.appFont(size: isCompact ? 32 : 40, weight: .bold, language: viewModel.currentLanguage))
+                    .font(IrshadTheme.Typography.appFont(size: isCompact ? 27 : 31, weight: .bold, language: viewModel.currentLanguage))
                     .foregroundStyle(IrshadTheme.Colors.primaryText)
                     .multilineTextAlignment(.center)
-                    .lineSpacing(3)
+                    .lineSpacing(2)
                     .fixedSize(horizontal: false, vertical: true)
 
                 Text(introSubtitle)
-                    .font(IrshadTheme.Typography.appFont(size: isCompact ? 16 : 18, language: viewModel.currentLanguage))
+                    .font(IrshadTheme.Typography.appFont(size: isCompact ? 15 : 16, language: viewModel.currentLanguage))
                     .foregroundStyle(IrshadTheme.Colors.secondaryText)
                     .multilineTextAlignment(.center)
-                    .lineSpacing(4)
+                    .lineSpacing(3)
                     .fixedSize(horizontal: false, vertical: true)
-                    .frame(maxWidth: 430)
+                    .frame(maxWidth: 340)
             }
         }
     }
 
+    /// Small, quiet logotype — an identifier, not a headline.
     private var introBrandBar: some View {
-        HStack(alignment: .center, spacing: 10) {
+        HStack(alignment: .center, spacing: 7) {
             Image("AppLogo")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 50, height: 50)
+                .frame(width: 26, height: 26)
 
             Text(viewModel.appTitle)
-                .font(IrshadTheme.Typography.appFont(size: 34, weight: .bold, language: .en))
+                .font(IrshadTheme.Typography.appFont(size: 18, weight: .semibold, language: .en))
                 .foregroundStyle(IrshadTheme.Colors.primaryAccent)
                 .lineLimit(1)
-                .minimumScaleFactor(0.82)
+                .minimumScaleFactor(0.85)
         }
         .environment(\.layoutDirection, .leftToRight)
         .fixedSize(horizontal: true, vertical: false)
@@ -168,32 +181,32 @@ struct WelcomeView: View {
         } label: {
             HStack(spacing: IrshadTheme.Layout.spacingStandard) {
                 Image(systemName: "arrow.forward")
-                    .font(.system(size: 24, weight: .bold))
+                    .font(.system(size: 22, weight: .bold))
 
                 Text(startButtonTitle)
-                    .font(IrshadTheme.Typography.appFont(size: 22, weight: .semibold, language: viewModel.currentLanguage))
+                    .font(IrshadTheme.Typography.appFont(size: 20, weight: .semibold, language: viewModel.currentLanguage))
                     .lineLimit(1)
                     .minimumScaleFactor(0.82)
 
                 Spacer(minLength: 0)
 
                 Image(systemName: "mic.fill")
-                    .font(.system(size: 22, weight: .semibold))
+                    .font(.system(size: 20, weight: .semibold))
             }
             .foregroundStyle(.white)
             .padding(.horizontal, IrshadTheme.Layout.spacingSection)
-            .frame(minHeight: 58)
+            .frame(minHeight: 54)
             .frame(maxWidth: .infinity)
             .background {
-                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
                     .fill(IrshadTheme.Colors.primaryAccent)
             }
             .irshadShadow(
                 IrshadTheme.Shadow(
                     color: IrshadTheme.Colors.primaryAccent.opacity(0.22),
-                    radius: 20,
+                    radius: 18,
                     x: 0,
-                    y: 12
+                    y: 10
                 )
             )
         }
@@ -222,19 +235,18 @@ struct WelcomeView: View {
     private var introTitle: String {
         switch viewModel.currentLanguage {
         case .ar:
-            return "ابدأ مشروعك بمحادثة"
+            return "خطّط لتأسيس مشروعك في 10 دقائق"
         case .en:
-            return "Start your business with a conversation"
+            return "Plan your business setup in 10 minutes"
         }
     }
 
     private var introSubtitle: String {
         switch viewModel.currentLanguage {
         case .ar:
-            return "أجب عن أسئلة صوتية بسيطة، وسنرشدك خطوة بخطوة من الفكرة إلى خطة واضحة."
+            return "أجب بصوتك عن أسئلة بسيطة واحصل على خطة واضحة للخطوات التالية."
         case .en:
-            return "Answer a few simple voice questions and Irshad will guide you from idea to clear plan."
-        }
+            return "Answer a few voice questions and get a clear plan for your next steps." }
     }
 
     private var personaOptionTitle: String {
@@ -348,210 +360,67 @@ private struct AssistantGreetingView: View {
     }
 }
 
-private struct WelcomeSceneIllustration: View {
+/// Tells the app's story in three flat, non-tappable-looking icon badges —
+/// voice in, a plan out, a business launched — linked by small arrows that
+/// nudge gently in the direction of the flow. No shadow/elevation on the
+/// badges on purpose: that's what made the old mic circle read as a button.
+private struct AppStoryRow: View {
     let isCompact: Bool
     let reduceMotion: Bool
 
     @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
-    @State private var bubbleIsLifted = false
+    @State private var isNudged = false
 
     private var shouldReduceMotion: Bool {
         reduceMotion || accessibilityReduceMotion
     }
 
+    private var iconSize: CGFloat {
+        isCompact ? 44 : 50
+    }
+
     var body: some View {
-        ZStack {
-            VStack(spacing: 0) {
-                Spacer(minLength: 0)
-
-                ZStack(alignment: .bottom) {
-                    RollingHill(heightRatio: 0.58)
-                        .fill(IrshadTheme.Colors.softHighlight.opacity(0.18))
-                        .offset(y: 8)
-
-                    RollingHill(heightRatio: 0.38)
-                        .fill(IrshadTheme.Colors.primaryAccent.opacity(0.10))
-                        .offset(y: 18)
-
-                    PalmTree()
-                        .fill(IrshadTheme.Colors.supportingAccent.opacity(0.32))
-                        .frame(width: 62, height: 78)
-                        .offset(x: -128, y: -38)
-
-                    House()
-                        .fill(IrshadTheme.Colors.primaryAccent.opacity(0.22))
-                        .frame(width: 68, height: 54)
-                        .offset(x: -64, y: -28)
-                }
-                .frame(height: isCompact ? 78 : 96)
-            }
-
-            floatingSpeechBubble
-                .offset(
-                    x: bubbleIsLifted && !shouldReduceMotion ? 82 : 88,
-                    y: (isCompact ? -28 : -36) + (bubbleIsLifted && !shouldReduceMotion ? -8 : 0)
-                )
-
-            Circle()
-                .fill(.white.opacity(0.94))
-                .frame(width: isCompact ? 118 : 138, height: isCompact ? 118 : 138)
-                .overlay {
-                    Circle()
-                        .stroke(IrshadTheme.Colors.softHighlight.opacity(0.34), lineWidth: 10)
-                }
-                .overlay {
-                    Circle()
-                        .stroke(.white, lineWidth: 3)
-                }
-                .shadow(color: IrshadTheme.Colors.primaryAccent.opacity(0.16), radius: 18, x: 0, y: 12)
-                .overlay {
-                    Image(systemName: "mic.fill")
-                        .font(.system(size: isCompact ? 46 : 54, weight: .semibold))
-                        .foregroundStyle(IrshadTheme.Colors.primaryAccent)
-                }
-                .offset(y: isCompact ? 34 : 44)
+        HStack(spacing: isCompact ? 8 : 12) {
+            storyIcon("mic.fill")
+            arrowGlyph
+            storyIcon("list.bullet.clipboard.fill")
+            arrowGlyph
+            storyIcon("building.2.fill")
         }
-        .frame(height: isCompact ? 156 : 184)
-        .frame(maxWidth: 420)
         .accessibilityHidden(true)
         .onAppear {
             guard !shouldReduceMotion else {
                 return
             }
 
-            bubbleIsLifted = true
+            isNudged = true
         }
         .animation(
             IrshadTheme.Animations.resolved(
-                Animation.easeInOut(duration: 2.6).repeatForever(autoreverses: true),
+                Animation.easeInOut(duration: 1.1).repeatForever(autoreverses: true),
                 reduceMotion: shouldReduceMotion
             ),
-            value: bubbleIsLifted
+            value: isNudged
         )
     }
 
-    private var floatingSpeechBubble: some View {
-        SpeechBubble()
-            .fill(.white.opacity(0.94))
-            .overlay {
-                VoiceBars()
-                    .stroke(IrshadTheme.Colors.supportingAccent, style: StrokeStyle(lineWidth: 3, lineCap: .round))
-                    .frame(width: 58, height: 30)
-            }
-            .overlay {
-                SpeechBubble()
-                    .stroke(IrshadTheme.Colors.primaryAccent.opacity(0.14), lineWidth: 1)
-            }
-            .frame(width: 126, height: 72)
-            .shadow(color: IrshadTheme.Colors.primaryAccent.opacity(0.08), radius: 12, x: 0, y: 8)
+    private var arrowGlyph: some View {
+        Image(systemName: "arrow.right")
+            .font(.system(size: isCompact ? 12 : 14, weight: .semibold))
+            .foregroundStyle(IrshadTheme.Colors.primaryAccent.opacity(0.45))
+            .offset(x: (isNudged && !shouldReduceMotion) ? 3 : -3)
     }
-}
 
-private struct RollingHill: Shape {
-    let heightRatio: CGFloat
+    private func storyIcon(_ systemName: String) -> some View {
+        ZStack {
+            Circle()
+                .fill(IrshadTheme.Colors.primaryAccent.opacity(0.10))
 
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let baseY = rect.height
-        let startY = rect.height * heightRatio
-
-        path.move(to: CGPoint(x: 0, y: baseY))
-        path.addLine(to: CGPoint(x: 0, y: startY))
-        path.addCurve(
-            to: CGPoint(x: rect.width * 0.45, y: rect.height * (heightRatio - 0.08)),
-            control1: CGPoint(x: rect.width * 0.16, y: rect.height * (heightRatio - 0.18)),
-            control2: CGPoint(x: rect.width * 0.28, y: rect.height * (heightRatio + 0.10))
-        )
-        path.addCurve(
-            to: CGPoint(x: rect.width, y: rect.height * (heightRatio - 0.03)),
-            control1: CGPoint(x: rect.width * 0.65, y: rect.height * (heightRatio - 0.30)),
-            control2: CGPoint(x: rect.width * 0.74, y: rect.height * (heightRatio + 0.18))
-        )
-        path.addLine(to: CGPoint(x: rect.width, y: baseY))
-        path.closeSubpath()
-        return path
-    }
-}
-
-private struct PalmTree: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let midX = rect.midX
-        let trunkTop = rect.minY + rect.height * 0.34
-        let trunkBottom = rect.maxY
-
-        path.move(to: CGPoint(x: midX - 4, y: trunkBottom))
-        path.addLine(to: CGPoint(x: midX + 2, y: trunkTop))
-        path.addLine(to: CGPoint(x: midX + 8, y: trunkBottom))
-        path.closeSubpath()
-
-        let leaves = [
-            (CGPoint(x: midX, y: trunkTop), CGPoint(x: rect.minX, y: rect.minY + 18), CGPoint(x: midX - 7, y: trunkTop + 8)),
-            (CGPoint(x: midX, y: trunkTop), CGPoint(x: rect.minX + 8, y: rect.minY), CGPoint(x: midX + 2, y: trunkTop + 6)),
-            (CGPoint(x: midX, y: trunkTop), CGPoint(x: rect.maxX - 4, y: rect.minY + 8), CGPoint(x: midX + 5, y: trunkTop + 8)),
-            (CGPoint(x: midX, y: trunkTop), CGPoint(x: rect.maxX, y: rect.minY + 30), CGPoint(x: midX + 4, y: trunkTop + 12)),
-            (CGPoint(x: midX, y: trunkTop), CGPoint(x: midX + 2, y: rect.minY), CGPoint(x: midX - 6, y: trunkTop + 6))
-        ]
-
-        for leaf in leaves {
-            path.move(to: leaf.0)
-            path.addQuadCurve(to: leaf.1, control: leaf.2)
-            path.addQuadCurve(to: leaf.0, control: CGPoint(x: (leaf.1.x + leaf.0.x) / 2, y: leaf.1.y + 12))
+            Image(systemName: systemName)
+                .font(.system(size: isCompact ? 17 : 20, weight: .semibold))
+                .foregroundStyle(IrshadTheme.Colors.primaryAccent)
         }
-
-        return path
-    }
-}
-
-private struct House: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let roofPeak = CGPoint(x: rect.midX, y: rect.minY)
-        let roofLeft = CGPoint(x: rect.minX + 4, y: rect.minY + rect.height * 0.38)
-        let roofRight = CGPoint(x: rect.maxX - 4, y: rect.minY + rect.height * 0.38)
-        let bodyTop = rect.minY + rect.height * 0.36
-
-        path.move(to: roofLeft)
-        path.addLine(to: roofPeak)
-        path.addLine(to: roofRight)
-        path.addLine(to: CGPoint(x: rect.maxX - 10, y: bodyTop))
-        path.addLine(to: CGPoint(x: rect.maxX - 10, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.minX + 10, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.minX + 10, y: bodyTop))
-        path.closeSubpath()
-
-        path.addRect(CGRect(x: rect.midX - 6, y: rect.maxY - 20, width: 12, height: 20))
-        return path
-    }
-}
-
-private struct SpeechBubble: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let bubbleRect = CGRect(x: rect.minX, y: rect.minY, width: rect.width, height: rect.height * 0.82)
-        path.addRoundedRect(in: bubbleRect, cornerSize: CGSize(width: 26, height: 26))
-        path.move(to: CGPoint(x: rect.minX + rect.width * 0.22, y: bubbleRect.maxY - 4))
-        path.addLine(to: CGPoint(x: rect.minX + rect.width * 0.10, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.minX + rect.width * 0.34, y: bubbleRect.maxY - 6))
-        path.closeSubpath()
-        return path
-    }
-}
-
-private struct VoiceBars: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let bars: [CGFloat] = [0.28, 0.46, 0.70, 0.96, 0.66, 0.44, 0.26]
-        let spacing = rect.width / CGFloat(bars.count - 1)
-
-        for (index, height) in bars.enumerated() {
-            let x = rect.minX + CGFloat(index) * spacing
-            let barHeight = rect.height * height
-            path.move(to: CGPoint(x: x, y: rect.midY - barHeight / 2))
-            path.addLine(to: CGPoint(x: x, y: rect.midY + barHeight / 2))
-        }
-
-        return path
+        .frame(width: iconSize, height: iconSize)
     }
 }
 
