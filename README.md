@@ -16,7 +16,7 @@
 
 <div align="center">
 
-[<img src="Assets/demo-thumbnail.png" alt="Watch the Irshad demo" width="30%" />]([DEMO LINK](https://www.youtube.com/shorts/K_AIcZKWtbQ))
+<a href="https://www.youtube.com/shorts/K_AIcZKWtbQ" target="_blank"> <img src="Assets/demo-thumbnail.png" alt="Watch the Irshad demo" width="30%" /> </a>
 
 <sub>Demo: spoken idea → adaptive questions → grounded roadmap. Replace the URL above with the final YouTube demo link.</sub>
 
