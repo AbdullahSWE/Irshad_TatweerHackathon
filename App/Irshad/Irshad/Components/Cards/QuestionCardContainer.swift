@@ -300,6 +300,10 @@ extension DynamicCard {
         metadata.bool(for: ["auto_submit", "autoSubmit"]) ?? false
     }
 
+    var isChoiceQuestion: Bool {
+        kind == .question && (type == .singleSelect || type == .multiSelect)
+    }
+
     var allowsCustomInput: Bool {
         if type == .text {
             return true

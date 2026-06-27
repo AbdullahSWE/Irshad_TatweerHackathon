@@ -20,10 +20,14 @@ struct JourneyInputOverlayView: View {
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }
 
-            InputDockView(viewModel: viewModel, isWelcome: false)
+            if !viewModel.isChoiceQuestionActive {
+                InputDockView(viewModel: viewModel, isWelcome: false)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
         }
         .frame(maxWidth: .infinity, alignment: .bottom)
         .animation(IrshadTheme.Animations.cardReveal, value: viewModel.toast)
+        .animation(IrshadTheme.Animations.cardReveal, value: viewModel.isChoiceQuestionActive)
         .accessibilityElement(children: .contain)
     }
 }

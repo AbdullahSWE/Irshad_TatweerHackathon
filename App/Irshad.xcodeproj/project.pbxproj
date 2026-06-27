@@ -21,9 +21,22 @@
 		21C5DA712FEEF00000F42425 /* Config/OpenRouter.example.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config/OpenRouter.example.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		21C5DA722FEEF10000F42425 /* Exceptions for "Irshad" folder in "Irshad" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 21C5DA562FEEA0BF00F42425 /* Irshad */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		21C5DA592FEEA0BF00F42425 /* Irshad */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				21C5DA722FEEF10000F42425 /* Exceptions for "Irshad" folder in "Irshad" target */,
+			);
 			path = Irshad;
 			sourceTree = "<group>";
 		};
@@ -283,7 +296,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = XUN72DS3QW;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Irshad/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Irshad;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Irshad uses the microphone to capture spoken input.";
@@ -327,7 +341,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = XUN72DS3QW;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Irshad/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Irshad;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Irshad uses the microphone to capture spoken input.";

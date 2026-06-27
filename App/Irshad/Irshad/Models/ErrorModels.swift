@@ -9,6 +9,11 @@ enum APIError: Error, Equatable, Sendable {
     case cancelled
 }
 
+struct DebuggableAPIError: Error, Sendable {
+    let underlying: APIError
+    let debugTrace: String
+}
+
 enum SpeechError: Error, Equatable, Sendable {
     case permissionDenied
     case microphoneUnavailable

@@ -12,6 +12,10 @@ struct DynamicCardRendererView: View {
             return [currentCard]
         }
 
+        if let firstQuestionCard = viewModel.renderableCards.first(where: { $0.kind == .question }) {
+            return [firstQuestionCard]
+        }
+
         return viewModel.renderableCards
     }
 
@@ -37,6 +41,13 @@ struct DynamicCardRendererView: View {
                     actionTitle: "Retry",
                     onAction: { viewModel.retryCurrentStep() }
                 )
+
+                if let debugTrace = viewModel.debugTrace,
+                   !debugTrace.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    DebugTracePanelView(trace: debugTrace) {
+                        viewModel.copyText(debugTrace)
+                    }
+                }
             } else if viewModel.isServiceBusy && !cardsToRender.isEmpty {
                 StatusPill("Updating", systemImage: "arrow.triangle.2.circlepath", tone: .active, showsSpinner: true)
                     .frame(maxWidth: .infinity, alignment: .leading)

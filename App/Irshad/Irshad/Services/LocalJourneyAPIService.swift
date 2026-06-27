@@ -36,8 +36,19 @@ actor LocalJourneyAPIService: JourneyAPIServiceProtocol {
             throw APIError.badStatus(400, "goalText is required")
         }
 
-        let classified = try await classifyGoal(goalText: goalText, language: request.language)
+        DebugLog.api("Journey startJourney session=\(request.sessionId) language=\(request.language.rawValue) goal=\"\(DebugLog.preview(goalText))\"")
+
+        let classified: ClassificationDTO
+        do {
+            classified = try await classifyGoal(goalText: goalText, language: request.language)
+            DebugLog.api("Journey startJourney.classifyGoal success session=\(request.sessionId) archetypeId=\(classified.archetypeId) archetypeLabel=\"\(classified.archetypeLabel)\"")
+        } catch {
+            DebugLog.api("Journey startJourney.classifyGoal failed session=\(request.sessionId): \(DebugLog.describe(error))")
+            throw error
+        }
+
         guard kb.archetype(id: classified.archetypeId) != nil else {
+            DebugLog.api("Journey startJourney unknown archetype session=\(request.sessionId) archetypeId=\(classified.archetypeId)")
             throw APIError.decoding("OpenRouter returned an unknown archetypeId: \(classified.archetypeId)")
         }
 
@@ -57,15 +68,23 @@ actor LocalJourneyAPIService: JourneyAPIServiceProtocol {
 
         let missing = computeMissing(archetypeId: classified.archetypeId, stage: "business", filledSlots: filledSlots)
         let slotToAsk = missing.first ?? "businessStage"
-        let card = try await generateCard(
-            slot: slotToAsk,
-            archetypeId: classified.archetypeId,
-            archetypeLabel: classified.archetypeLabel,
-            stage: "business",
-            filledSlots: filledSlots,
-            history: [],
-            language: request.language
-        )
+        DebugLog.api("Journey startJourney.generateCard begin session=\(request.sessionId) stage=business slot=\(slotToAsk) missing=\(missing)")
+        let card: DynamicCard
+        do {
+            card = try await generateCard(
+                slot: slotToAsk,
+                archetypeId: classified.archetypeId,
+                archetypeLabel: classified.archetypeLabel,
+                stage: "business",
+                filledSlots: filledSlots,
+                history: [],
+                language: request.language
+            )
+            DebugLog.api("Journey startJourney.generateCard success session=\(request.sessionId) cardId=\(card.cardId) type=\(card.type) title=\"\(DebugLog.preview(card.title, limit: 300))\"")
+        } catch {
+            DebugLog.api("Journey startJourney.generateCard failed session=\(request.sessionId) stage=business slot=\(slotToAsk): \(DebugLog.describe(error))")
+            throw error
+        }
 
         filledSlots = session.filledSlots
         sessions[request.sessionId] = StoredSession(
@@ -345,6 +364,7 @@ private extension LocalJourneyAPIService {
             }
             """,
             language: language,
+            debugLabel: "startJourney.classifyGoal",
             as: ClassificationDTO.self
         )
     }
@@ -392,6 +412,7 @@ private extension LocalJourneyAPIService {
             - Keep title conversational and specific to \(archetypeLabel)
             """,
             language: language,
+            debugLabel: "generateCard.\(stage).\(slot)",
             as: DynamicCard.self
         )
     }
@@ -423,6 +444,7 @@ private extension LocalJourneyAPIService {
             Confidence guide: 0.9 = all slots filled + KB match; 0.6 = partial profile; 0.4 = many gaps.
             """,
             language: stored.language,
+            debugLabel: "runAnalysis",
             as: AnalysisDTO.self
         )
 
@@ -480,6 +502,7 @@ private extension LocalJourneyAPIService {
                 }
                 """,
                 language: language,
+                debugLabel: "runVerify",
                 as: VerifyDTO.self
             )
 
@@ -548,6 +571,7 @@ private extension LocalJourneyAPIService {
             }
             """,
             language: stored.language,
+            debugLabel: "runLicenseRec",
             as: LicenseDTO.self
         )
 
@@ -581,6 +605,7 @@ private extension LocalJourneyAPIService {
             Order: most likely to approve first.
             """,
             language: stored.language,
+            debugLabel: "runBankingRec",
             as: BankingDTO.self
         )
 
@@ -635,6 +660,7 @@ private extension LocalJourneyAPIService {
             }
             """,
             language: stored.language,
+            debugLabel: "runPlan",
             as: PlanDTO.self
         )
 

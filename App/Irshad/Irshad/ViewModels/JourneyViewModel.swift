@@ -94,6 +94,7 @@ final class JourneyViewModel {
     var toast: ToastState?
     var banner: BannerState?
     var recoverableError: RecoverableError?
+    var debugTrace: String?
     var unsupportedCard: DynamicCard?
 
     var isTextEntryExpanded: Bool
@@ -176,6 +177,7 @@ final class JourneyViewModel {
         toast = nil
         banner = nil
         recoverableError = nil
+        debugTrace = nil
         unsupportedCard = nil
 
         isTextEntryExpanded = false
@@ -276,6 +278,14 @@ extension JourneyViewModel {
             && finalPlan == nil
     }
 
+    var isChoiceQuestionActive: Bool {
+        guard let currentCard, currentCard.isChoiceQuestion else {
+            return false
+        }
+
+        return !currentCard.allowsCustomInput
+    }
+
     func beginOnboarding() {
         guard !hasStartedOnboarding else {
             beginListening()
@@ -308,6 +318,7 @@ extension JourneyViewModel {
         hasStartedOnboarding = true
         let requestSessionID = sessionId.isEmpty ? UUID().uuidString : sessionId
         sessionId = requestSessionID
+        DebugLog.api("ViewModel startJourneyWithText session=\(requestSessionID) language=\(currentLanguage.rawValue) input=\"\(DebugLog.preview(trimmedText))\"")
         pendingOperation = .startText(trimmedText)
         launchServiceOperation(status: .preparing) { [weak self] in
             guard let self else { return }
@@ -937,12 +948,14 @@ private extension JourneyViewModel {
             return
         }
 
+        debugTrace = nil
         activeTask?.cancel()
         isServiceBusy = true
         recoverableError = nil
         banner = nil
         journeyStatus = status
         serviceActionMessage = localizedServiceAction(for: pendingOperation, status: status)
+        DebugLog.api("ViewModel operation begin pending=\(debugPendingOperation(pendingOperation)) status=\(status)")
 
         activeTask = Task { @MainActor [weak self] in
             guard let self else { return }
@@ -950,6 +963,7 @@ private extension JourneyViewModel {
                 try Task.checkCancellation()
                 try await operation()
                 try Task.checkCancellation()
+                DebugLog.api("ViewModel operation success pending=\(self.debugPendingOperation(self.pendingOperation)) status=\(self.journeyStatus)")
                 self.isServiceBusy = false
                 self.serviceActionMessage = nil
                 self.activeTask = nil
@@ -959,16 +973,20 @@ private extension JourneyViewModel {
                 self.isServiceBusy = false
                 self.serviceActionMessage = nil
                 self.activeTask = nil
+                DebugLog.api("ViewModel operation cancelled pending=\(self.debugPendingOperation(self.pendingOperation))")
                 await self.track("journey_operation_cancelled")
             } catch APIError.cancelled {
                 self.isServiceBusy = false
                 self.serviceActionMessage = nil
                 self.activeTask = nil
+                DebugLog.api("ViewModel operation API-cancelled pending=\(self.debugPendingOperation(self.pendingOperation))")
                 await self.track("journey_operation_cancelled")
             } catch {
                 self.isServiceBusy = false
                 self.serviceActionMessage = nil
                 self.activeTask = nil
+                DebugLog.api("ViewModel operation failed pending=\(self.debugPendingOperation(self.pendingOperation)) status=\(self.journeyStatus) error=\(DebugLog.describe(error))")
+                self.debugTrace = self.debugTrace(for: error)
                 self.handleRecoverableError(error)
                 await self.track("journey_operation_failed")
             }
@@ -981,8 +999,10 @@ private extension JourneyViewModel {
             goalText: text,
             language: currentLanguage
         )
+        DebugLog.api("ViewModel performStartJourney request session=\(sessionID) language=\(currentLanguage.rawValue) goal=\"\(DebugLog.preview(text))\"")
         let response = try await apiService.startJourney(request)
         try Task.checkCancellation()
+        DebugLog.api("ViewModel performStartJourney response session=\(response.session?.sessionId ?? sessionID) stage=\(response.currentStage ?? "nil") phase=\(String(describing: response.currentPhase)) cardId=\(response.card?.cardId ?? "nil")")
 
         sessionId = response.session?.sessionId ?? sessionID
         let phase = response.currentPhase
@@ -1676,6 +1696,9 @@ private extension JourneyViewModel {
     }
 
     func handleRecoverableError(_ error: Error) {
+        DebugLog.api("ViewModel recoverableError from \(DebugLog.describe(error)) pending=\(debugPendingOperation(pendingOperation))")
+        debugTrace = debugTrace(for: error)
+
         if case ViewModelError.invalidAnswer(let message) = error {
             cardValidationMessage = message
             recoverableError = nil
@@ -1724,7 +1747,46 @@ private extension JourneyViewModel {
         }
     }
 
+    func debugTrace(for error: Error) -> String? {
+        if let debugError = error as? DebuggableAPIError {
+            return debugError.debugTrace
+        }
+
+        return nil
+    }
+
+    func debugPendingOperation(_ operation: PendingOperation?) -> String {
+        switch operation {
+        case .startText(let text):
+            return "startText(\"\(DebugLog.preview(text, limit: 300))\")"
+        case .nextCard(let cardID):
+            return "nextCard(cardID: \(cardID))"
+        case .analyze:
+            return "analyze"
+        case .verify:
+            return "verify"
+        case .license:
+            return "license"
+        case .banking:
+            return "banking"
+        case .finalPlan:
+            return "finalPlan"
+        case .loadSavedPlan:
+            return "loadSavedPlan"
+        case .saveFinalPlan:
+            return "saveFinalPlan"
+        case .shareFinalPlan:
+            return "shareFinalPlan"
+        case .none:
+            return "nil"
+        }
+    }
+
     func userSafeMessage(for error: Error) -> String {
+        if let debugError = error as? DebuggableAPIError {
+            return userSafeMessage(for: debugError.underlying)
+        }
+
         switch error {
         case APIError.timeout:
             return localizedRecoverableMessage(.timeout)

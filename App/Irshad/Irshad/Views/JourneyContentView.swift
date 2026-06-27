@@ -16,7 +16,11 @@ struct JourneyContentView: View {
 
     /// Bottom inset so the anchored input dock never covers scrolling content.
     private var bottomInset: CGFloat {
-        IrshadTheme.Layout.bottomDockHeight + IrshadTheme.Layout.spacingMajor * 2
+        if viewModel.isChoiceQuestionActive {
+            return IrshadTheme.Layout.spacingMajor
+        }
+
+        return IrshadTheme.Layout.bottomDockHeight + IrshadTheme.Layout.spacingMajor * 2
     }
 
     var body: some View {
