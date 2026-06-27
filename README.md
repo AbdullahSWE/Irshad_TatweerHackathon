@@ -97,7 +97,7 @@ Irshad is a voice-first iOS guide. The founder speaks an idea. The app asks a sm
 |---|---|
 | ✅ | SwiftUI iOS welcome screen with guide and language selection. |
 | ✅ | Voice-first interaction using Apple Speech and `AVSpeechSynthesizer`. |
-| ✅ | Server-driven question cards and progress stages. |
+| ✅ | Card-driven question cards and progress stages. |
 | ✅ | Adaptive business profile capture. |
 | ✅ | Final plan screen with approvals, banks, confidence, unverified items, share, copy, and continue options. |
 | ✅ | Trust labels for verified / estimated / unverified / missing facts. |
@@ -166,7 +166,7 @@ Its safety rule is simple: show what is verified, estimate only when grounded, a
 | App | Runs on a normal iPhone | Same app can serve more users |
 | Intelligence | OpenRouter model call | Model can be swapped |
 | Knowledge | Bundled JSON KB | Swap KB per emirate/community |
-| Journey | card-driven flow | Add archetypes without redesigning UI |
+| Journey | Card-driven flow | Add archetypes without redesigning UI |
 
 ### 📱 Deployment Path
 
