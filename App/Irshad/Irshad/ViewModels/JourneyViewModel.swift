@@ -738,6 +738,7 @@ extension JourneyViewModel {
             activeResultScreen = .banking
             currentPhase = .banking
             journeyStatus = .showingResults
+            speakResultScreenIntro(for: .banking)
             return
         }
 
@@ -757,6 +758,7 @@ extension JourneyViewModel {
             activeResultScreen = .authority
             currentPhase = .verify
             journeyStatus = .showingResults
+            speakResultScreenIntro(for: .authority)
             return
         }
 
@@ -773,6 +775,7 @@ extension JourneyViewModel {
             activeResultScreen = .finalPlan
             currentPhase = .plan
             journeyStatus = .complete
+            speakResultScreenIntro(for: .finalPlan)
             return
         }
 
@@ -1399,6 +1402,7 @@ private extension JourneyViewModel {
             journeyStatus = .showingResults
             pendingOperation = nil
             refreshDerivedState()
+            speakResultScreenIntro(for: .license)
             return
         }
 
@@ -1417,6 +1421,7 @@ private extension JourneyViewModel {
             journeyStatus = .showingResults
             pendingOperation = nil
             refreshDerivedState()
+            speakResultScreenIntro(for: .license)
             return
         }
 
@@ -1435,6 +1440,7 @@ private extension JourneyViewModel {
             journeyStatus = .showingResults
             pendingOperation = nil
             refreshDerivedState()
+            speakResultScreenIntro(for: .banking)
             return
         }
 
@@ -1452,6 +1458,7 @@ private extension JourneyViewModel {
             journeyStatus = .showingResults
             pendingOperation = nil
             refreshDerivedState()
+            speakResultScreenIntro(for: .authority)
             return
         }
 
@@ -1472,6 +1479,7 @@ private extension JourneyViewModel {
         activeResultScreen = .finalPlan
         journeyStatus = .complete
         refreshDerivedState()
+        speakResultScreenIntro(for: .finalPlan)
         try await saveCurrentPlan()
         pendingOperation = nil
     }
@@ -1639,6 +1647,60 @@ private extension JourneyViewModel {
             guard let self else { return }
             await self.speechSynthesisService.speak(text, language: self.currentLanguage, voice: self.selectedVoicePersona)
         }
+    }
+
+    func speakResultScreenIntro(for screen: ActiveResultScreen) {
+        let text: String?
+        switch (screen, currentLanguage) {
+        case (.license, .ar):
+            if let license = licenseRecommendation?.best?.type, !license.isEmpty {
+                text = "أفضل رخصة لمشروعك هي \(license)."
+            } else {
+                text = "هذه أفضل رخصة لمشروعك."
+            }
+        case (.license, .en):
+            if let license = licenseRecommendation?.best?.type, !license.isEmpty {
+                text = "The best license for your business is \(license)."
+            } else {
+                text = "Here is the best license for your business."
+            }
+        case (.banking, .ar):
+            let bank = preferredBankName
+            if let bank, !bank.isEmpty {
+                text = "أفضل بنك لك هو \(bank)."
+            } else {
+                text = "هذه أفضل الخيارات البنكية لك."
+            }
+        case (.banking, .en):
+            let bank = preferredBankName
+            if let bank, !bank.isEmpty {
+                text = "The best bank for you is \(bank)."
+            } else {
+                text = "Here are the best banking options for you."
+            }
+        case (.authority, .ar):
+            text = "هذه العناصر التي تحتاج إلى التحقق منها قبل المتابعة."
+        case (.authority, .en):
+            text = "Here are the items to verify before you continue."
+        case (.finalPlan, .ar):
+            text = "هذه خطة العمل الخاصة بك."
+        case (.finalPlan, .en):
+            text = "Here is your action plan."
+        default:
+            text = nil
+        }
+
+        guard let text else { return }
+        speechTask?.cancel()
+        speechTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+            await self.speechSynthesisService.speak(text, language: self.currentLanguage, voice: self.selectedVoicePersona)
+        }
+    }
+
+    var preferredBankName: String? {
+        bankingRecommendations?.banks.first(where: { $0.likelyToApprove == true })?.name
+            ?? bankingRecommendations?.banks.first?.name
     }
 
     func revealResultErrorSurfaceIfNeeded() {
