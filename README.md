@@ -2,7 +2,7 @@
 
 <img src="Assets/irshad-banner.png" alt="Irshad — إرشاد" width="100%" />
 
-# 🗣️💼 إرشاد · Irshad
+#  إرشاد · Irshad 🗣️💼
 
 **A voice-controlled Arabic/English business guide that feels like a normal conversation and uses curated UAE license and bank database to create your tailored business action plan.**
 
@@ -40,7 +40,7 @@
 
 ---
 
-## 1. The challenge and the problem
+## 🎯 I. The Challenge and the Problem
 
 **Chosen challenge:** Challenge 1 — Taking the First Entrepreneurial Step.
 
@@ -66,7 +66,7 @@ Ahmed is fictional, but the friction is real: official steps exist, but they are
 
 ---
 
-## 2. Who it is for, and their situation
+## 👥 II. Who It Is For and the Situation They Face
 
 | | |
 |---|---|
@@ -80,7 +80,7 @@ Irshad does **not** try to replace official portals. It prepares the founder to 
 
 ---
 
-## 3. The solution
+## 💡 III. The Solution
 
 Irshad is a voice-first iOS guide. The founder speaks an idea. The app asks a small number of adaptive questions. The server fills a structured business profile. Once enough information is known, Irshad produces a plan with:
 
@@ -126,7 +126,7 @@ Two guardrails keep the demo stable and honest:
 
 ---
 
-## 4. What is working now
+## ✅ IV. What Is Working Now
 
 | Status | Feature |
 |---|---|
@@ -144,7 +144,7 @@ Two guardrails keep the demo stable and honest:
 
 ---
 
-## 5. Impact and testable claims
+📊 V. Impact and Testable Claims
 
 | # | Claim | Evidence / how to test |
 |---:|---|---|
@@ -161,7 +161,7 @@ Two guardrails keep the demo stable and honest:
 
 ---
 
-## 6. Evidence and validation
+## 🔍 VI. Evidence and Validation
 
 The judging guide rewards specific, testable claims backed by evidence, not vague hype. This repo therefore separates product claims from proof.
 
@@ -190,7 +190,7 @@ The judging guide rewards specific, testable claims backed by evidence, not vagu
 
 ---
 
-## 7. Grounding and safety
+## 🛡️ VII. Grounding and Safety
 
 An AI that invents a licence fee can hurt a founder. Irshad is designed to show uncertainty instead of hiding it.
 
@@ -215,7 +215,7 @@ It helps the founder understand the likely first path, prepare the right documen
 
 ---
 
-## 8. Feasibility and deployment
+## 🚀 VIII. Feasibility and Deployment
 
 | Area | Current approach | Why it is feasible |
 |---|---|---|
@@ -237,7 +237,7 @@ It helps the founder understand the likely first path, prepare the right documen
 
 ---
 
-## 9. Scalability
+## 🌍 IX. Scalability
 
 Irshad is designed to scale by changing the knowledge base, not rebuilding the app.
 
@@ -253,7 +253,7 @@ The reusable parts are the voice interface, stage engine, trust-label system, ad
 
 ---
 
-## 10. Architecture and tools
+## 🏗️ X. Architecture and Tools
 
 <div align="center">
 <img src="Assets/architecture.png" alt="Irshad architecture diagram" width="100%" />
@@ -269,7 +269,7 @@ The reusable parts are the voice interface, stage engine, trust-label system, ad
 
 ---
 
-## 11. Knowledge base
+## 📚 XI. Knowledge Base
 
 The knowledge base is the repo’s most inspectable artifact.
 
@@ -290,7 +290,7 @@ For farm-related paths, the UI should point the founder toward the **Farm Licenc
 
 ---
 
-## 12. How to run or verify it
+## 🧪 XII. How to Run or Verify It
 
 ### Backend
 
@@ -341,7 +341,7 @@ curl -X POST http://localhost:3000/api/journey/start \
 
 ---
 
-## 13. Limitations and next steps
+## 🛠️ XIII. Limitations and Next Steps
 
 | Limitation | Why we accept it now | Next step |
 |---|---|---|
@@ -353,7 +353,7 @@ curl -X POST http://localhost:3000/api/journey/start \
 
 ---
 
-## 14. Hard questions we expect
+## ❓ XIV. Answering the Hard Questions
 
 | Judge question | Our answer |
 |---|---|
@@ -368,7 +368,7 @@ curl -X POST http://localhost:3000/api/journey/start \
 
 ---
 
-## Built for
+## 🤝 Built for
 
 **Tatweer Hackathon 2026** · Al Qua'a, Al Ain, UAE · Challenge 1 — Taking the First Entrepreneurial Step
 
