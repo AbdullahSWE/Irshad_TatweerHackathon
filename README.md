@@ -4,13 +4,13 @@
 
 # إرشاد · Irshad
 
-**A voice-first Arabic/English business guide that turns a rural founder’s spoken idea into a clear, evidence-labelled first-step action plan.**
+**A voice-controlled Arabic/English business guide that feels like a normal conversation and uses curated UAE license and bank database to create your tailored business action plan.**
 
 <sub>Tatweer Hackathon 2026 · Al Qua'a, Al Ain, UAE · Challenge 1 — Taking the First Entrepreneurial Step</sub>
 
 <br/>
 
-`SwiftUI iOS` · `Next.js journey engine` · `OpenRouter LLM` · `Sourced Abu Dhabi knowledge base` · `Arabic + English`
+`SwiftUI iOS` · `OpenRouter LLM` · `UAE Licenses & Bank Database` · `English + Arabic`
 
 </div>
 
