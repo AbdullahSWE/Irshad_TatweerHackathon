@@ -7,23 +7,37 @@ struct PhaseStepperView: View {
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
-    private var visiblePhases: [JourneyPhase] {
-        let servicePhases = phases.filter { $0 != .unknown }
-        let source = servicePhases.isEmpty ? JourneyPhase.visibleOrder : servicePhases
-        let compactOrder: [JourneyPhase] = [.business, .founder, .details, .budget, .documents]
-        let compact = compactOrder.filter { source.contains($0) }
-        return compact.isEmpty ? compactOrder : compact
+    private var visibleSteps: [JourneyFlowStep] {
+        JourneyFlowStep.allCases
+    }
+
+    private var currentStep: JourneyFlowStep {
+        JourneyFlowStep(phase: currentPhase)
+    }
+
+    private var completedSteps: Set<JourneyFlowStep> {
+        var steps = Set(completedPhases.map(JourneyFlowStep.init(phase:)))
+
+        if let currentIndex = visibleSteps.firstIndex(of: currentStep) {
+            steps.formUnion(visibleSteps.prefix(currentIndex))
+        }
+
+        if currentPhase == .plan {
+            steps.insert(.actionPlan)
+        }
+
+        return steps
     }
 
     var body: some View {
         ScrollView(.horizontal) {
             HStack(alignment: .top, spacing: 0) {
-                ForEach(Array(visiblePhases.enumerated()), id: \.element) { index, phase in
+                ForEach(Array(visibleSteps.enumerated()), id: \.element) { index, step in
                     PhaseStepItem(
-                        phase: phase,
-                        state: state(for: phase),
-                        title: title(for: phase),
-                        showsConnector: index < visiblePhases.count - 1
+                        accessibilityTitle: step.accessibleDisplayName,
+                        state: state(for: step),
+                        title: title(for: step),
+                        showsConnector: index < visibleSteps.count - 1
                     )
                 }
             }
@@ -42,25 +56,25 @@ struct PhaseStepperView: View {
         dynamicTypeSize.isAccessibilitySize ? IrshadTheme.Layout.phaseStepperHeight + 34 : IrshadTheme.Layout.phaseStepperHeight
     }
 
-    private func state(for phase: JourneyPhase) -> PhaseStepState {
-        if completedPhases.contains(phase) {
-            return .completed
+    private func state(for step: JourneyFlowStep) -> PhaseStepState {
+        if step == currentStep {
+            return .current
         }
 
-        if phase == currentPhase {
-            return .current
+        if completedSteps.contains(step) {
+            return .completed
         }
 
         return .pending
     }
 
-    private func title(for phase: JourneyPhase) -> String {
-        dynamicTypeSize.isAccessibilitySize ? phase.accessibleDisplayName : phase.compactDisplayName
+    private func title(for step: JourneyFlowStep) -> String {
+        dynamicTypeSize.isAccessibilitySize ? step.accessibleDisplayName : step.compactDisplayName
     }
 }
 
 private struct PhaseStepItem: View {
-    let phase: JourneyPhase
+    let accessibilityTitle: String
     let state: PhaseStepState
     let title: String
     let showsConnector: Bool
@@ -88,7 +102,7 @@ private struct PhaseStepItem: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(Text(phase.accessibleDisplayName))
+            .accessibilityLabel(Text(accessibilityTitle))
             .accessibilityValue(Text(state.accessibilityValue))
 
             if showsConnector {
@@ -171,66 +185,55 @@ private enum PhaseStepState {
     }
 }
 
-private extension JourneyPhase {
+private enum JourneyFlowStep: Int, CaseIterable {
+    case idea
+    case clarify
+    case license
+    case bank
+    case actionPlan
+
+    init(phase: JourneyPhase) {
+        switch phase {
+        case .goal, .unknown:
+            self = .idea
+        case .business, .founder, .details, .budget, .documents:
+            self = .clarify
+        case .analysis, .license:
+            self = .license
+        case .banking:
+            self = .bank
+        case .verify, .nextSteps, .plan:
+            self = .actionPlan
+        }
+    }
+
     var compactDisplayName: String {
         switch self {
-        case .goal:
-            "Start"
-        case .business:
-            "Business"
-        case .founder:
-            "Founder"
-        case .details:
-            "Details"
-        case .budget:
-            "Budget"
-        case .documents:
-            "Docs"
-        case .analysis:
-            "Analysis"
+        case .idea:
+            "Idea"
+        case .clarify:
+            "Clarify"
         case .license:
             "License"
-        case .banking:
+        case .bank:
             "Bank"
-        case .verify:
-            "Verify"
-        case .nextSteps:
-            "Next"
-        case .plan:
-            "Plan"
-        case .unknown:
-            "Phase"
+        case .actionPlan:
+            "Action Plan"
         }
     }
 
     var accessibleDisplayName: String {
         switch self {
-        case .goal:
-            "Goal"
-        case .business:
-            "Business"
-        case .founder:
-            "Founder"
-        case .details:
-            "Details"
-        case .budget:
-            "Budget"
-        case .documents:
-            "Documents"
-        case .analysis:
-            "Analysis"
+        case .idea:
+            "Idea"
+        case .clarify:
+            "Clarify"
         case .license:
             "License"
-        case .banking:
-            "Banking"
-        case .verify:
-            "Verify"
-        case .nextSteps:
-            "Next Steps"
-        case .plan:
-            "Plan"
-        case .unknown:
-            "Current Phase"
+        case .bank:
+            "Bank"
+        case .actionPlan:
+            "Action Plan"
         }
     }
 }

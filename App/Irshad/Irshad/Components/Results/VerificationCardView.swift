@@ -121,14 +121,14 @@ struct VerificationCardView: View {
                     }
                 }
 
-                HStack(spacing: IrshadTheme.Layout.spacingTight) {
+                VStack(alignment: .leading, spacing: IrshadTheme.Layout.spacingTight) {
                     if let contactURL = summary.contactURL {
                         Button {
                             viewModel.openURL(contactURL)
                         } label: {
                             Label("Official page", systemImage: "safari")
                         }
-                        .buttonStyle(DynamicCardSecondaryButtonStyle())
+                        .buttonStyle(VerificationContactButtonStyle())
                     }
 
                     if let phone = summary.phone, !phone.isEmpty {
@@ -137,7 +137,7 @@ struct VerificationCardView: View {
                         } label: {
                             Label(phone, systemImage: "phone.fill")
                         }
-                        .buttonStyle(DynamicCardSecondaryButtonStyle())
+                        .buttonStyle(VerificationContactButtonStyle())
                     }
 
                     if let emailURL {
@@ -146,7 +146,7 @@ struct VerificationCardView: View {
                         } label: {
                             Label(email ?? "Email", systemImage: "envelope.fill")
                         }
-                        .buttonStyle(DynamicCardSecondaryButtonStyle())
+                        .buttonStyle(VerificationContactButtonStyle())
                     }
                 }
 
@@ -160,5 +160,27 @@ struct VerificationCardView: View {
                     .fill(IrshadTheme.Colors.surfaceElevated)
             )
         }
+    }
+}
+
+private struct VerificationContactButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(IrshadTheme.Typography.statusMicrocopy)
+            .foregroundStyle(IrshadTheme.Colors.supportingAccent)
+            .lineLimit(2)
+            .multilineTextAlignment(.leading)
+            .frame(maxWidth: .infinity, minHeight: IrshadTheme.Layout.minimumTapTarget, alignment: .leading)
+            .padding(.horizontal, IrshadTheme.Layout.spacingStandard)
+            .background(
+                RoundedRectangle(cornerRadius: IrshadTheme.Layout.controlRadius, style: .continuous)
+                    .fill(configuration.isPressed ? IrshadTheme.Colors.indigoTint.opacity(0.7) : IrshadTheme.Colors.indigoTint)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: IrshadTheme.Layout.controlRadius, style: .continuous)
+                            .stroke(IrshadTheme.Colors.supportingAccent.opacity(0.28), lineWidth: 1)
+                    }
+            )
+            .opacity(configuration.isPressed ? 0.84 : 1)
+            .animation(IrshadTheme.Animations.buttonFeedback, value: configuration.isPressed)
     }
 }
