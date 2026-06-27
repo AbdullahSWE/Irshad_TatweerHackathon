@@ -48,15 +48,7 @@ Irshad targets the moment before a business exists: when a founder has a real id
 
 This is a real procedural problem. The UAE official business setup flow includes identifying the business activity, selecting the legal form, applying for a trade licence, registering the trade name, applying for initial approval, choosing a location, getting additional government approvals, submitting documents, and paying fees. Abu Dhabi’s ADRA setup guidance also starts with business activity and may require additional approvals depending on the activity and location.
 
-**Why that is hard for our user:** a first-time founder is not only asking “Can I start?” They are asking:
-
-| Question | Why it blocks action |
-|---|---|
-| Which licence applies to my exact activity? | The wrong licence path wastes time and money. |
-| Which authority do I contact? | ADRA / ADDED, ADAFSA, DCT Abu Dhabi, banks, and funds each cover different parts. |
-| What documents do I need? | Missing documents delay the first visit or application. |
-| What will it cost? | A founder with limited capital needs a realistic range before spending. |
-| What must I confirm officially? | AI guidance must not pretend to replace authorities. |
+For a first-time founder, the blocker is not the business idea. It is knowing which licence applies, which authority to contact, what documents are needed, what it may cost, and what must be officially verified.
 
 ### The example we built around
 
@@ -71,10 +63,8 @@ Ahmed is fictional, but the friction is real: official steps exist, but they are
 | | |
 |---|---|
 | **Primary user** | A first-time rural founder in Al Qua'a / Al Ain with a practical business idea but no business setup experience. |
-| **Device reality** | Phone-first. The UAE has very high mobile and internet adoption, so a mobile-first assistant is realistic. |
-| **Language reality** | The user may be more comfortable speaking Arabic than reading long English forms or portals. |
 | **Business types** | Camel dairy, dates and honey, farm products, home food, tailoring / henna / craft, livestock services, small retail, repair services, tutoring, and desert / astro-tourism. |
-| **Current cost of confusion** | Delays, wrong first calls, incomplete documents, uncertainty around licence fit, and sometimes paying a third party before the founder even understands the process. |
+| **Main barrier** | They know the idea, but not the licence, authority, document, cost, or banking path. |
 
 Irshad does **not** try to replace official portals. It prepares the founder to approach them with the right question, the likely path, and the missing information already identified.
 
@@ -119,38 +109,25 @@ Irshad is a voice-first iOS guide. The founder speaks an idea. The app asks a sm
 
 ---
 
-## 📊 V. Impact and Testable Claims
+## 📊 V. Impact, Evidence & Validation
 
 | # | Claim | Evidence / how to test |
 |---:|---|---|
 | 1 | Irshad gives different questions for different businesses while keeping the same path. | Run `stargazing on my land` and `sell camel milk`; compare Stage 2 cards. The path stays fixed, but question content changes. |
 | 2 | The founder can reach a first action plan without filling a traditional form. | Watch the demo video and inspect the screenshots in `Assets/` and `Evidence/screenshots/`. |
-| 3 | Important facts are labelled instead of silently presented as certain. | See `Assets/trust-labels.png` and the final plan screenshot, where unverified items are explicitly shown. |
-| 4 | The knowledge base is inspectable. | Open `Backend/kb/knowledge.json` and check source URLs, authorities, licence types, banks, and archetypes. |
-| 5 | The app can be verified without the iOS build. | Run the backend smoke test in [How to run or verify](#12-how-to-run-or-verify-it). |
-| 6 | The project is deployable with light infrastructure. | Thin SwiftUI client + stateless Next.js API + JSON knowledge base. No GPU or heavy database required for the prototype. |
+| 3 | The project is deployable with light infrastructure. | A simple Apple tesflight deployment. No GPU or heavy database required for the prototype. |
 
 <div align="center">
 <img src="Assets/evidence-scorecard.png" alt="Evidence pack overview" width="100%" />
 </div>
 
----
+### Knowledge Base Snapshot
 
-## 🔍 VI. Evidence and Validation
+| Artifact | Current coverage |
+|---|---|
+| `Backend/kb/knowledge.json` | 7 authorities, 6 licence types, 6 banks, 5 loan products, 10 funds/programmes, 11 business archetypes |
 
-The judging guide rewards specific, testable claims backed by evidence, not vague hype. This repo therefore separates product claims from proof.
-
-| Evidence | What it proves | Location |
-|---|---|---|
-| Demo video | End-to-end readiness | Top of README, replace with final YouTube link |
-| App screenshots | The product is built and has multiple working states | `Assets/` and `Evidence/screenshots/` |
-| Source matrix | The problem and KB are tied to official / reputable references | `Evidence/source-matrix.md` |
-| Test run sheet | Persona-by-persona verification format | `Evidence/test-runs.md` |
-| Rebuttals | Hard judge questions answered in advance | `Evidence/rebuttals.md` |
-| Limitations | Honest scope and risks | `Evidence/limitations.md` |
-| Run steps | Judge can verify without contacting us | This README |
-
-### Research references used for grounding
+### 🔗 Research References used for Grounding
 
 | Area | Source | Why it matters |
 |---|---|---|
@@ -165,9 +142,11 @@ The judging guide rewards specific, testable claims backed by evidence, not vagu
 
 ---
 
-## 🛡️ VII. Grounding and Safety
+## 🛡️ VI. Grounding and Safety
 
-An AI that invents a licence fee can hurt a founder. Irshad is designed to show uncertainty instead of hiding it.
+Irshad does not replace ADDED, ADRA, ADAFSA, TAMM, banks, lawyers, or business setup officers. It does not issue licences, submit applications, guarantee approval, or guarantee final fees.
+
+Its safety rule is simple: show what is verified, estimate only when grounded, and mark uncertain items as unverified with the exact authority question to ask.
 
 <div align="center">
 <img src="Assets/trust-labels.png" alt="Irshad trust labels" width="100%" />
@@ -180,24 +159,16 @@ An AI that invents a licence fee can hurt a founder. Irshad is designed to show 
 | **Unverified** | Needs official confirmation. | Show the authority and the exact question to ask. |
 | **Missing** | Not enough information yet. | Ask a follow-up or block final analysis. |
 
-### What Irshad is NOT
-
-Irshad does **not** replace ADDED, ADRA, ADAFSA, TAMM, banks, lawyers, or business setup officers.
-
-It does **not** issue licences, submit applications, call authorities, guarantee bank approval, or guarantee that a cost estimate is final.
-
-It helps the founder understand the likely first path, prepare the right documents and questions, and know what to verify before spending money.
-
 ---
 
-## 🚀 VIII. Feasibility and Deployment
+## 🚀 VII. Feasibility & Scalability
 
-| Area         | Current Approach                | Why It Is Feasible                                                          |
-| ------------ | ------------------------------- | --------------------------------------------------------------------------- |
-| App          | Swift + SwiftUI iOS app         | Runs on a normal iPhone with no special hardware.                           |
-| API calls    | Routed directly through the app | Keeps the prototype simple and easy to test.                                |
-| Intelligence | OpenRouter model call           | The model can be swapped without changing the full app.                     |
-| Knowledge    | Bundled JSON knowledge base     | UAE license, bank, authority, fee, and contact data can be updated clearly. |
+| Area | Why it is feasible now | How it scales |
+|---|---|---|
+| App | Runs on a normal iPhone | Same app can serve more users |
+| Intelligence | OpenRouter model call | Model can be swapped |
+| Knowledge | Bundled JSON KB | Swap KB per emirate/community |
+| Journey | Server/card-driven flow | Add archetypes without redesigning UI |
 
 ### Deployment Path
 
@@ -208,23 +179,7 @@ It helps the founder understand the likely first path, prepare the right documen
 
 ---
 
-## 🌍 IX. Scalability
-
-Irshad is designed to scale by changing the knowledge base, not rebuilding the app.
-
-| Today | Tomorrow |
-|---|---|
-| Al Qua'a / Al Ain focus | Other rural UAE communities. |
-| Abu Dhabi authorities | Swap to emirate-specific authorities. |
-| 11 archetypes | Add more archetypes as checklist entries. |
-| JSON source matrix | Replace or expand sources per region. |
-| Server-driven cards | Improve the journey without App Store resubmission. |
-
-The reusable parts are the voice interface, stage engine, trust-label system, adaptive card renderer, and final plan format.
-
----
-
-## 🏗️ X. Architecture and Tools
+## 🏗️ VIII. Architecture and Tools
 
 <div align="center">
 <img src="Assets/architecture.png" alt="Irshad architecture diagram" width="100%" />
@@ -240,28 +195,7 @@ The reusable parts are the voice interface, stage engine, trust-label system, ad
 
 ---
 
-## 📚 XI. Knowledge Base
-
-The knowledge base is the repo’s most inspectable artifact.
-
-| Record type | Current count | Each should include |
-|---|---:|---|
-| Government authorities | 7 | Name, role, phone, email, website, source URL. |
-| Licence types | 6 | Issuer, eligibility, cost basis, source URL. |
-| Banks | 6 | Requirements, documents, account-readiness notes. |
-| Loan products | 5 | Eligibility, terms, support source. |
-| Government funds / programmes | 10 | Who they support and how they are relevant. |
-| Business archetypes | 11 | Required slots and activity-specific questions. |
-
-Core authority naming used in the README and UI should be:
-
-> **ADRA / ADDED — Abu Dhabi Registration Authority / Abu Dhabi Department of Economic Development**
-
-For farm-related paths, the UI should point the founder toward the **Farm Licence / Farms and Small Producers Licence** only when eligibility fits, and otherwise mark it as something to verify with ADRA / ADDED.
-
----
-
-## 🧪 XII. How to Run or Verify It
+## 🧪 IX. How to Run or Verify It
 
 ### Backend
 
@@ -312,7 +246,7 @@ curl -X POST http://localhost:3000/api/journey/start \
 
 ---
 
-## 🛠️ XIII. Limitations and Next Steps
+## 🛠️ X. Limitations and Next Steps
 
 | Limitation | Why we accept it now | Next step |
 |---|---|---|
@@ -324,18 +258,15 @@ curl -X POST http://localhost:3000/api/journey/start \
 
 ---
 
-## ❓ XIV. Answering the Hard Questions
+## ❓ XI. Answering the Hard Questions
 
 | Judge question | Our answer |
 |---|---|
-| Why not just use TAMM or ADDED? | Those are official destinations. Irshad prepares a first-time founder before they go there: what activity, what licence path, which authority, what documents, and what to ask. |
-| Is this legal or business advice? | No. It is first-step guidance. It labels uncertainty and tells users what to verify with official authorities. |
-| What if the AI is wrong? | Critical outputs are labelled verified, estimated, unverified, or missing. Unsupported items are not presented as final. |
-| Why would rural founders use this? | It is voice-first, mobile-first, Arabic/English, and avoids forcing the user through long forms before they know the path. |
-| How do you maintain source accuracy? | The KB is inspectable and version-controlled. A local operator can update source URLs, dates, fees, and authority contacts. |
-| Can it scale beyond Al Qua'a? | Yes. The stage engine is generic; the community-specific part is the KB and archetypes. |
-| Is this just a chatbot? | No. It is a server-driven journey engine with structured stages, adaptive questions, a completeness gate, confidence labels, and a final plan format. |
-| Does it work today? | The prototype has a working iOS flow, backend journey engine, screenshots, and a smoke-test path. |
+| Why not just use TAMM or ADDED? | Those are official destinations. Irshad prepares the founder before they go there. |
+| Is this legal/business advice? | No. It is first-step guidance with uncertainty labels. |
+| What if the AI is wrong? | Unsupported outputs are marked unverified or missing, not presented as final. |
+| Why would rural founders use this? | It is voice-first, mobile-first, Arabic/English, and avoids long forms. |
+| Can it scale beyond Al Qua'a? | Yes. The app logic stays the same; the KB and archetypes change. |
 
 ---
 
