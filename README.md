@@ -156,7 +156,7 @@ Two guardrails keep the demo stable and honest:
 | 6 | The project is deployable with light infrastructure. | Thin SwiftUI client + stateless Next.js API + JSON knowledge base. No GPU or heavy database required for the prototype. |
 
 <div align="center">
-<img src="Assets/Evidence-scorecard.png" alt="Evidence pack overview" width="100%" />
+<img src="Assets/evidence-scorecard.png" alt="Evidence pack overview" width="100%" />
 </div>
 
 ---
