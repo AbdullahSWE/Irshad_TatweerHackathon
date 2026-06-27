@@ -10,38 +10,25 @@ struct JourneyHeaderView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: IrshadTheme.Layout.spacingStandard) {
-            HStack(alignment: .top, spacing: IrshadTheme.Layout.spacingStandard) {
-                VStack(alignment: .leading, spacing: IrshadTheme.Layout.spacingTight) {
-                    Text(viewModel.appTitle)
-                        .font(IrshadTheme.Typography.stepIndicatorDynamic)
-                        .foregroundStyle(IrshadTheme.Colors.primaryText)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.82)
+        VStack(alignment: .leading, spacing: IrshadTheme.Layout.spacingTight) {
+            HStack(alignment: .firstTextBaseline, spacing: IrshadTheme.Layout.spacingTight) {
+                Text(businessText)
+                    .font(IrshadTheme.Typography.secondaryLabelDynamic.weight(.semibold))
+                    .foregroundStyle(IrshadTheme.Colors.primaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.76)
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
-                    Text(viewModel.phaseHeadline)
-                        .font(IrshadTheme.Typography.secondaryLabelDynamic.weight(.semibold))
-                        .foregroundStyle(IrshadTheme.Colors.primaryAccent)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    Text(framingText)
-                        .font(IrshadTheme.Typography.statusMicrocopyDynamic)
-                        .foregroundStyle(IrshadTheme.Colors.secondaryText)
-                        .lineLimit(2)
-                        .fixedSize(horizontal: false, vertical: true)
+                if viewModel.isServiceBusy {
+                    ProgressView()
+                        .controlSize(.small)
+                        .tint(IrshadTheme.Colors.primaryAccent)
+                        .accessibilityHidden(true)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-                StatusPill(
-                    statusTitle,
-                    systemImage: statusIcon,
-                    tone: statusTone,
-                    showsSpinner: viewModel.isServiceBusy
-                )
             }
 
             if shouldShowPhaseDetails {
-                VStack(spacing: IrshadTheme.Layout.spacingStandard) {
+                VStack(spacing: IrshadTheme.Layout.spacingTight) {
                     PhaseProgressBar(progress: viewModel.progress, isServiceBusy: viewModel.isServiceBusy)
 
                     PhaseStepperView(
@@ -84,34 +71,13 @@ struct JourneyHeaderView: View {
         .animation(IrshadTheme.Animations.progressTransition, value: viewModel.isServiceBusy)
     }
 
-    private var framingText: String {
-        if viewModel.isServiceBusy, let serviceAction = normalized(viewModel.serviceActionMessage) {
-            return serviceAction
-        }
-
-        if let message = normalized(viewModel.framingMessage) {
-            return message
-        }
-
-        if let sessionLabel {
-            return sessionLabel
-        }
-
+    private var businessText: String {
         switch viewModel.currentLanguage {
         case .ar:
-            return "ابدأ رحلة موجهة لتأسيس مشروعك."
+            return "المشروع: \(viewModel.compactBusinessLabel)"
         case .en:
-            return "Start a guided journey to set up your business."
+            return "Business: \(viewModel.compactBusinessLabel)"
         }
-    }
-
-    private var sessionLabel: String? {
-        let trimmed = viewModel.sessionId.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else {
-            return nil
-        }
-
-        return "Session \(trimmed)"
     }
 
     private var statusTitle: String {

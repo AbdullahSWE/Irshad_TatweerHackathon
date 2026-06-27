@@ -2,6 +2,7 @@ import SwiftUI
 
 struct QuestionCardContainer<Content: View>: View {
     let card: DynamicCard
+    var screenTitle: String?
     var validationMessage: String?
     var isServiceBusy: Bool
     var showsConfirm: Bool
@@ -12,7 +13,7 @@ struct QuestionCardContainer<Content: View>: View {
     @ViewBuilder var content: Content
 
     var body: some View {
-        DynamicCardSurface(card: card, onCopy: onCopy) {
+        DynamicCardSurface(card: card, screenTitle: screenTitle, onCopy: onCopy) {
             content
 
             if let validationMessage = normalized(validationMessage) {
@@ -55,12 +56,13 @@ struct QuestionCardContainer<Content: View>: View {
 
 struct DynamicCardSurface<Content: View>: View {
     let card: DynamicCard
+    var screenTitle: String? = nil
     var onCopy: (() -> Void)? = nil
     @ViewBuilder var content: Content
 
     var body: some View {
         VStack(alignment: .leading, spacing: IrshadTheme.Layout.spacingComfortable) {
-            DynamicCardHeader(card: card, onCopy: onCopy)
+            DynamicCardHeader(card: card, screenTitle: screenTitle, onCopy: onCopy)
 
             content
         }
@@ -82,19 +84,20 @@ struct DynamicCardSurface<Content: View>: View {
 
 private struct DynamicCardHeader: View {
     let card: DynamicCard
+    var screenTitle: String?
     var onCopy: (() -> Void)?
 
     var body: some View {
         VStack(alignment: .leading, spacing: IrshadTheme.Layout.spacingStandard) {
             HStack(alignment: .top, spacing: IrshadTheme.Layout.spacingTight) {
                 VStack(alignment: .leading, spacing: 6) {
-                    if let eyebrow = card.eyebrowLabel {
+                    if let eyebrow = card.eyebrowLabel, !usesQuestionScreenTitle {
                         Text(eyebrow)
                             .font(IrshadTheme.Typography.statusMicrocopy)
                             .foregroundStyle(IrshadTheme.Colors.primaryAccent)
                     }
 
-                    Text(card.displayTitle)
+                    Text(headerTitle)
                         .font(IrshadTheme.Typography.cardTitle)
                         .foregroundStyle(IrshadTheme.Colors.primaryText)
                         .fixedSize(horizontal: false, vertical: true)
@@ -113,7 +116,7 @@ private struct DynamicCardHeader: View {
                 }
             }
 
-            if let subtitle = card.displaySubtitle {
+            if let subtitle = headerSubtitle {
                 Text(subtitle)
                     .font(IrshadTheme.Typography.secondaryLabel)
                     .foregroundStyle(IrshadTheme.Colors.secondaryText)
@@ -133,6 +136,33 @@ private struct DynamicCardHeader: View {
             }
             .fixedSize(horizontal: false, vertical: true)
         }
+    }
+
+    private var usesQuestionScreenTitle: Bool {
+        card.kind == .question && normalized(screenTitle) != nil
+    }
+
+    private var headerTitle: String {
+        if usesQuestionScreenTitle, let screenTitle = normalized(screenTitle) {
+            return screenTitle
+        }
+
+        return card.displayTitle
+    }
+
+    private var headerSubtitle: String? {
+        if usesQuestionScreenTitle {
+            return [card.displayTitle, card.displaySubtitle]
+                .compactMap { normalized($0) }
+                .joined(separator: "\n")
+        }
+
+        return card.displaySubtitle
+    }
+
+    private func normalized(_ value: String?) -> String? {
+        let trimmed = value?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return trimmed.isEmpty ? nil : trimmed
     }
 }
 

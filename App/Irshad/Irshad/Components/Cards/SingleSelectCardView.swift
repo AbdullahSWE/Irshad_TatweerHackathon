@@ -20,6 +20,7 @@ struct SingleSelectCardView: View {
     var body: some View {
         QuestionCardContainer(
             card: card,
+            screenTitle: viewModel.questionScreenTitle,
             validationMessage: viewModel.cardValidationMessage,
             isServiceBusy: viewModel.isServiceBusy,
             showsConfirm: !shouldAutoSubmit,
@@ -29,7 +30,7 @@ struct SingleSelectCardView: View {
             onConfirm: { viewModel.submitCardAnswer(card.cardId) }
         ) {
             VStack(spacing: IrshadTheme.Layout.spacingTight) {
-                ForEach(card.options) { option in
+                ForEach(Array(card.options.enumerated()), id: \.element.id) { index, option in
                     Button {
                         viewModel.selectSingleOption(cardID: card.cardId, optionID: option.id)
 
@@ -47,6 +48,14 @@ struct SingleSelectCardView: View {
                     }
                     .buttonStyle(.plain)
                     .disabled(viewModel.isServiceBusy)
+                    .transition(.move(edge: .trailing).combined(with: .opacity))
+                    .animation(
+                        IrshadTheme.Animations.resolved(
+                            .easeOut(duration: 0.28).delay(Double(index) * 0.04),
+                            reduceMotion: viewModel.reduceMotionPreferred
+                        ),
+                        value: card.cardId
+                    )
                 }
             }
         }

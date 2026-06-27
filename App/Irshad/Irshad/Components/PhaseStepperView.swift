@@ -9,7 +9,10 @@ struct PhaseStepperView: View {
 
     private var visiblePhases: [JourneyPhase] {
         let servicePhases = phases.filter { $0 != .unknown }
-        return servicePhases.isEmpty ? JourneyPhase.visibleOrder : servicePhases
+        let source = servicePhases.isEmpty ? JourneyPhase.visibleOrder : servicePhases
+        let compactOrder: [JourneyPhase] = [.business, .founder, .details, .budget, .documents]
+        let compact = compactOrder.filter { source.contains($0) }
+        return compact.isEmpty ? compactOrder : compact
     }
 
     var body: some View {
@@ -65,22 +68,13 @@ private struct PhaseStepItem: View {
     var body: some View {
         HStack(alignment: .top, spacing: IrshadTheme.Layout.spacingTight) {
             VStack(spacing: 6) {
-                ZStack {
-                    Circle()
-                        .fill(dotFill)
-                        .frame(width: dotSize, height: dotSize)
-                        .overlay {
-                            Circle()
-                                .stroke(dotStroke, lineWidth: state == .pending ? 1 : 0)
-                        }
-
-                    if state == .completed {
-                        Image(systemName: "checkmark")
-                            .font(.system(size: 9, weight: .bold))
-                            .foregroundStyle(.white)
-                            .accessibilityHidden(true)
+                Circle()
+                    .fill(dotFill)
+                    .frame(width: dotSize, height: dotSize)
+                    .overlay {
+                        Circle()
+                            .stroke(dotStroke, lineWidth: state == .pending ? 1 : 0)
                     }
-                }
                 .frame(width: IrshadTheme.Layout.minimumTapTarget, height: 22)
 
                 Text(title)
@@ -110,9 +104,9 @@ private struct PhaseStepItem: View {
     private var dotSize: CGFloat {
         switch state {
         case .completed:
-            IrshadTheme.Layout.phaseDotSize + 8
+            IrshadTheme.Layout.phaseDotSize
         case .current:
-            IrshadTheme.Layout.phaseDotSize + 12
+            IrshadTheme.Layout.phaseDotSize + 6
         case .pending:
             IrshadTheme.Layout.phaseDotSize
         }
@@ -121,7 +115,7 @@ private struct PhaseStepItem: View {
     private var dotFill: Color {
         switch state {
         case .completed:
-            IrshadTheme.Colors.verifiedTint.opacity(0.95)
+            IrshadTheme.Colors.primaryAccent.opacity(0.58)
         case .current:
             IrshadTheme.Colors.primaryAccent
         case .pending:
@@ -168,9 +162,9 @@ private enum PhaseStepState {
     var accessibilityValue: String {
         switch self {
         case .completed:
-            "Completed"
+            "Done"
         case .current:
-            "Current phase"
+            "Current"
         case .pending:
             "Pending"
         }
@@ -181,9 +175,9 @@ private extension JourneyPhase {
     var compactDisplayName: String {
         switch self {
         case .goal:
-            "Goal"
+            "Start"
         case .business:
-            "Biz"
+            "Business"
         case .founder:
             "Founder"
         case .details:

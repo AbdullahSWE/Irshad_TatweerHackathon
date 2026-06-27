@@ -23,6 +23,7 @@ struct TextAnswerCardView: View {
     var body: some View {
         QuestionCardContainer(
             card: card,
+            screenTitle: viewModel.questionScreenTitle,
             validationMessage: viewModel.cardValidationMessage,
             isServiceBusy: viewModel.isServiceBusy,
             showsConfirm: true,

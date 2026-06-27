@@ -201,13 +201,11 @@ extension JourneyViewModel {
     }
 
     var onboardingGreetingMessage: String {
-        let name = selectedVoicePersona.displayName(in: currentLanguage)
-
         switch currentLanguage {
         case .ar:
-            return "السلام عليكم، أنا \(name) وسأساعدك في إعداد مشروعك. أخبرني ما نوع المشروع الذي تريد تأسيسه."
+            return "يرجى الإجابة عن بعض الأسئلة حتى نتمكن من تقديم التوصيات المناسبة. ما نوع المشروع الذي تريد تأسيسه؟"
         case .en:
-            return "Assalamu Alaikum, I'm \(name) and I'm here to help you set up your business. Please share what business you'd like to set up."
+            return "Please answer a few questions so we can make the proper recommendations. What business would you like to set up?"
         }
     }
 
@@ -269,6 +267,38 @@ extension JourneyViewModel {
             title = "Irshad journey"
         }
         return "\(title) \(emoji)"
+    }
+
+    var questionScreenTitle: String {
+        switch currentLanguage {
+        case .ar:
+            return "ساعدنا نفهم أكثر \(selectedVoicePersona.assistantEmoji)"
+        case .en:
+            return "Help us understand better \(selectedVoicePersona.assistantEmoji)"
+        }
+    }
+
+    var compactBusinessLabel: String {
+        let fallback: String
+        switch currentLanguage {
+        case .ar:
+            fallback = "لم يحدد بعد"
+        case .en:
+            fallback = "Not decided yet"
+        }
+
+        guard let activeSession else {
+            return fallback
+        }
+
+        let candidates = [
+            activeSession.filledSlots["activity"]?.displayString,
+            activeSession.goalText
+        ]
+
+        return candidates
+            .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .first { !$0.isEmpty } ?? fallback
     }
 
     var shouldShowVerificationDecision: Bool {

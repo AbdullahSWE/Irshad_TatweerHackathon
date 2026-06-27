@@ -30,6 +30,7 @@ struct ToggleAnswerCardView: View {
     var body: some View {
         QuestionCardContainer(
             card: card,
+            screenTitle: viewModel.questionScreenTitle,
             validationMessage: viewModel.cardValidationMessage,
             isServiceBusy: viewModel.isServiceBusy,
             showsConfirm: true,
@@ -39,7 +40,7 @@ struct ToggleAnswerCardView: View {
             onConfirm: { viewModel.submitCardAnswer(card.cardId) }
         ) {
             HStack(spacing: IrshadTheme.Layout.spacingTight) {
-                ForEach(choices, id: \.value) { choice in
+                ForEach(Array(choices.enumerated()), id: \.element.value) { index, choice in
                     Button {
                         viewModel.setToggleAnswer(cardID: card.cardId, value: choice.value)
                     } label: {
@@ -69,6 +70,14 @@ struct ToggleAnswerCardView: View {
                     .buttonStyle(.plain)
                     .disabled(viewModel.isServiceBusy)
                     .accessibilityValue(Text(selectedValue == choice.value ? "Selected" : "Not selected"))
+                    .transition(.move(edge: .trailing).combined(with: .opacity))
+                    .animation(
+                        IrshadTheme.Animations.resolved(
+                            .easeOut(duration: 0.28).delay(Double(index) * 0.04),
+                            reduceMotion: viewModel.reduceMotionPreferred
+                        ),
+                        value: card.cardId
+                    )
                 }
             }
         }
