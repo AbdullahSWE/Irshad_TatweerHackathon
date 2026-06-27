@@ -1,308 +1,265 @@
-<!-- =============================================================== -->
-<!--  HERO WORDMARK                                                  -->
-<!--  IMAGE PLACEHOLDER → assets/hero-wordmark.png                   -->
-<!--  Description: Full-bleed banner. Deep midnight-indigo (#0B1437) -->
-<!--  night sky fading to signal-blue, faint star field (a nod to   -->
-<!--  Al Qua'a's stargazing skies). Centered: the Arabic wordmark    -->
-<!--  "إرشاد" large in Bricolage Grotesque, with "IRSHAD" beneath in  -->
-<!--  tracked-out caps, and a single bright guiding-star ✦ above the  -->
-<!--  dot of the letterform. Tagline underneath in star-white.       -->
-<!-- =============================================================== -->
-
 <div align="center">
 
-<img src="assets/hero-wordmark.png" alt="Irshad — إرشاد" width="100%" />
+<img src="Assets/irshad-banner.png" alt="Irshad — إرشاد" width="100%" />
 
-# إرشاد · Irshad
+#  إرشاد · Irshad 🗣️💼
 
-**An Arabic, voice-first AI guide that walks a first-time rural founder from “I have an idea” to “here is my first action” — without a single form.**
+**A voice-controlled Arabic/English business guide that feels like a normal conversation and uses curated UAE license and bank database to create your tailored business action plan.**
 
-<sub>✦ &nbsp; Tatweer Hackathon 2026 &nbsp;·&nbsp; Al Qua'a, Al Ain, UAE &nbsp;·&nbsp; Challenge 1 — Taking the First Entrepreneurial Step &nbsp; ✦</sub>
+<sub>Tatweer Hackathon 2026 · Al Qua'a, Al Ain, UAE · Challenge 1 — Taking the First Entrepreneurial Step</sub>
 
 <br/>
 
-`SwiftUI iOS` &nbsp;•&nbsp; `Next.js journey engine` &nbsp;•&nbsp; `Grounded Abu Dhabi knowledge base` &nbsp;•&nbsp; `Arabic + English`
+`Swift iOS` · `OpenRouter LLM` · `UAE Licenses & Bank Database` · `English + Arabic`
+
+</div>
+
+<div align="center">
+
+[<img src="Assets/demo-thumbnail.png" alt="Watch the Irshad demo" width="88%" />](https://youtube.com/REPLACE_WITH_DEMO_LINK)
+
+<sub>Demo: spoken idea → adaptive questions → grounded roadmap. Replace the URL above with the final YouTube demo link.</sub>
 
 </div>
 
 ---
 
-<div align="center"><sub>THE SITUATION</sub></div>
-
-## ✦ &nbsp; Ahmed already has the business. He just can't start it.
-
-> Ahmed is 55. He has kept camels in Al Qua'a his whole life, and his milk is good enough that neighbours already pay for it. He has **AED 20,000** set aside and a real idea: sell camel milk, legally.
->
-> He does not know which **licence** he needs. Or which **authority** issues it. Or whether a **bank** will open an account for him. Or what it will **cost**. Or **who to call**. So the idea stays an idea — not for lack of ambition, but for lack of a first move.
-
-Ahmed is not unusual. Across Al Qua'a — a dispersed rural community on the Tropic of Cancer, where many families live off camel farms — the barrier to entrepreneurship is almost never the idea. It is the **invisible procedural wall** between an idea and a registered business: licences, jurisdictions, approvals, documents, eligibility, banking. The knowledge exists, but it is scattered across government portals, written for people who already know the system, and rarely in plain spoken Arabic.
-
-> **Challenge 1 — Taking the first entrepreneurial step.** *“Many people here have a viable idea or a real skill but never take the first step… The barrier is rarely ambition, it is not knowing what the first move is, what is required, or where to begin.”*
-
-This is the specific problem we chose, and the exact person we built for.
-
----
-
-<div align="center"><sub>WHO WE BUILT FOR</sub></div>
-
-## ✦ &nbsp; The target demographic
+## 🔹 Irshad in 60 Seconds
 
 | | |
 |---|---|
-| **Primary** | A first-time founder in a rural UAE community who has an idea or a skill but has never registered a business — and does not know the legal, banking, or government process. |
-| **Their reality** | Often more comfortable **speaking Arabic than filling English web forms**; on a phone, not a laptop; on patchy connectivity; with modest starting capital. |
-| **The livelihoods** | Camel milk & dairy, dates & honey, home food, tailoring / henna / craft, livestock services, small retail, repair services, tutoring — and the local headline act: **desert & astro-tourism** under Al Qua'a's famously dark skies. |
-
-We encoded these as **11 real business archetypes** (see [the knowledge base](#-the-evidence-the-knowledge-base)) so the guidance is shaped to *this* community's actual economy — not a generic “start a company” wizard.
-
----
-
-<div align="center"><sub>THE SOLUTION</sub></div>
-
-## ✦ &nbsp; Irshad — guidance, by conversation
-
-The name **إرشاد (irshād)** means *guidance* — and in a place known for its night sky, we took that literally. Irshad is a guide you **talk to**. You say your idea out loud in Arabic; it asks a handful of simple, spoken questions; and it fills in the business profile *for* you. No forms, no jargon, no dead ends.
-
-Underneath the conversation is the idea that makes Irshad work as a **product, not a chatbot**:
-
-> ### A *defined path*, with an AI that adapts *inside* it.
->
-> The journey always follows the same ordered backbone of stages — so it is predictable, grounded, and demo-stable. But **within** each stage the AI generates the questions that matter for *this* activity, skips what is irrelevant, and stops asking once the stage is satisfied. A stargazing host gets land & hosting questions; a home-food cook gets kitchen & food-safety questions. **Same path, different questions.**
-
-The client is deliberately “dumb”: a thin SwiftUI renderer that draws whatever card the server sends and asks *“what’s next?”*. All the intelligence — the path, the adaptive questioning, the grounding — lives server-side, so guidance improves without shipping a new app.
-
-<!-- =============================================================== -->
-<!--  APP FLOW — 3-UP SCREENSHOTS                                     -->
-<!--  IMAGE PLACEHOLDER → assets/flow-3up.png                         -->
-<!--  Description: Three iPhone frames side by side on the indigo→blue -->
-<!--  gradient. (1) The voice/idea screen: a glowing radial audio orb  -->
-<!--  mid-listen with an Arabic prompt. (2) An adaptive question card  -->
-<!--  ("Do you own the land or use public desert?") with a stage       -->
-<!--  stepper across the top (Business · Founder · Details · Budget ·  -->
-<!--  Documents). (3) The final roadmap with a green "verified" badge, -->
-<!--  an amber "confirm by phone" badge, and a tappable phone number.  -->
-<!-- =============================================================== -->
+| **Problem** | First-time rural founders often know their business idea, but not the legal, authority, banking, document, and cost steps needed to start. |
+| **Solution** | Irshad lets the founder speak naturally, asks only the questions needed, and produces a first-step action plan with confidence labels. |
+| **Built** | Working SwiftUI app, voice input/output, adaptive cards, final plan screen, and a sourced Abu Dhabi knowledge base. |
+| **Why it matters** | It turns a confusing setup process into one guided conversation, while clearly showing what is verified, estimated, missing, or still needs official confirmation. |
+| **How to verify** | Run the app, use the API smoke test, inspect `Backend/kb/knowledge.json`, and check the evidence pack linked below. |
 
 <div align="center">
-<img src="assets/flow-3up.png" alt="Speak an idea → adaptive cards fill the profile → grounded roadmap" width="100%" />
-<br/><sub>Speak an idea &nbsp;→&nbsp; adaptive cards fill the profile &nbsp;→&nbsp; a grounded launch roadmap</sub>
+<img src="Assets/comic-2x2.png" alt="Irshad story in four panels" width="100%" />
 </div>
 
-### The journey — an 11-stage path you navigate like stars
+---
 
-The server walks a fixed backbone. Stages **1–6 collect** (adaptive questions). A **completeness gate** then opens, and stages **7–11 produce** the plan — each its own honest step. Because the journey *is* a real ordered sequence, the numbers below mean something; they are not decoration.
+## 🎯 I. The Challenge and the Problem
 
-```
-        COLLECT  ─ adaptive within each stage ───────────────────────────────────
+**Chosen challenge:** Challenge 1 — Taking the First Entrepreneurial Step.
 
-   ✦ 01  GOAL ........... say the idea aloud → AI classifies it to an archetype
-   │
-   ✦ 02  BUSINESS ....... activity details   ← questions specific to THIS activity
-   │
-   ✦ 03  FOUNDER ........ individual/team, residency, existing business, language
-   │
-   ✦ 04  DETAILS ........ location, jurisdiction, sales channel, office need
-   │
-   ✦ 05  BUDGET ......... capital, revenue, employees, growth
-   │
-   ✦ 06  DOCUMENTS ...... IDs, assets, permits held vs. needed
-   │
-   ═════ COMPLETENESS GATE ═══ all required slots filled → produce the plan ══════
-   │
-   ✦ 07  ANALYZE ........ match activity + estimate setup cost + confidence score
-   │
-   ✦ 08  VERIFY ......... confirm the live facts; if unsure, hand over the real
-   │                      authority's name + phone instead of guessing
-   ✦ 09  LICENSE ........ best licence + alternatives (pros, cons, timeline, cost)
-   │
-   ✦ 10  BANKING ........ banks matched to the founder's profile & eligibility
-   │
-   ✦ 11  PLAN ........... one roadmap, total cost, total timeline, next action
-```
+Irshad targets the moment before a business exists: when a founder has a real idea, but does not know the first legal, banking, authority, and document steps.
 
-Two guardrails keep it stable and honest in a live demo: a **hard cap of 8 questions** (it can never loop forever), and a **floor** that refuses to analyse before the four core slots — `activity`, `residency`, `location`, `capital` — are known.
+This is a real procedural problem. The UAE official business setup flow includes identifying the business activity, selecting the legal form, applying for a trade licence, registering the trade name, applying for initial approval, choosing a location, getting additional government approvals, submitting documents, and paying fees. Abu Dhabi’s ADRA setup guidance also starts with business activity and may require additional approvals depending on the activity and location.
+
+For a first-time founder, the blocker is not the business idea. It is knowing which licence applies, which authority to contact, what documents are needed, what it may cost, and what must be officially verified.
+
+### The example we built around
+
+> Ahmed is 55. He has kept camels in Al Qua'a his whole life. Neighbours already buy his camel milk. He has AED 20,000 and wants to sell legally. He does not know which licence, authority, bank, documents, or cost path applies, so the idea stays stuck.
+
+Ahmed is fictional, but the friction is real: official steps exist, but they are spread across portals and written for people who already understand the system.
 
 ---
 
-<div align="center"><sub>WHY YOU CAN TRUST WHAT IT SAYS</sub></div>
+## 👥 II. Who It Is For and the Situation They Face
 
-## ✦ &nbsp; It is grounded, and it admits what it doesn't know
+| | |
+|---|---|
+| **Primary user** | A first-time rural founder in Al Qua'a / Al Ain with a practical business idea but no business setup experience. |
+| **Business types** | Camel dairy, dates and honey, farm products, home food, tailoring / henna / craft, livestock services, small retail, repair services, tutoring, and desert / astro-tourism. |
+| **Main barrier** | They know the idea, but not the licence, authority, document, cost, or banking path. |
 
-An AI that confidently invents a licence fee is worse than useless to Ahmed — it is dangerous. So Irshad is built to be **falsifiable on screen**. Every figure it shows carries a trust label, and the agent is prompted **never to invent** a licence, a fee, or a phone number.
-
-| Label | Meaning | Shown when |
-|:--|:--|:--|
-| ● **Verified** | Confirmed against a source | the fact was confirmed in the verify step |
-| ● **Estimated** | A range grounded in the KB | KB gives a range, not an exact figure |
-| ● **Unverified — confirm by phone** | Honest gap | the agent could not confirm it → it shows the **real authority + number to call** |
-| ● **Missing** | Not yet known | a required slot is still empty |
-
-The agent **never calls anyone**. When it can't confirm a fact online, it does the honest thing: it surfaces the relevant authority's real name and phone number as a tappable `tel:` link and tells the founder exactly what to ask. *The founder stays in control; the app never fabricates and never auto-dials.*
-
-> A judge can break this on purpose: feed Irshad a fake or unknown business and it returns **“not verified”** instead of inventing one. That failure mode is the feature.
+Irshad does **not** try to replace official portals. It prepares the founder to approach them with the right question, the likely path, and the missing information already identified.
 
 ---
 
-<div align="center"><sub>THE IMPACT, AS TESTABLE CLAIMS</sub></div>
+## 💡 III. The Solution
 
-## ✦ &nbsp; Impact — and how to falsify each claim
+Irshad is a voice-first iOS guide. The founder speaks an idea. The app asks a small number of adaptive questions. The server fills a structured business profile. Once enough information is known, Irshad produces a plan with:
 
-We state these as **specific, checkable claims**, not hype. Each one can be verified from this repository or a 5-minute run.
-
-| # | Claim | How to test it |
-|:--|:--|:--|
-| 1 | **Two founders with different ideas get different questions** along the same path. | Run the journey with *“stargazing on my land”* vs *“sell camel milk”*; compare the Stage-2 cards. They differ (land/hosting vs kitchen/food-safety). |
-| 2 | **Idea → action plan in ≤ 8 questions.** The path can never exceed an 8-question cap. | `Backend/lib/journey.ts` → `MAX_QUESTIONS = 8`. Run any persona to a finished roadmap. |
-| 3 | **Every shown fact is traceable to a dated source**, or labelled unverified. | `Backend/kb/knowledge.json` carries `last_verified: 2026-06-26`; each authority has a `source_url`. |
-| 4 | **The agent will not invent a licence, fee, or phone number.** | Read the grounding prompts in `Backend/lib/llm.ts`; feed an unknown business and watch it return `not_verified` / `not_found`. |
-| 5 | **It speaks the founder's language.** Full Arabic (RTL) and English, voice in and out. | Switch language; values come back in Arabic. Voice via Apple Speech + `AVSpeechSynthesizer`. |
-| 6 | **It runs on the hardware the community actually has** — one iPhone, one server. | Follow [How to run](#-how-to-run--verify); end-to-end on an iOS 16+ device. |
-
-**The benefit, plainly:** a first-time founder who today would stall — or pay an agent to navigate the process — instead leaves with a named licence, the issuing authority, a cost range, candidate banks, the documents required, and a single concrete next action. That is the gap between an idea and a business, closed in one conversation.
-
----
-
-<div align="center"><sub>THE EVIDENCE</sub></div>
-
-## ✦ &nbsp; The knowledge base
-
-Irshad’s honesty is only as good as what it stands on. We hand-built a **verified Abu Dhabi business-setup knowledge base** focused on Al Qua'a / Al Ain, dated and sourced. This is the repo's most checkable artifact — open `Backend/kb/knowledge.json` and count.
+| Output | Example |
+|---|---|
+| Business activity match | Camel milk / dairy product |
+| Recommended licence path | Farm / small producer or standard economic path, depending on eligibility |
+| Official authority | ADRA / ADDED, ADAFSA, DCT Abu Dhabi, or another relevant body |
+| Cost range | Labelled as estimated unless confirmed |
+| Required approvals | Food safety, agriculture, tourism, or other activity-specific checks |
+| Bank suggestions | Candidate banks matched to founder profile and documents |
+| Next action | A concrete question to ask, number to call, or document to prepare |
+| Confidence labels | Verified, estimated, unverified, or missing |
 
 <div align="center">
-
-| Records | Count | Each carries |
-|:--|:--:|:--|
-| Government authorities | **7** | real phone, email, website, **source URL** |
-| Licence types | **6** | issuer, eligibility, cost basis |
-| Banks | **6** | min balance basis, requirements, docs |
-| Loan products | **5** | eligibility & terms |
-| Government funds & programs | **10** | who they support |
-| Business archetypes | **11** | activity-specific required-slots checklist |
-
+<img src="Assets/demo-flow-5up.png" alt="Irshad app flow from welcome to final plan" width="100%" />
 </div>
 
-Real authorities, with real numbers: **ADRA / ADDED**, **ADAFSA**, **DCT Abu Dhabi**, **Khalifa Fund**, **EDB**, **ADIO**, **Ma'an** — the actual bodies a rural founder in Abu Dhabi must deal with. The 11 archetypes (astro-tourism, camel dairy, dates/honey, home food, tailoring/henna/craft, livestock services, retail, AgriTech, freelance, repair, tutoring) are drawn straight from Al Qua'a's livelihoods.
+---
+
+## ✅ IV. What Is Working Now
+
+| Status | Feature |
+|---|---|
+| ✅ | SwiftUI iOS welcome screen with guide and language selection. |
+| ✅ | Voice-first interaction using Apple Speech and `AVSpeechSynthesizer`. |
+| ✅ | Server-driven question cards and progress stages. |
+| ✅ | Adaptive business profile capture. |
+| ✅ | Final plan screen with approvals, banks, confidence, unverified items, share, copy, and continue options. |
+| ✅ | Trust labels for verified / estimated / unverified / missing facts. |
+| ✅ | Sourced Abu Dhabi knowledge base. |
+| ⚠️ | The prototype does not submit government applications or guarantee approval. |
+| ⚠️ | Live fact verification depends on the current knowledge base and available online sources. |
 
 ---
 
-<div align="center"><sub>FEASIBILITY · DEPLOYMENT · SCALE</sub></div>
+## 📊 V. Impact, Evidence & Validation
 
-## ✦ &nbsp; Built to deploy, designed to replicate
+| # | Claim | Evidence / how to test |
+|---:|---|---|
+| 1 | Irshad gives different questions for different businesses while keeping the same path. | Run `stargazing on my land` and `sell camel milk`; compare Stage 2 cards. The path stays fixed, but question content changes. |
+| 2 | The founder can reach a first action plan without filling a traditional form. | Watch the demo video and inspect the screenshots in `Assets/` and `Evidence/screenshots/`. |
+| 3 | The project is deployable with light infrastructure. | A simple Apple tesflight deployment. No GPU or heavy database required for the prototype. |
 
-**Feasibility — it is realistic to run, today.** The whole system is a thin SwiftUI client plus one stateless Next.js server and a JSON knowledge base. No GPU, no heavy infra, no per-user database to maintain. The LLM runs through **OpenRouter** (model swappable; default `google/gemini-2.5-flash-lite`) — so inference is a low, per-call cost, not a fixed server bill. Maintenance is mostly *keeping the KB current*, which is a content task a non-engineer can do by editing one file.
+<div align="center">
+<img src="Assets/evidence-scorecard.png" alt="Evidence pack overview" width="100%" />
+</div>
 
-**Deployment.** The backend deploys to any Node host (Vercel/Render/a single VM) in minutes; the iOS app distributes via TestFlight / the App Store. A community organisation could stand up its own instance without a dedicated platform team.
+### 📚 Knowledge Base Snapshot
 
-**Scalability beyond the event — this is the part we designed for.**
+| Artifact | Current coverage |
+|---|---|
+| `Backend/kb/knowledge.json` | 7 authorities, 6 licence types, 6 banks, 5 loan products, 10 funds/programmes, 11 business archetypes |
 
-```
-   Al Qua'a today              Any rural community tomorrow
-   ───────────                 ────────────────────────────
-   Abu Dhabi KB        ──►     swap knowledge.json per emirate / region
-   11 archetypes       ──►     add an archetype = add one checklist entry
-   thin client         ──►     same app, new server, no resubmission
-   server-driven path  ──►     improve guidance for everyone, instantly
-```
+### 🔗 Research References used for Grounding
 
-Because the client knows *nothing* about the journey, the entire product can be re-pointed at a new community by **editing data, not code**. The defined-path engine, the trust-label system, the voice layer, and the card renderer are all community-agnostic. Al Qua'a is the first map; the navigator is reusable.
+| Area | Source | Why it matters |
+|---|---|---|
+| UAE business setup steps | [UAE official portal — Steps to start a business on the mainland](https://u.ae/en/information-and-services/business/doing-business-on-the-mainland/steps-to-start-a-business-on-the-mainland) | Confirms the setup process is multi-step. |
+| Abu Dhabi setup path | [ADRA — Business setup](https://www.adra.gov.ae/en/establishing) | Confirms activity, location, legal form, initial approval, and additional approvals are part of setup. |
+| Farm / small producer path | [ADRA — Farm Licence](https://www.adra.gov.ae/en/establishing/small-producers-licence) | Confirms the farms and small producers path for citizens who own or lease farms. |
+| Abu Dhabi licensing categories | [ADDED — Licensing requirements](https://www.added.gov.ae/en/set-up/establish-your-business/licensing-requirements) | Confirms the small producers licence and standard economic licence context. |
+| Agriculture and food safety | [ADAFSA — Agricultural sustainability](https://adafsa.gov.ae/en/work/agricultural-sustainability/Pages/default.aspx) | Supports agriculture / food-safety relevance in Abu Dhabi. |
+| Camel farms and Al Ain relevance | [DCT Abu Dhabi — local camel farms](https://dct.gov.ae/en/media.centre/news/visit.local.camel.farms.with.the.travel.through.our.traditions.tour.series.in.al.ain.aspx) | Supports the cultural / economic relevance of camel activity around Al Ain. |
+| Al Qua'a astro-tourism relevance | [Associated Press — Al Quaa Desert stargazing](https://apnews.com/article/ee678e1b535df81edc96f5140ad5e998) | Supports the local dark-sky / astro-tourism opportunity. |
+| Mobile-first feasibility | [DataReportal — Digital 2026 UAE](https://datareportal.com/reports/digital-2026-united-arab-emirates) | Supports mobile-first delivery in the UAE context. |
 
 ---
 
-<div align="center"><sub>UNDER THE HOOD</sub></div>
+## 🛡️ VI. Grounding and Safety
 
-## ✦ &nbsp; Architecture & tools
+Irshad does not replace ADDED, ADRA, ADAFSA, TAMM, banks, lawyers, or business setup officers. It does not issue licences, submit applications, guarantee approval, or guarantee final fees.
 
-```
-   ┌──────────────────────────────┐         ┌────────────────────────────────────┐
-   │   iOS · SwiftUI (thin client)│  HTTPS  │      Next.js · journey engine        │
-   │                              │ ◄─────► │                                      │
-   │  • voice in/out (Apple       │  JSON   │  /journey/start   classify idea      │
-   │    Speech + AVSpeechSynth)   │  cards  │  /journey/next    adaptive loop      │
-   │  • generic card renderer     │         │  /analyze /verify /license           │
-   │  • stage stepper + progress  │         │  /banking /plan/final                │
-   │  • trust-label UI            │         │                ▲                     │
-   └──────────────────────────────┘         │                │ grounded prompts    │
-                                            │     ┌──────────┴──────────┐          │
-                                            │     │  LLM (OpenRouter)   │          │
-                                            │     └──────────┬──────────┘          │
-                                            │     ┌──────────┴──────────┐          │
-                                            │     │ knowledge.json (KB) │ sources  │
-                                            │     └─────────────────────┘          │
-                                            └────────────────────────────────────┘
-```
+Its safety rule is simple: show what is verified, estimate only when grounded, and mark uncertain items as unverified with the exact authority question to ask.
+
+<div align="center">
+<img src="Assets/trust-labels.png" alt="Irshad trust labels" width="100%" />
+</div>
+
+| Label | Meaning | Product behavior |
+|---|---|---|
+| **Verified** | Confirmed against a source. | Show as usable information. |
+| **Estimated** | Grounded range, not an exact official figure. | Show range and avoid pretending it is final. |
+| **Unverified** | Needs official confirmation. | Show the authority and the exact question to ask. |
+| **Missing** | Not enough information yet. | Ask a follow-up or block final analysis. |
+
+---
+
+## 🚀 VII. Feasibility & Scalability
+
+| Area | Why it is feasible now | How it scales |
+|---|---|---|
+| App | Runs on a normal iPhone | Same app can serve more users |
+| Intelligence | OpenRouter model call | Model can be swapped |
+| Knowledge | Bundled JSON KB | Swap KB per emirate/community |
+| Journey | Server/card-driven flow | Add archetypes without redesigning UI |
+
+### 📱 Deployment Path
+
+| Phase      | Deployment                                                                                  |
+| ---------- | ------------------------------------------------------------------------------------------- |
+| Hackathon  | iPhone demo using the SwiftUI app with direct API calls and bundled knowledge base.         |
+| TestFlight | Shared through Apple TestFlight so testers can install it using the QR code in Section XII. |
+
+---
+
+## 🏗️ VIII. Architecture and Tools
+
+<div align="center">
+<img src="Assets/architecture.png" alt="Irshad architecture diagram" width="100%" />
+</div>
 
 | Layer | Tools |
-|:--|:--|
-| **Client** | Swift 5.9, SwiftUI, iOS 16+, Apple Speech & `AVSpeechSynthesizer`, **Bricolage Grotesque** type, full RTL / Dynamic Type / VoiceOver / reduced-motion support |
-| **Server** | Next.js (App Router), TypeScript, Route Handlers |
-| **Intelligence** | OpenRouter LLM (default `google/gemini-2.5-flash-lite`), strict JSON, grounding + “not-verified” prompting |
-| **Knowledge** | Hand-curated, sourced `knowledge.json` (Abu Dhabi / Al Qua'a) |
+|---|---|
+| **Client** | Swift 5.9, SwiftUI, iOS 16+, Apple Speech, `AVSpeechSynthesizer`, RTL-aware UI. |
+| **LLM** | OpenRouter, default model currently `google/gemini-2.5-flash-lite`. |
+| **Knowledge** | `Backend/kb/knowledge.json`, source URLs, authorities, licences, banks, programmes, archetypes. |
+| **Verification UX** | Trust labels, unverified warnings, copyable authority questions, phone / email / official-page actions. |
 
 ---
 
-<div align="center"><sub>RUN IT YOURSELF</sub></div>
+## 🧪 IX. How to Run or Verify It
 
-## ✦ &nbsp; How to run & verify
-
-**1 — Backend (the journey engine)**
+### Backend
 
 ```bash
 cd Backend
 cp .env.local.example .env.local      # add OPENROUTER_API_KEY
 npm install
-npm run dev                           # serves the API on http://localhost:3000
+npm run dev                           # http://localhost:3000
 ```
 
-Smoke-test the path with no app at all:
+### API smoke test
 
 ```bash
 curl -X POST http://localhost:3000/api/journey/start \
   -H "Content-Type: application/json" \
-  -d '{"sessionId":"demo","goalText":"I want to take tourists stargazing on my land"}'
+  -d '{"sessionId":"demo","goalText":"I want to sell camel milk legally from my farm"}'
 ```
 
-**2 — iOS app (the experience)**
+Try a second idea and compare the next question:
+
+```bash
+curl -X POST http://localhost:3000/api/journey/start \
+  -H "Content-Type: application/json" \
+  -d '{"sessionId":"demo2","goalText":"I want to host tourists for stargazing on my land"}'
+```
+
+### iOS app
 
 ```text
-1. Open  App/Irshad/  in Xcode 15+
-2. Set   AppConfig.baseURL  to your running backend
-3. Select an iOS 16+ simulator or device → Run (⌘R)
-4. Speak an idea in Arabic and follow the guided path to a roadmap
+1. Open App/Irshad/ in Xcode 15+
+2. Set AppConfig.baseURL to the backend URL
+3. Run on an iOS 16+ simulator or iPhone
+4. Choose guide + language
+5. Speak an idea
+6. Follow the guided cards to the final plan
 ```
-
-**3 — Verify the claims** &nbsp;→&nbsp; see the [falsifiable-claims table](#--impact--and-how-to-falsify-each-claim). The fastest checks: open `Backend/kb/knowledge.json` (counts, sources, `last_verified`), read the grounding prompts in `Backend/lib/llm.ts`, and confirm the 8-question cap in `Backend/lib/journey.ts`.
-
-<!-- =============================================================== -->
-<!--  DEMO VIDEO                                                      -->
-<!--  IMAGE PLACEHOLDER → assets/demo-thumb.png  (links to video)     -->
-<!--  Description: A clean video poster frame — an iPhone held in a    -->
-<!--  hand outdoors in daylight (rural/desert), Irshad on screen mid- -->
-<!--  conversation, a large centered ✦ play button. Caption: the full -->
-<!--  Ahmed run, idea → roadmap, in under two minutes.                -->
-<!-- =============================================================== -->
-
-<div align="center">
-
-### ✦ &nbsp; Watch the full run
-
-[<img src="assets/demo-thumb.png" alt="Watch Irshad guide Ahmed from idea to launch roadmap" width="70%" />](#)
-
-<sub>▶ &nbsp; Ahmed’s idea → a grounded launch roadmap, end to end &nbsp;·&nbsp; ~2 min</sub>
-
-</div>
 
 ---
 
-<div align="center">
+## 🛠️ X. Limitations and Next Steps
 
-<sub>BUILT FOR</sub>
+| Limitation | Why we accept it now | Next step |
+|---|---|---|
+| It does not submit applications | Submission requires official systems and user identity. | Integrate with TAMM / authority workflows only through official channels. |
+| It does not guarantee fees | Fees can depend on activity, legal form, location, and date. | Keep ranges, show source dates, and add official API/data source if available. |
+| It needs internet | LLM and server run remotely. | Add cached KB and offline draft mode. |
+| Community validation is still limited | Hackathon timeline is short. | Run 5–10 target-user tests and update `Evidence/test-runs.md`. |
+| Knowledge base can become stale | Regulations and fees change. | Add `last_verified`, owner, and review cadence to each KB record. |
 
-**Tatweer Hackathon 2026** &nbsp;·&nbsp; Al Qua'a, Al Ain, UAE &nbsp;·&nbsp; Challenge 1
+---
 
-<sub>Repository: [AbdullahSWE/Irshad_TatweerHackathon](https://github.com/AbdullahSWE/Irshad_TatweerHackathon) &nbsp;·&nbsp; built by Abdullah & Rudra</sub>
+## ❓ XI. Answering the Hard Questions
 
-✦
+| Judge question | Our answer |
+|---|---|
+| Why not just use TAMM or ADDED? | Those are official destinations. Irshad prepares the founder before they go there. |
+| Is this legal/business advice? | No. It is first-step guidance with uncertainty labels. |
+| What if the AI is wrong? | Unsupported outputs are marked unverified or missing, not presented as final. |
+| Why would rural founders use this? | It is voice-first, mobile-first, Arabic/English, and avoids long forms. |
+| Can it scale beyond Al Qua'a? | Yes. The app logic stays the same; the KB and archetypes change. |
+
+---
+
+## 🤝 Built for
+
+**Tatweer Hackathon 2026** · Al Qua'a, Al Ain, UAE · Challenge 1 — Taking the First Entrepreneurial Step
+
+Repository: `AbdullahSWE/Irshad_TatweerHackathon`
 
 *Irshad — إرشاد. Guidance, for the first step.*
-
-</div>
