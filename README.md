@@ -30,7 +30,7 @@
 |---|---|
 | **Problem** | First-time rural founders often know their business idea, but not the legal, authority, banking, document, and cost steps needed to start. |
 | **Solution** | Irshad lets the founder speak naturally, asks only the questions needed, and produces a first-step action plan with confidence labels. |
-| **Built** | Working SwiftUI app, server-driven Next.js journey engine, voice input/output, adaptive cards, final plan screen, and a sourced Abu Dhabi knowledge base. |
+| **Built** | Working SwiftUI app, voice input/output, adaptive cards, final plan screen, and a sourced Abu Dhabi knowledge base. |
 | **Why it matters** | It turns a confusing setup process into one guided conversation, while clearly showing what is verified, estimated, missing, or still needs official confirmation. |
 | **How to verify** | Run the app, use the API smoke test, inspect `Backend/kb/knowledge.json`, and check the evidence pack linked below. |
 
@@ -101,9 +101,7 @@ Irshad is a voice-first iOS guide. The founder speaks an idea. The app asks a sm
 | ✅ | Adaptive business profile capture. |
 | ✅ | Final plan screen with approvals, banks, confidence, unverified items, share, copy, and continue options. |
 | ✅ | Trust labels for verified / estimated / unverified / missing facts. |
-| ✅ | Next.js backend journey engine. |
 | ✅ | Sourced Abu Dhabi knowledge base. |
-| ✅ | API smoke-test path for judges who do not run the iOS app. |
 | ⚠️ | The prototype does not submit government applications or guarantee approval. |
 | ⚠️ | Live fact verification depends on the current knowledge base and available online sources. |
 
@@ -188,7 +186,6 @@ Its safety rule is simple: show what is verified, estimate only when grounded, a
 | Layer | Tools |
 |---|---|
 | **Client** | Swift 5.9, SwiftUI, iOS 16+, Apple Speech, `AVSpeechSynthesizer`, RTL-aware UI. |
-| **Server** | Next.js App Router, TypeScript, route handlers. |
 | **LLM** | OpenRouter, default model currently `google/gemini-2.5-flash-lite`. |
 | **Knowledge** | `Backend/kb/knowledge.json`, source URLs, authorities, licences, banks, programmes, archetypes. |
 | **Verification UX** | Trust labels, unverified warnings, copyable authority questions, phone / email / official-page actions. |
