@@ -84,6 +84,14 @@ private struct LicenseOptionView: View {
         option.metadata.string(for: ["phone"])
     }
 
+    private var authorityEmail: String? {
+        option.metadata.string(for: ["email"])
+    }
+
+    private var authorityEmailURL: URL? {
+        option.metadata.string(for: ["email_url", "emailURL"]).flatMap(URL.init(string:))
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: IrshadTheme.Layout.spacingStandard) {
             HStack(alignment: .top, spacing: IrshadTheme.Layout.spacingStandard) {
@@ -156,7 +164,7 @@ private struct LicenseOptionView: View {
                         OutputDetailRow(label: "Source", value: source, systemImage: "link")
                     }
 
-                    if authorityURL != nil || authorityPhone != nil {
+                    if authorityURL != nil || authorityPhone != nil || authorityEmailURL != nil {
                         HStack(spacing: IrshadTheme.Layout.spacingTight) {
                             if let authorityURL {
                                 Button {
@@ -172,6 +180,15 @@ private struct LicenseOptionView: View {
                                     viewModel.callPhoneNumber(authorityPhone)
                                 } label: {
                                     Label(authorityPhone, systemImage: "phone.fill")
+                                }
+                                .buttonStyle(DynamicCardSecondaryButtonStyle())
+                            }
+
+                            if let authorityEmailURL {
+                                Button {
+                                    viewModel.openURL(authorityEmailURL)
+                                } label: {
+                                    Label(authorityEmail ?? "Email", systemImage: "envelope.fill")
                                 }
                                 .buttonStyle(DynamicCardSecondaryButtonStyle())
                             }

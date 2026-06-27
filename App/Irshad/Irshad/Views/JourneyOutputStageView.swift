@@ -1,64 +1,71 @@
+import Combine
 import SwiftUI
 
-/// Composes the mature-journey output cards (analysis, license, banking,
-/// verification, next steps, final roadmap) into a single ordered stage. A card
-/// appears only when the ViewModel supplies its state, or while that stage is
-/// actively generating — so users never face a wall of locked placeholders.
-/// Each card owns its own surface, loading, partial, and error chrome.
+/// Presents one mature-journey result at a time so recommendations arrive as a
+/// guided flow instead of one stacked information dump.
 struct JourneyOutputStageView: View {
     var viewModel: JourneyViewModel
 
-    private var isGeneratingOutput: Bool {
-        viewModel.isServiceBusy && (
-            viewModel.journeyStatus == .processing
-                || viewModel.journeyStatus == .gateOpen
-                || viewModel.journeyStatus == .showingResults
-        )
-    }
-
-    private var hasAnalysis: Bool { viewModel.analysisSummary != nil }
-    private var hasLicense: Bool { viewModel.licenseRecommendation != nil }
-    private var hasBanking: Bool { viewModel.bankingRecommendations != nil }
-    private var hasVerification: Bool {
-        viewModel.verificationSummary != nil
-            || (viewModel.isServiceBusy && viewModel.currentPhase == .verify && !viewModel.shouldShowVerificationDecision)
-    }
-    private var hasNextSteps: Bool { !viewModel.nextStepChecklist.isEmpty }
-    private var hasFinalPlan: Bool { viewModel.finalPlan != nil }
-
     private var showsStage: Bool {
-        hasAnalysis || hasLicense || hasBanking || hasVerification
-            || viewModel.shouldShowVerificationDecision || hasNextSteps || hasFinalPlan || isGeneratingOutput
+        viewModel.activeResultScreen != .none || viewModel.savedPlanSummary != nil
     }
 
     var body: some View {
         if showsStage {
             VStack(spacing: IrshadTheme.Layout.spacingComfortable) {
-                if hasAnalysis || isGeneratingOutput {
-                    AnalysisSummaryCardView(viewModel: viewModel)
-                }
-
-                if hasLicense {
+                switch viewModel.activeResultScreen {
+                case .none:
+                    EmptyView()
+                case .loadingLicense:
+                    ResultLoadingProgressView(
+                        title: "Finding your license",
+                        systemImage: "doc.badge.gearshape",
+                        messages: [
+                            "Checking license fit for your activity",
+                            "Comparing official requirements",
+                            "Reviewing cost and timing signals",
+                            "Preparing the strongest match"
+                        ],
+                        reduceMotion: viewModel.reduceMotionPreferred
+                    )
+                case .license:
                     LicenseRecommendationCardView(viewModel: viewModel)
-                }
-
-                if hasBanking {
+                    ContinueResultButton(
+                        title: "View banking options",
+                        systemImage: "building.columns",
+                        isDisabled: viewModel.licenseRecommendation == nil || viewModel.isServiceBusy,
+                        action: { viewModel.showBankingOptions() }
+                    )
+                case .loadingBanking:
+                    ResultLoadingProgressView(
+                        title: "Finding banking options",
+                        systemImage: "building.columns",
+                        messages: [
+                            "Checking account fit",
+                            "Comparing bank requirements",
+                            "Reviewing documents and balances",
+                            "Shortlisting practical options"
+                        ],
+                        reduceMotion: viewModel.reduceMotionPreferred
+                    )
+                case .banking:
                     BankRecommendationListView(viewModel: viewModel)
-                }
-
-                if viewModel.shouldShowVerificationDecision {
-                    AuthorityVerificationChoiceView(viewModel: viewModel)
-                }
-
-                if hasVerification {
+                    ContinueResultButton(
+                        title: "Contact government office",
+                        systemImage: "phone.connection",
+                        isDisabled: viewModel.bankingRecommendations == nil || viewModel.isServiceBusy,
+                        action: { viewModel.showAuthorityContacts() }
+                    )
+                case .authority:
                     VerificationCardView(viewModel: viewModel)
-                }
-
-                if hasNextSteps {
+                    ContinueResultButton(
+                        title: "Create action plan",
+                        systemImage: "map",
+                        isDisabled: viewModel.bankingRecommendations == nil || viewModel.isServiceBusy,
+                        action: { viewModel.createFinalActionPlan() }
+                    )
+                case .finalPlan:
                     NextStepChecklistView(viewModel: viewModel)
-                }
-
-                if hasFinalPlan {
                     FinalRoadmapView(viewModel: viewModel)
                 }
 
@@ -67,7 +74,7 @@ struct JourneyOutputStageView: View {
                 }
             }
             .transition(IrshadTheme.Animations.cardRevealTransition)
-            .animation(IrshadTheme.Animations.cardReveal, value: viewModel.journeyStatus)
+            .animation(IrshadTheme.Animations.cardReveal, value: viewModel.activeResultScreen)
             .accessibilityElement(children: .contain)
         }
     }
@@ -89,87 +96,116 @@ struct JourneyOutputStageView: View {
     }
 }
 
-private struct AuthorityVerificationChoiceView: View {
-    var viewModel: JourneyViewModel
+private struct ContinueResultButton: View {
+    let title: String
+    let systemImage: String
+    var isDisabled: Bool
+    let action: () -> Void
 
-    private var licenseName: String {
-        viewModel.licenseRecommendation?.best?.type ?? "the recommended license"
+    var body: some View {
+        Button(action: action) {
+            Label(title, systemImage: systemImage)
+                .frame(maxWidth: .infinity, minHeight: IrshadTheme.Layout.minimumTapTarget)
+        }
+        .buttonStyle(DynamicCardPrimaryButtonStyle())
+        .disabled(isDisabled)
     }
+}
 
-    private var authorityName: String? {
-        viewModel.licenseRecommendation?.best?.metadata.string(for: ["authority"])
-    }
+private struct ResultLoadingProgressView: View {
+    let title: String
+    let systemImage: String
+    let messages: [String]
+    var reduceMotion: Bool
 
-    private var phone: String? {
-        viewModel.licenseRecommendation?.best?.metadata.string(for: ["phone"])
-    }
+    @State private var startedAt = Date()
+    @State private var progress = 0.0
+    @State private var messageIndex = 0
 
-    private var contactURL: URL? {
-        viewModel.licenseRecommendation?.best?.metadata.string(for: ["url"]).flatMap(URL.init(string:))
+    private let duration = 8.0
+    private let timer = Timer.publish(every: 0.12, on: .main, in: .common).autoconnect()
+
+    private var currentMessage: String {
+        guard !messages.isEmpty else { return "Preparing your recommendation" }
+        return messages[min(messageIndex, messages.count - 1)]
     }
 
     var body: some View {
-        OutputStageContainerView(
-            title: "Authority verification",
-            subtitle: "Optional check before the final roadmap",
-            systemImage: "phone.connection",
-            state: .partial,
-            hasContent: true,
-            loadingLabel: "Preparing verification…",
-            emptyLabel: "",
-            partialNote: "Confirm fees, approvals, and timing before you apply.",
-            recoverableError: nil,
-            onRetry: nil
-        ) {
-            VStack(alignment: .leading, spacing: IrshadTheme.Layout.spacingComfortable) {
-                Text("Do you want Irshad to prepare an authority verification summary for \(licenseName)?")
-                    .font(IrshadTheme.Typography.secondaryLabel)
-                    .foregroundStyle(IrshadTheme.Colors.primaryText)
-                    .fixedSize(horizontal: false, vertical: true)
+        VStack(alignment: .leading, spacing: IrshadTheme.Layout.spacingComfortable) {
+            HStack(alignment: .top, spacing: IrshadTheme.Layout.spacingStandard) {
+                ProcessingOrbView(symbolName: systemImage, title: title, isActive: true)
+                    .frame(width: 58, height: 58)
+                    .accessibilityHidden(true)
 
-                if let authorityName {
-                    OutputDetailRow(label: "Authority", value: authorityName, systemImage: "building.2")
+                VStack(alignment: .leading, spacing: IrshadTheme.Layout.spacingTight) {
+                    Text(title)
+                        .font(IrshadTheme.Typography.cardTitle)
+                        .foregroundStyle(IrshadTheme.Colors.primaryText)
+
+                    Text(currentMessage)
+                        .font(IrshadTheme.Typography.secondaryLabel)
+                        .foregroundStyle(IrshadTheme.Colors.secondaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .contentTransition(reduceMotion ? .identity : .opacity)
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
 
-                HStack(spacing: IrshadTheme.Layout.spacingTight) {
-                    if let contactURL {
-                        Button {
-                            viewModel.openURL(contactURL)
-                        } label: {
-                            Label("Authority page", systemImage: "safari")
-                        }
-                        .buttonStyle(DynamicCardSecondaryButtonStyle())
-                    }
+            progressBar
 
-                    if let phone {
-                        Button {
-                            viewModel.callPhoneNumber(phone)
-                        } label: {
-                            Label(phone, systemImage: "phone.fill")
-                        }
-                        .buttonStyle(DynamicCardSecondaryButtonStyle())
-                    }
+            StatusPill("Preparing", tone: .active, showsSpinner: true)
+        }
+        .padding(.horizontal, IrshadTheme.Layout.cardHorizontalPadding)
+        .padding(.vertical, IrshadTheme.Layout.cardVerticalPadding)
+        .background(
+            RoundedRectangle(cornerRadius: IrshadTheme.Layout.cardRadius, style: .continuous)
+                .fill(IrshadTheme.Colors.surface)
+                .overlay {
+                    RoundedRectangle(cornerRadius: IrshadTheme.Layout.cardRadius, style: .continuous)
+                        .stroke(IrshadTheme.Colors.separator, lineWidth: 1)
                 }
+        )
+        .irshadShadow(IrshadTheme.Shadows.cardShadow)
+        .onAppear {
+            startedAt = Date()
+            progress = 0
+            messageIndex = 0
+        }
+        .onReceive(timer) { now in
+            let elapsed = now.timeIntervalSince(startedAt)
+            let normalized = min(max(elapsed / duration, 0), 1)
+            progress = normalized
 
-                HStack(spacing: IrshadTheme.Layout.spacingStandard) {
-                    Button {
-                        viewModel.skipVerificationAndCreatePlan()
-                    } label: {
-                        Label("Skip", systemImage: "arrow.forward")
-                            .frame(maxWidth: .infinity)
+            guard !messages.isEmpty else { return }
+            let nextIndex = min(Int(elapsed / (duration / Double(messages.count))), messages.count - 1)
+            if nextIndex != messageIndex {
+                if reduceMotion {
+                    messageIndex = nextIndex
+                } else {
+                    withAnimation(IrshadTheme.Animations.cardReveal) {
+                        messageIndex = nextIndex
                     }
-                    .buttonStyle(DynamicCardSecondaryButtonStyle())
-
-                    Button {
-                        viewModel.verifyBeforeFinalPlan()
-                    } label: {
-                        Label("Verify now", systemImage: "checkmark.shield")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(DynamicCardPrimaryButtonStyle())
                 }
             }
         }
+        .animation(reduceMotion ? nil : IrshadTheme.Animations.progressTransition, value: progress)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(Text(title))
+        .accessibilityValue(Text(currentMessage))
+    }
+
+    private var progressBar: some View {
+        GeometryReader { proxy in
+            ZStack(alignment: .leading) {
+                Capsule(style: .continuous)
+                    .fill(IrshadTheme.Colors.progressTrack)
+                Capsule(style: .continuous)
+                    .fill(IrshadTheme.Colors.primaryAccent)
+                    .frame(width: proxy.size.width * progress)
+            }
+        }
+        .frame(height: 8)
+        .accessibilityHidden(true)
     }
 }
 

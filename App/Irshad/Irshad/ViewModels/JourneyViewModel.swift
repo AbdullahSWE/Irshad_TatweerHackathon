@@ -15,6 +15,16 @@ enum PendingOperation: Equatable, Sendable {
     case shareFinalPlan
 }
 
+enum ActiveResultScreen: Equatable, Sendable {
+    case none
+    case loadingLicense
+    case license
+    case loadingBanking
+    case banking
+    case authority
+    case finalPlan
+}
+
 @MainActor
 @Observable
 final class JourneyViewModel {
@@ -80,6 +90,7 @@ final class JourneyViewModel {
     var licenseRecommendation: LicenseRecommendation?
     var bankingRecommendations: BankingRecommendations?
     var verificationSummary: VerificationSummary?
+    var activeResultScreen: ActiveResultScreen
     var isVerificationDecisionPending: Bool
     var nextStepChecklist: [NextStepChecklistItem]
     var finalPlan: FinalPlan?
@@ -166,6 +177,7 @@ final class JourneyViewModel {
         licenseRecommendation = nil
         bankingRecommendations = nil
         verificationSummary = nil
+        activeResultScreen = .none
         isVerificationDecisionPending = false
         nextStepChecklist = []
         finalPlan = nil
@@ -712,6 +724,57 @@ extension JourneyViewModel {
         toast = ToastState(id: "preferred-bank-\(id)", message: localizedToast(.preferredBankSaved))
     }
 
+    func showBankingOptions() {
+        guard licenseRecommendation != nil, bankingRecommendations == nil else {
+            activeResultScreen = .banking
+            currentPhase = .banking
+            journeyStatus = .showingResults
+            return
+        }
+
+        pendingOperation = .banking
+        launchServiceOperation(status: .processing) { [weak self] in
+            guard let self else { return }
+            try await self.runOutputChain(startingAt: .banking)
+        }
+    }
+
+    func showAuthorityContacts() {
+        guard bankingRecommendations != nil else {
+            return
+        }
+
+        if verificationSummary != nil {
+            activeResultScreen = .authority
+            currentPhase = .verify
+            journeyStatus = .showingResults
+            return
+        }
+
+        isVerificationDecisionPending = false
+        pendingOperation = .verify
+        launchServiceOperation(status: .processing) { [weak self] in
+            guard let self else { return }
+            try await self.runOutputChain(startingAt: .verify)
+        }
+    }
+
+    func createFinalActionPlan() {
+        guard bankingRecommendations != nil, finalPlan == nil else {
+            activeResultScreen = .finalPlan
+            currentPhase = .plan
+            journeyStatus = .complete
+            return
+        }
+
+        isVerificationDecisionPending = false
+        pendingOperation = .finalPlan
+        launchServiceOperation(status: .processing) { [weak self] in
+            guard let self else { return }
+            try await self.runOutputChain(startingAt: .finalPlan)
+        }
+    }
+
     func openURL(_ url: URL) {
         guard journeyRouter.canOpenTrustedURL(url), isKnownTrustedURL(url) else {
             recoverableError = RecoverableError(
@@ -1099,6 +1162,7 @@ private extension JourneyViewModel {
                 self.isServiceBusy = false
                 self.serviceActionMessage = nil
                 self.activeTask = nil
+                self.revealResultErrorSurfaceIfNeeded()
                 DebugLog.api("ViewModel operation failed pending=\(self.debugPendingOperation(self.pendingOperation)) status=\(self.journeyStatus) error=\(DebugLog.describe(error))")
                 self.debugTrace = self.debugTrace(for: error)
                 self.handleRecoverableError(error)
@@ -1153,6 +1217,7 @@ private extension JourneyViewModel {
         licenseRecommendation = nil
         bankingRecommendations = nil
         verificationSummary = nil
+        activeResultScreen = .none
         isVerificationDecisionPending = false
         nextStepChecklist = []
         finalPlan = nil
@@ -1299,6 +1364,7 @@ private extension JourneyViewModel {
         journeyStatus = .processing
 
         if start == .analyze {
+            let loadingStart = beginResultLoading(.loadingLicense)
             pendingOperation = .analyze
             serviceActionMessage = localizedServiceAction(for: .analyze, status: .processing)
             currentPhase = .analysis
@@ -1309,6 +1375,58 @@ private extension JourneyViewModel {
             analysisSummary = response.analysis
             completedPhases.insert(.analysis)
             refreshDerivedState()
+
+            pendingOperation = .license
+            serviceActionMessage = localizedServiceAction(for: .license, status: .processing)
+            currentPhase = .license
+            let licenseResponse = try await apiService.license(SessionOnlyRequest(sessionId: session.sessionId))
+            try Task.checkCancellation()
+            licenseRecommendation = licenseResponse.license
+            completedPhases.insert(.license)
+            refreshDerivedState()
+            try await finishResultLoading(startedAt: loadingStart)
+            activeResultScreen = .license
+            currentPhase = .license
+            journeyStatus = .showingResults
+            pendingOperation = nil
+            refreshDerivedState()
+            return
+        }
+
+        if start == .license {
+            let loadingStart = beginResultLoading(.loadingLicense)
+            pendingOperation = .license
+            serviceActionMessage = localizedServiceAction(for: .license, status: .processing)
+            currentPhase = .license
+            let response = try await apiService.license(SessionOnlyRequest(sessionId: session.sessionId))
+            try Task.checkCancellation()
+            licenseRecommendation = response.license
+            completedPhases.insert(.license)
+            refreshDerivedState()
+            try await finishResultLoading(startedAt: loadingStart)
+            activeResultScreen = .license
+            journeyStatus = .showingResults
+            pendingOperation = nil
+            refreshDerivedState()
+            return
+        }
+
+        if start == .banking {
+            let loadingStart = beginResultLoading(.loadingBanking)
+            pendingOperation = .banking
+            serviceActionMessage = localizedServiceAction(for: .banking, status: .processing)
+            currentPhase = .banking
+            let response = try await apiService.banking(SessionOnlyRequest(sessionId: session.sessionId))
+            try Task.checkCancellation()
+            bankingRecommendations = response.banking
+            completedPhases.insert(.banking)
+            refreshDerivedState()
+            try await finishResultLoading(startedAt: loadingStart)
+            activeResultScreen = .banking
+            journeyStatus = .showingResults
+            pendingOperation = nil
+            refreshDerivedState()
+            return
         }
 
         if start == .verify {
@@ -1321,38 +1439,15 @@ private extension JourneyViewModel {
             try Task.checkCancellation()
             verificationSummary = response.verification
             completedPhases.insert(.verify)
+            activeResultScreen = .authority
+            journeyStatus = .showingResults
+            pendingOperation = nil
             refreshDerivedState()
+            return
         }
 
-        if start == .analyze || start == .license {
-            pendingOperation = .license
-            serviceActionMessage = localizedServiceAction(for: .license, status: .processing)
-            currentPhase = .license
-            let response = try await apiService.license(SessionOnlyRequest(sessionId: session.sessionId))
-            try Task.checkCancellation()
-            licenseRecommendation = response.license
-            completedPhases.insert(.license)
-            refreshDerivedState()
-        }
-
-        if start == .analyze || start == .license || start == .banking {
-            pendingOperation = .banking
-            serviceActionMessage = localizedServiceAction(for: .banking, status: .processing)
-            currentPhase = .banking
-            let response = try await apiService.banking(SessionOnlyRequest(sessionId: session.sessionId))
-            try Task.checkCancellation()
-            bankingRecommendations = response.banking
-            completedPhases.insert(.banking)
-            refreshDerivedState()
-
-            isVerificationDecisionPending = verificationSummary == nil
-            if shouldShowVerificationDecision {
-                pendingOperation = nil
-                currentPhase = .verify
-                journeyStatus = .showingResults
-                refreshDerivedState()
-                return
-            }
+        guard start == .finalPlan else {
+            return
         }
 
         pendingOperation = .finalPlan
@@ -1365,6 +1460,7 @@ private extension JourneyViewModel {
         completedPhases.insert(.nextSteps)
         currentPhase = .plan
         completedPhases.insert(.plan)
+        activeResultScreen = .finalPlan
         journeyStatus = .complete
         refreshDerivedState()
         try await saveCurrentPlan()
@@ -1399,6 +1495,7 @@ private extension JourneyViewModel {
         nextStepChecklist = summary.checklist
         currentPhase = .plan
         completedPhases.insert(.plan)
+        activeResultScreen = .finalPlan
         journeyStatus = .complete
         showSavedPlan = true
         pendingOperation = nil
@@ -1484,6 +1581,65 @@ private extension JourneyViewModel {
         Task { @MainActor [weak self] in
             guard let self else { return }
             await self.speakCurrentPrompt()
+        }
+    }
+
+    func beginResultLoading(_ screen: ActiveResultScreen) -> Date {
+        activeResultScreen = screen
+        journeyStatus = .processing
+        let startedAt = Date()
+        speakResultLoadingIntro(for: screen)
+        return startedAt
+    }
+
+    func finishResultLoading(startedAt: Date) async throws {
+        let elapsed = Date().timeIntervalSince(startedAt)
+        let remaining = max(0, 8.0 - elapsed)
+        guard remaining > 0 else { return }
+        try await Task.sleep(nanoseconds: UInt64(remaining * 1_000_000_000))
+    }
+
+    func speakResultLoadingIntro(for screen: ActiveResultScreen) {
+        let business = compactBusinessLabel.trimmingCharacters(in: .whitespacesAndNewlines)
+        let hasBusiness = !business.isEmpty && business != "Not decided yet" && business != "لم يحدد بعد"
+
+        let text: String
+        switch (screen, currentLanguage) {
+        case (.loadingLicense, .ar):
+            text = hasBusiness
+                ? "نبحث الآن عن أفضل رخصة مناسبة لـ \(business)."
+                : "نبحث الآن عن أفضل رخصة مناسبة لمشروعك."
+        case (.loadingLicense, .en):
+            text = hasBusiness
+                ? "We're finding the best license for \(business)."
+                : "We're finding the best license for your business."
+        case (.loadingBanking, .ar):
+            text = hasBusiness
+                ? "نبحث الآن عن أفضل الخيارات البنكية المناسبة لـ \(business)."
+                : "نبحث الآن عن أفضل الخيارات البنكية المناسبة لمشروعك."
+        case (.loadingBanking, .en):
+            text = hasBusiness
+                ? "We're finding the best banking options for \(business)."
+                : "We're finding the best banking options for your business."
+        default:
+            return
+        }
+
+        speechTask?.cancel()
+        speechTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+            await self.speechSynthesisService.speak(text, language: self.currentLanguage, voice: self.selectedVoicePersona)
+        }
+    }
+
+    func revealResultErrorSurfaceIfNeeded() {
+        switch activeResultScreen {
+        case .loadingLicense:
+            activeResultScreen = .license
+        case .loadingBanking:
+            activeResultScreen = .banking
+        default:
+            break
         }
     }
 }

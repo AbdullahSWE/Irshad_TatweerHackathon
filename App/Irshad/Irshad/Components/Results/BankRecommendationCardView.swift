@@ -34,6 +34,18 @@ struct BankRecommendationCardView: View {
         return URL(string: raw)
     }
 
+    private var phone: String? {
+        bank.metadata.string(for: ["phone", "business_phone", "corporate_phone"])
+    }
+
+    private var email: String? {
+        bank.metadata.string(for: ["email", "corporate_email"])
+    }
+
+    private var emailURL: URL? {
+        bank.metadata.string(for: ["email_url", "emailURL"]).flatMap(URL.init(string:))
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: IrshadTheme.Layout.spacingStandard) {
             HStack(alignment: .top, spacing: IrshadTheme.Layout.spacingStandard) {
@@ -103,6 +115,24 @@ struct BankRecommendationCardView: View {
                         viewModel.openURL(websiteURL)
                     } label: {
                         Label("Website", systemImage: "safari")
+                    }
+                    .buttonStyle(DynamicCardSecondaryButtonStyle())
+                }
+
+                if let phone {
+                    Button {
+                        viewModel.callPhoneNumber(phone)
+                    } label: {
+                        Label(phone, systemImage: "phone.fill")
+                    }
+                    .buttonStyle(DynamicCardSecondaryButtonStyle())
+                }
+
+                if let emailURL {
+                    Button {
+                        viewModel.openURL(emailURL)
+                    } label: {
+                        Label(email ?? "Email", systemImage: "envelope.fill")
                     }
                     .buttonStyle(DynamicCardSecondaryButtonStyle())
                 }

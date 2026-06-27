@@ -33,17 +33,20 @@ struct TranscriptConfirmationView: View {
 
                 if transcript.wrappedValue.isEmpty {
                     Text(placeholder)
-                        .font(IrshadTheme.Typography.secondaryLabel)
+                        .font(transcriptFont)
                         .foregroundStyle(IrshadTheme.Colors.secondaryText)
-                        .padding(IrshadTheme.Layout.spacingComfortable)
+                        .padding(.horizontal, IrshadTheme.Layout.spacingStandard)
+                        .padding(.vertical, IrshadTheme.Layout.spacingTight)
                 }
 
                 TextEditor(text: transcript)
-                    .font(IrshadTheme.Typography.primaryBody)
+                    .font(transcriptFont)
                     .foregroundStyle(IrshadTheme.Colors.primaryText)
                     .scrollContentBackground(.hidden)
-                    .padding(IrshadTheme.Layout.spacingTight)
-                    .frame(minHeight: 48, maxHeight: 68)
+                    .lineSpacing(4)
+                    .padding(.horizontal, IrshadTheme.Layout.baseUnit)
+                    .padding(.vertical, IrshadTheme.Layout.baseUnit)
+                    .frame(minHeight: 104, maxHeight: 136, alignment: .topLeading)
                     .disabled(isProcessing)
                     .focused($isTranscriptFocused)
                     .toolbar {
@@ -56,7 +59,7 @@ struct TranscriptConfirmationView: View {
                         }
                     }
             }
-            .frame(minHeight: 58)
+            .frame(minHeight: 112)
 
             if let errorMessage, !errorMessage.isEmpty {
                 Text(errorMessage)
@@ -95,6 +98,10 @@ struct TranscriptConfirmationView: View {
         case .en:
             return "Review what we heard"
         }
+    }
+
+    private var transcriptFont: Font {
+        IrshadTheme.Typography.appFont(size: 18, language: language)
     }
 
     private func retryListeningAndDismissKeyboard() {

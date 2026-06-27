@@ -11,6 +11,7 @@ struct AuthorityEntry: Sendable {
     let id: String
     let name: String
     let phone: String?
+    let email: String?
     let contactURL: String
     let website: String
 }
@@ -40,6 +41,9 @@ struct BankKBEntry: Sendable {
     let bestFor: [String]
     let plans: [BankPlanEntry]
     let notes: String
+    let website: String?
+    let phone: String?
+    let email: String?
     let source: String
 }
 
@@ -73,6 +77,7 @@ final class LocalKnowledgeBase: @unchecked Sendable {
                 id: authority.id,
                 name: authority.shortName.map { "\(authority.name) (\($0))" } ?? authority.name,
                 phone: authority.phone,
+                email: authority.email,
                 contactURL: authority.sourceURL ?? authority.servicePlatform ?? authority.mainWebsite ?? "",
                 website: (authority.mainWebsite ?? "").withoutHTTPPrefix
             )
@@ -115,6 +120,9 @@ final class LocalKnowledgeBase: @unchecked Sendable {
                     )
                 },
                 notes: raw.notes ?? "",
+                website: raw.website,
+                phone: Self.firstContactValue(in: raw.contact, matching: ["phone", "contact_centre"]),
+                email: Self.firstContactValue(in: raw.contact, matching: ["email"]),
                 source: (raw.sourceURL ?? raw.website ?? "").withoutHTTPPrefix
             )
         }
@@ -232,6 +240,17 @@ final class LocalKnowledgeBase: @unchecked Sendable {
         formatter.locale = Locale(identifier: "en_US")
         return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
     }
+
+    private static func firstContactValue(in contact: [String: JSONValue], matching keys: [String]) -> String? {
+        let sortedContact = contact.sorted { $0.key < $1.key }
+        for keyFragment in keys {
+            if let value = sortedContact.first(where: { $0.key.lowercased().contains(keyFragment) })?.value.displayString,
+               !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                return value
+            }
+        }
+        return nil
+    }
 }
 
 private extension String {
@@ -259,6 +278,7 @@ private struct RawAuthority: Decodable {
     let name: String
     let shortName: String?
     let phone: String?
+    let email: String?
     let mainWebsite: String?
     let servicePlatform: String?
     let sourceURL: String?
@@ -268,6 +288,7 @@ private struct RawAuthority: Decodable {
         case name
         case shortName = "short_name"
         case phone
+        case email
         case mainWebsite = "main_website"
         case servicePlatform = "service_platform"
         case sourceURL = "source_url"
@@ -354,6 +375,7 @@ private struct RawBank: Decodable {
     let bestFor: [String]
     let website: String?
     let sourceURL: String?
+    let contact: [String: JSONValue]
     let planOptions: [RawBankPlan]
     let notes: String?
 
@@ -363,6 +385,7 @@ private struct RawBank: Decodable {
         case bestFor = "best_for"
         case website
         case sourceURL = "source_url"
+        case contact
         case planOptions = "plan_options"
         case notes
     }
@@ -374,6 +397,7 @@ private struct RawBank: Decodable {
         bestFor = try container.decodeIfPresent([String].self, forKey: .bestFor) ?? []
         website = try container.decodeIfPresent(String.self, forKey: .website)
         sourceURL = try container.decodeIfPresent(String.self, forKey: .sourceURL)
+        contact = try container.decodeIfPresent([String: JSONValue].self, forKey: .contact) ?? [:]
         planOptions = try container.decodeIfPresent([RawBankPlan].self, forKey: .planOptions) ?? []
         notes = try container.decodeIfPresent(String.self, forKey: .notes)
     }

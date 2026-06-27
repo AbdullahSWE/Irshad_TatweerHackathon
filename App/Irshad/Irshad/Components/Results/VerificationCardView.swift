@@ -39,6 +39,14 @@ struct VerificationCardView: View {
         }
     }
 
+    private var email: String? {
+        summary?.metadata.string(for: ["email"])
+    }
+
+    private var emailURL: URL? {
+        summary?.metadata.string(for: ["email_url", "emailURL"]).flatMap(URL.init(string:))
+    }
+
     var body: some View {
         OutputStageContainerView(
             title: "Authority verification",
@@ -79,6 +87,7 @@ struct VerificationCardView: View {
             || (summary.whatToConfirm?.isEmpty == false)
             || summary.contactURL != nil
             || (summary.phone?.isEmpty == false)
+            || emailURL != nil
 
         if hasAuthorityInfo {
             VStack(alignment: .leading, spacing: IrshadTheme.Layout.spacingStandard) {
@@ -127,6 +136,15 @@ struct VerificationCardView: View {
                             viewModel.callPhoneNumber(phone)
                         } label: {
                             Label(phone, systemImage: "phone.fill")
+                        }
+                        .buttonStyle(DynamicCardSecondaryButtonStyle())
+                    }
+
+                    if let emailURL {
+                        Button {
+                            viewModel.openURL(emailURL)
+                        } label: {
+                            Label(email ?? "Email", systemImage: "envelope.fill")
                         }
                         .buttonStyle(DynamicCardSecondaryButtonStyle())
                     }

@@ -519,7 +519,7 @@ private extension LocalJourneyAPIService {
                     contactURL: authority.flatMap { URL(string: $0.contactURL) },
                     whatToConfirm: verifyTarget,
                     message: nil,
-                    metadata: [:]
+                    metadata: authorityEmailMetadata(authority)
                 )
             }
         } catch APIError.cancelled {
@@ -612,18 +612,7 @@ private extension LocalJourneyAPIService {
         )
 
         return BankingRecommendations(
-            banks: dto.banks.map {
-                BankRecommendation(
-                    id: Self.normalizedID($0.name),
-                    name: $0.name,
-                    minBalance: $0.minBalance,
-                    requirements: $0.requirements ?? [],
-                    docsNeeded: $0.docsNeeded ?? [],
-                    likelyToApprove: $0.likelyToApprove,
-                    source: $0.source,
-                    metadata: [:]
-                )
-            },
+            banks: dto.banks.map { makeBankRecommendation($0, archetypeId: stored.archetypeId) },
             metadata: [:]
         )
     }
@@ -690,6 +679,12 @@ private extension LocalJourneyAPIService {
             if let phone = authority.phone, !phone.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 metadata["phone"] = .string(phone)
             }
+            if let email = authority.email, !email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                metadata["email"] = .string(email)
+                if let mailURL = Self.mailtoURLString(email) {
+                    metadata["email_url"] = .string(mailURL)
+                }
+            }
             if !authority.contactURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 metadata["url"] = .string(authority.contactURL)
             }
@@ -706,6 +701,39 @@ private extension LocalJourneyAPIService {
             estCost: dto.estCost,
             costStatus: dto.costStatus == "verified" ? .verified : .unverified,
             source: dto.source ?? kbLicense?.source,
+            metadata: metadata
+        )
+    }
+
+    func makeBankRecommendation(_ dto: BankDTO, archetypeId: String) -> BankRecommendation {
+        let kbBank = kb.banks(for: archetypeId).first {
+            Self.normalizedID($0.name) == Self.normalizedID(dto.name)
+                || $0.name.localizedCaseInsensitiveContains(dto.name)
+                || dto.name.localizedCaseInsensitiveContains($0.name)
+        }
+
+        var metadata: [String: JSONValue] = [:]
+        if let website = kbBank?.website, !website.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            metadata["website"] = .string(website)
+        }
+        if let phone = kbBank?.phone, !phone.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            metadata["phone"] = .string(phone)
+        }
+        if let email = kbBank?.email, !email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            metadata["email"] = .string(email)
+            if let mailURL = Self.mailtoURLString(email) {
+                metadata["email_url"] = .string(mailURL)
+            }
+        }
+
+        return BankRecommendation(
+            id: Self.normalizedID(dto.name),
+            name: dto.name,
+            minBalance: dto.minBalance,
+            requirements: dto.requirements ?? [],
+            docsNeeded: dto.docsNeeded ?? [],
+            likelyToApprove: dto.likelyToApprove,
+            source: dto.source ?? kbBank?.source,
             metadata: metadata
         )
     }
@@ -818,8 +846,23 @@ private extension LocalJourneyAPIService {
             message: language == .ar
                 ? "لم يتم التحقق إلكترونياً. يرجى التواصل مع \(authority?.name ?? "الجهة المختصة") للتأكد من المتطلبات."
                 : "Could not verify online. Contact \(authority?.name ?? "the relevant authority") to confirm exact requirements.",
-            metadata: [:]
+            metadata: authorityEmailMetadata(authority)
         )
+    }
+
+    func authorityEmailMetadata(_ authority: AuthorityEntry?) -> [String: JSONValue] {
+        guard let email = authority?.email, let mailURL = Self.mailtoURLString(email) else {
+            return [:]
+        }
+        return ["email": .string(email), "email_url": .string(mailURL)]
+    }
+
+    static func mailtoURLString(_ email: String) -> String? {
+        let trimmed = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            return nil
+        }
+        return "mailto:\(trimmed)"
     }
 
     static func normalizedID(_ value: String) -> String {
