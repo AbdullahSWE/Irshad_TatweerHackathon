@@ -13,39 +13,57 @@ struct QuestionCardContainer<Content: View>: View {
     @ViewBuilder var content: Content
 
     var body: some View {
-        DynamicCardSurface(card: card, screenTitle: screenTitle, onCopy: onCopy) {
-            content
-
-            if let validationMessage = normalized(validationMessage) {
-                InfoBannerView(
-                    message: validationMessage,
-                    systemImage: "exclamationmark.circle.fill",
-                    tone: .warning
-                )
+        VStack(alignment: .leading, spacing: IrshadTheme.Layout.spacingTight) {
+            if let promptIntro {
+                Text(promptIntro)
+                    .font(IrshadTheme.Typography.secondaryLabelDynamic.weight(.semibold))
+                    .foregroundStyle(IrshadTheme.Colors.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.horizontal, IrshadTheme.Layout.spacingTight)
             }
 
-            if showsConfirm {
-                Button(action: onConfirm) {
-                    HStack(spacing: IrshadTheme.Layout.spacingTight) {
-                        if isServiceBusy {
-                            ProgressView()
-                                .controlSize(.small)
-                                .tint(.white)
-                                .accessibilityHidden(true)
-                        }
+            DynamicCardSurface(card: card, onCopy: onCopy) {
+                content
 
-                        Text(confirmTitle ?? card.confirmLabel)
-                            .font(IrshadTheme.Typography.statusMicrocopy)
-                            .fontWeight(.semibold)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .frame(minHeight: IrshadTheme.Layout.minimumTapTarget)
+                if let validationMessage = normalized(validationMessage) {
+                    InfoBannerView(
+                        message: validationMessage,
+                        systemImage: "exclamationmark.circle.fill",
+                        tone: .warning
+                    )
                 }
-                .buttonStyle(DynamicCardPrimaryButtonStyle())
-                .disabled(!canSubmit || isServiceBusy)
-                .accessibilityHint(Text("Submits this answer."))
+
+                if showsConfirm {
+                    Button(action: onConfirm) {
+                        HStack(spacing: IrshadTheme.Layout.spacingTight) {
+                            if isServiceBusy {
+                                ProgressView()
+                                    .controlSize(.small)
+                                    .tint(.white)
+                                    .accessibilityHidden(true)
+                            }
+
+                            Text(confirmTitle ?? card.confirmLabel)
+                                .font(IrshadTheme.Typography.statusMicrocopy)
+                                .fontWeight(.semibold)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .frame(minHeight: IrshadTheme.Layout.minimumTapTarget)
+                    }
+                    .buttonStyle(DynamicCardPrimaryButtonStyle())
+                    .disabled(!canSubmit || isServiceBusy)
+                    .accessibilityHint(Text("Submits this answer."))
+                }
             }
         }
+    }
+
+    private var promptIntro: String? {
+        guard card.kind == .question else {
+            return nil
+        }
+
+        return normalized(screenTitle)
     }
 
     private func normalized(_ value: String?) -> String? {

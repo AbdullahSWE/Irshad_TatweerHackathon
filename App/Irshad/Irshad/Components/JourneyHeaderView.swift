@@ -42,20 +42,6 @@ struct JourneyHeaderView: View {
                 .transition(.opacity.combined(with: .move(edge: .top)))
             }
 
-            if shouldShowRecoveryActions {
-                HStack(spacing: IrshadTheme.Layout.spacingStandard) {
-                    if let onRetry {
-                        Button(retryButtonTitle, action: onRetry)
-                            .buttonStyle(HeaderActionButtonStyle(tone: .primary))
-                    }
-
-                    if let onCancel {
-                        Button(cancelButtonTitle, action: onCancel)
-                            .buttonStyle(HeaderActionButtonStyle(tone: .secondary))
-                    }
-                }
-                .transition(IrshadTheme.Animations.cardRevealTransition)
-            }
         }
         .padding(IrshadTheme.Layout.outerMarginCompact)
         .background(
@@ -187,7 +173,7 @@ struct JourneyHeaderView: View {
     }
 
     private var shouldShowRecoveryActions: Bool {
-        (viewModel.journeyStatus == .failed || viewModel.isServiceBusy) && (onRetry != nil || onCancel != nil)
+        false
     }
 
     private func normalized(_ value: String?) -> String? {

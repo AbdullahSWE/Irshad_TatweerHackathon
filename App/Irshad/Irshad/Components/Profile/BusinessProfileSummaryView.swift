@@ -65,12 +65,6 @@ struct BusinessProfileSummaryView: View {
                     copyText: viewModel.copyText(_:)
                 )
 
-                TrustLegendView(
-                    verifiedFacts: viewModel.verifiedFacts,
-                    estimatedFacts: viewModel.estimatedFacts,
-                    unverifiedFacts: viewModel.unverifiedFacts,
-                    guidanceDisclaimer: viewModel.guidanceDisclaimer
-                )
             }
             .transition(IrshadTheme.Animations.cardRevealTransition)
             .animation(
