@@ -10,7 +10,7 @@
 
 <br/>
 
-`SwiftUI iOS` · `OpenRouter LLM` · `UAE Licenses & Bank Database` · `English + Arabic`
+`Swift iOS` · `OpenRouter LLM` · `UAE Licenses & Bank Database` · `English + Arabic`
 
 </div>
 
@@ -99,31 +99,6 @@ Irshad is a voice-first iOS guide. The founder speaks an idea. The app asks a sm
 <img src="Assets/demo-flow-5up.png" alt="Irshad app flow from welcome to final plan" width="100%" />
 </div>
 
-### What makes it more than a chatbot
-
-Irshad uses a **fixed journey backbone** with AI adaptation inside each stage.
-
-| Stage | Purpose |
-|---|---|
-| 1. Goal | Founder says the idea aloud. |
-| 2. Business | Activity-specific questions. |
-| 3. Founder | Residency, ownership, team, existing registration. |
-| 4. Details | Location, sales channel, office / farm / online needs. |
-| 5. Budget | Capital, employees, revenue assumptions. |
-| 6. Documents | IDs, farm deed / lease, current permits, missing documents. |
-| 7. Analyze | Match activity and estimate first path. |
-| 8. Verify | Confirm what can be confirmed, flag what cannot. |
-| 9. Licence | Recommend licence path and alternatives. |
-| 10. Banking | Suggest banks and account-readiness. |
-| 11. Plan | Produce the final roadmap and next action. |
-
-Two guardrails keep the demo stable and honest:
-
-| Guardrail | Why it matters |
-|---|---|
-| **Question cap** | The journey cannot loop endlessly. |
-| **Completeness floor** | It does not produce a plan before core slots like activity, residency, location, and capital are known. |
-
 ---
 
 ## ✅ IV. What Is Working Now
@@ -144,7 +119,7 @@ Two guardrails keep the demo stable and honest:
 
 ---
 
-📊 V. Impact and Testable Claims
+## 📊 V. Impact and Testable Claims
 
 | # | Claim | Evidence / how to test |
 |---:|---|---|
@@ -205,7 +180,7 @@ An AI that invents a licence fee can hurt a founder. Irshad is designed to show 
 | **Unverified** | Needs official confirmation. | Show the authority and the exact question to ask. |
 | **Missing** | Not enough information yet. | Ask a follow-up or block final analysis. |
 
-### What Irshad is not
+### What Irshad is NOT
 
 Irshad does **not** replace ADDED, ADRA, ADAFSA, TAMM, banks, lawyers, or business setup officers.
 
@@ -217,23 +192,19 @@ It helps the founder understand the likely first path, prepare the right documen
 
 ## 🚀 VIII. Feasibility and Deployment
 
-| Area | Current approach | Why it is feasible |
-|---|---|---|
-| Client | SwiftUI iOS app | Runs on a normal iPhone; no special hardware. |
-| Backend | Next.js API | Deployable to Vercel, Render, a VM, or a local server. |
-| Intelligence | OpenRouter model call | Model is swappable; no GPU owned by the team. |
-| Knowledge | JSON knowledge base | Easy to inspect, update, and version-control. |
-| Maintenance | Update source URLs, fees, authorities, and contact details | Can be maintained by a local operator or incubator partner, not only engineers. |
-| Cost profile | Low fixed infrastructure; variable LLM usage | Practical for a pilot before deeper integration. |
+| Area         | Current Approach                | Why It Is Feasible                                                          |
+| ------------ | ------------------------------- | --------------------------------------------------------------------------- |
+| App          | Swift + SwiftUI iOS app         | Runs on a normal iPhone with no special hardware.                           |
+| API calls    | Routed directly through the app | Keeps the prototype simple and easy to test.                                |
+| Intelligence | OpenRouter model call           | The model can be swapped without changing the full app.                     |
+| Knowledge    | Bundled JSON knowledge base     | UAE license, bank, authority, fee, and contact data can be updated clearly. |
 
-### Deployment path
+### Deployment Path
 
-| Phase | Deployment |
-|---|---|
-| Hackathon | Local backend + iPhone demo + API smoke test. |
-| Pilot | Hosted backend + TestFlight app + curated KB updates. |
-| Community rollout | Add local partner for source updates and user onboarding. |
-| Authority partnership | Replace manual verification gaps with official API or data-sharing where available. |
+| Phase      | Deployment                                                                                  |
+| ---------- | ------------------------------------------------------------------------------------------- |
+| Hackathon  | iPhone demo using the SwiftUI app with direct API calls and bundled knowledge base.         |
+| TestFlight | Shared through Apple TestFlight so testers can install it using the QR code in Section XII. |
 
 ---
 
