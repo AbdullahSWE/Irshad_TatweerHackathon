@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/hero-wordmark.png" alt="Irshad — إرشاد" width="100%" />
+<img src="Assets/hero-wordmark.png" alt="Irshad — إرشاد" width="100%" />
 
 # إرشاد · Irshad
 
@@ -16,7 +16,7 @@
 
 <div align="center">
 
-[<img src="assets/demo-thumbnail.png" alt="Watch the Irshad demo" width="88%" />](https://youtube.com/REPLACE_WITH_DEMO_LINK)
+[<img src="Assets/demo-thumbnail.png" alt="Watch the Irshad demo" width="88%" />](https://youtube.com/REPLACE_WITH_DEMO_LINK)
 
 <sub>Demo: spoken idea → adaptive questions → grounded roadmap. Replace the URL above with the final YouTube demo link.</sub>
 
@@ -35,7 +35,7 @@
 | **How to verify** | Run the app, use the API smoke test, inspect `Backend/kb/knowledge.json`, and check the evidence pack linked below. |
 
 <div align="center">
-<img src="assets/comic-2x2.png" alt="Irshad story in four panels" width="100%" />
+<img src="Assets/comic-2x2.png" alt="Irshad story in four panels" width="100%" />
 </div>
 
 ---
@@ -96,7 +96,7 @@ Irshad is a voice-first iOS guide. The founder speaks an idea. The app asks a sm
 | Confidence labels | Verified, estimated, unverified, or missing |
 
 <div align="center">
-<img src="assets/demo-flow-5up.png" alt="Irshad app flow from welcome to final plan" width="100%" />
+<img src="Assets/demo-flow-5up.png" alt="Irshad app flow from welcome to final plan" width="100%" />
 </div>
 
 ### What makes it more than a chatbot
@@ -149,14 +149,14 @@ Two guardrails keep the demo stable and honest:
 | # | Claim | Evidence / how to test |
 |---:|---|---|
 | 1 | Irshad gives different questions for different businesses while keeping the same path. | Run `stargazing on my land` and `sell camel milk`; compare Stage 2 cards. The path stays fixed, but question content changes. |
-| 2 | The founder can reach a first action plan without filling a traditional form. | Watch the demo video and inspect the screenshots in `assets/` and `evidence/screenshots/`. |
-| 3 | Important facts are labelled instead of silently presented as certain. | See `assets/trust-labels.png` and the final plan screenshot, where unverified items are explicitly shown. |
+| 2 | The founder can reach a first action plan without filling a traditional form. | Watch the demo video and inspect the screenshots in `Assets/` and `Evidence/screenshots/`. |
+| 3 | Important facts are labelled instead of silently presented as certain. | See `Assets/trust-labels.png` and the final plan screenshot, where unverified items are explicitly shown. |
 | 4 | The knowledge base is inspectable. | Open `Backend/kb/knowledge.json` and check source URLs, authorities, licence types, banks, and archetypes. |
 | 5 | The app can be verified without the iOS build. | Run the backend smoke test in [How to run or verify](#12-how-to-run-or-verify-it). |
 | 6 | The project is deployable with light infrastructure. | Thin SwiftUI client + stateless Next.js API + JSON knowledge base. No GPU or heavy database required for the prototype. |
 
 <div align="center">
-<img src="assets/evidence-scorecard.png" alt="Evidence pack overview" width="100%" />
+<img src="Assets/Evidence-scorecard.png" alt="Evidence pack overview" width="100%" />
 </div>
 
 ---
@@ -168,11 +168,11 @@ The judging guide rewards specific, testable claims backed by evidence, not vagu
 | Evidence | What it proves | Location |
 |---|---|---|
 | Demo video | End-to-end readiness | Top of README, replace with final YouTube link |
-| App screenshots | The product is built and has multiple working states | `assets/` and `evidence/screenshots/` |
-| Source matrix | The problem and KB are tied to official / reputable references | `evidence/source-matrix.md` |
-| Test run sheet | Persona-by-persona verification format | `evidence/test-runs.md` |
-| Rebuttals | Hard judge questions answered in advance | `evidence/rebuttals.md` |
-| Limitations | Honest scope and risks | `evidence/limitations.md` |
+| App screenshots | The product is built and has multiple working states | `Assets/` and `Evidence/screenshots/` |
+| Source matrix | The problem and KB are tied to official / reputable references | `Evidence/source-matrix.md` |
+| Test run sheet | Persona-by-persona verification format | `Evidence/test-runs.md` |
+| Rebuttals | Hard judge questions answered in advance | `Evidence/rebuttals.md` |
+| Limitations | Honest scope and risks | `Evidence/limitations.md` |
 | Run steps | Judge can verify without contacting us | This README |
 
 ### Research references used for grounding
@@ -195,7 +195,7 @@ The judging guide rewards specific, testable claims backed by evidence, not vagu
 An AI that invents a licence fee can hurt a founder. Irshad is designed to show uncertainty instead of hiding it.
 
 <div align="center">
-<img src="assets/trust-labels.png" alt="Irshad trust labels" width="100%" />
+<img src="Assets/trust-labels.png" alt="Irshad trust labels" width="100%" />
 </div>
 
 | Label | Meaning | Product behavior |
@@ -256,7 +256,7 @@ The reusable parts are the voice interface, stage engine, trust-label system, ad
 ## 10. Architecture and tools
 
 <div align="center">
-<img src="assets/architecture.png" alt="Irshad architecture diagram" width="100%" />
+<img src="Assets/architecture.png" alt="Irshad architecture diagram" width="100%" />
 </div>
 
 | Layer | Tools |
@@ -332,12 +332,12 @@ curl -X POST http://localhost:3000/api/journey/start \
 
 | Check | Where |
 |---|---|
-| App has real screens | `assets/demo-flow-5up.png`, `evidence/screenshots/` |
+| App has real screens | `Assets/demo-flow-5up.png`, `Evidence/screenshots/` |
 | Backend can start a journey | API smoke test above |
 | Claims are testable | [Impact and testable claims](#5-impact-and-testable-claims) |
-| Sources are inspectable | `Backend/kb/knowledge.json`, `evidence/source-matrix.md` |
-| Limitations are explicit | `evidence/limitations.md` |
-| Hard questions are answered | `evidence/rebuttals.md` |
+| Sources are inspectable | `Backend/kb/knowledge.json`, `Evidence/source-matrix.md` |
+| Limitations are explicit | `Evidence/limitations.md` |
+| Hard questions are answered | `Evidence/rebuttals.md` |
 
 ---
 
@@ -348,7 +348,7 @@ curl -X POST http://localhost:3000/api/journey/start \
 | It does not submit applications | Submission requires official systems and user identity. | Integrate with TAMM / authority workflows only through official channels. |
 | It does not guarantee fees | Fees can depend on activity, legal form, location, and date. | Keep ranges, show source dates, and add official API/data source if available. |
 | It needs internet | LLM and server run remotely. | Add cached KB and offline draft mode. |
-| Community validation is still limited | Hackathon timeline is short. | Run 5–10 target-user tests and update `evidence/test-runs.md`. |
+| Community validation is still limited | Hackathon timeline is short. | Run 5–10 target-user tests and update `Evidence/test-runs.md`. |
 | Knowledge base can become stale | Regulations and fees change. | Add `last_verified`, owner, and review cadence to each KB record. |
 
 ---
