@@ -330,6 +330,41 @@ extension JourneyViewModel {
             && finalPlan == nil
     }
 
+    var isAdditionalContextPromptActive: Bool {
+        journeyStatus == .gateOpen
+            && activeSession != nil
+            && currentCard == nil
+            && finalPlan == nil
+            && !isServiceBusy
+    }
+
+    var additionalContextTitle: String {
+        switch currentLanguage {
+        case .ar:
+            return "هل تود إضافة شيء آخر؟"
+        case .en:
+            return "Would you like to add anything else?"
+        }
+    }
+
+    var additionalContextMessage: String {
+        switch currentLanguage {
+        case .ar:
+            return "إذا كانت لديك تفاصيل أخيرة من طرفك، قلها الآن. أو يمكنك تخطي هذه الخطوة وسأجهز خطتك."
+        case .en:
+            return "If there is anything more from your end, say it now. Or skip ahead if it is all good."
+        }
+    }
+
+    var additionalContextSkipTitle: String {
+        switch currentLanguage {
+        case .ar:
+            return "لا، كل شيء جيد"
+        case .en:
+            return "No, it's all good"
+        }
+    }
+
     var isChoiceQuestionActive: Bool {
         guard let currentCard, currentCard.isChoiceQuestion else {
             return false
@@ -383,6 +418,11 @@ extension JourneyViewModel {
         let fallbackText = textFallbackValue.trimmingCharacters(in: .whitespacesAndNewlines)
         let value = acceptedText.isEmpty ? fallbackText : acceptedText
 
+        if isAdditionalContextPromptActive {
+            submitAdditionalContext(value)
+            return
+        }
+
         guard !value.isEmpty else {
             inputErrorMessage = localizedInputError(.missingAnswer)
             isTextEntryExpanded = true
@@ -413,6 +453,24 @@ extension JourneyViewModel {
             guard let self else { return }
             try await self.performNextCard(cardID: cardID, appendLocalAnswer: true)
         }
+    }
+
+    func submitAdditionalContext(_ value: String) {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            inputErrorMessage = localizedInputError(.missingAnswer)
+            voiceState = .idle
+            transcriptState = .empty
+            return
+        }
+
+        appendAdditionalContext(trimmed)
+        proceedFromAdditionalContext()
+    }
+
+    func skipAdditionalContext() {
+        resetInputAfterSuccessfulSubmit()
+        proceedFromAdditionalContext()
     }
 
     func retryCurrentStep() {
@@ -1174,24 +1232,30 @@ private extension JourneyViewModel {
             speakCurrentPromptAfterResponse()
             return false
         case .gateOpen:
-            currentCard = response.card
-            renderableCards = response.card.map { [$0] } ?? []
-            unsupportedCard = unsupportedCardIfNeeded(response.card)
+            currentCard = nil
+            renderableCards = []
+            unsupportedCard = nil
             journeyStatus = .gateOpen
+            currentPrompt = additionalContextTitle
+            currentAssistantMessage = additionalContextMessage
             resetInputAfterSuccessfulSubmit()
             refreshDerivedState()
             pendingOperation = .analyze
-            return true
+            speakCurrentPromptAfterResponse()
+            return false
         case .ready:
             if response.card == nil, let progress, progress.filled >= progress.required {
                 currentCard = nil
                 renderableCards = []
                 unsupportedCard = nil
                 journeyStatus = .gateOpen
+                currentPrompt = additionalContextTitle
+                currentAssistantMessage = additionalContextMessage
                 resetInputAfterSuccessfulSubmit()
                 refreshDerivedState()
                 pendingOperation = .analyze
-                return true
+                speakCurrentPromptAfterResponse()
+                return false
             } else {
                 pendingOperation = .nextCard(cardID: currentCard?.cardId ?? "")
                 recoverableError = RecoverableError(
@@ -1437,6 +1501,41 @@ private extension JourneyViewModel {
         inputErrorMessage = nil
         if voiceState == .transcriptReady {
             voiceState = .idle
+        }
+    }
+
+    func appendAdditionalContext(_ value: String) {
+        guard var session = activeSession else {
+            return
+        }
+
+        let answer = JSONValue.string(value)
+        session.filledSlots["additional_context"] = answer
+        session.history.append(
+            JourneyHistoryItem(
+                cardId: "additional-context-\(UUID().uuidString)",
+                question: additionalContextTitle,
+                answer: answer,
+                slot: "additional_context",
+                stage: "final_context",
+                timestamp: Date()
+            )
+        )
+        activeSession = session
+        refreshDerivedState()
+        resetInputAfterSuccessfulSubmit()
+    }
+
+    func proceedFromAdditionalContext() {
+        guard activeSession != nil else {
+            handleRecoverableError(ViewModelError.noActiveSession)
+            return
+        }
+
+        pendingOperation = .analyze
+        launchServiceOperation(status: .processing) { [weak self] in
+            guard let self else { return }
+            try await self.runOutputChain(startingAt: .analyze)
         }
     }
 
@@ -1921,7 +2020,8 @@ private extension JourneyViewModel {
 
     func profileField(id: String, value: JSONValue) -> ProfileField {
         if case .object(let object) = value {
-            let label = object["label"]?.displayString.nonEmptyValue ?? labelize(id)
+            let label = object["label"]?.displayString.nonEmptyValue
+                .map(DisplayLabelFormatter.humanizeIfMachineLabel) ?? labelize(id)
             let displayValue = object["value"]?.displayString.nonEmptyValue
                 ?? object["answer"]?.displayString.nonEmptyValue
                 ?? value.displayString
@@ -2313,14 +2413,7 @@ private extension JourneyViewModel {
     }
 
     func labelize(_ key: String) -> String {
-        key
-            .replacingOccurrences(of: "_", with: " ")
-            .replacingOccurrences(of: "-", with: " ")
-            .split(separator: " ")
-            .map { word in
-                word.prefix(1).uppercased() + word.dropFirst()
-            }
-            .joined(separator: " ")
+        DisplayLabelFormatter.humanizeKey(key)
     }
 
     func firstQuestionPrompt(cardTitle: String?, fallback: String?) -> String? {

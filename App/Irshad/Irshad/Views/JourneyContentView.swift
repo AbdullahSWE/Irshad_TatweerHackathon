@@ -16,6 +16,10 @@ struct JourneyContentView: View {
 
     /// Bottom inset so the anchored input dock never covers scrolling content.
     private var bottomInset: CGFloat {
+        if viewModel.isAdditionalContextPromptActive {
+            return IrshadTheme.Layout.spacingMajor
+        }
+
         if viewModel.isChoiceQuestionActive {
             return IrshadTheme.Layout.spacingMajor
         }
@@ -33,9 +37,15 @@ struct JourneyContentView: View {
                         onCancel: { viewModel.cancelCurrentOperation() }
                     )
 
-                    DynamicCardRendererView(viewModel: viewModel)
-                        .id(AnchorID.card)
-                        .accessibilityFocused($cardFocused)
+                    if viewModel.isAdditionalContextPromptActive {
+                        AdditionalContextView(viewModel: viewModel)
+                            .id(AnchorID.card)
+                            .accessibilityFocused($cardFocused)
+                    } else {
+                        DynamicCardRendererView(viewModel: viewModel)
+                            .id(AnchorID.card)
+                            .accessibilityFocused($cardFocused)
+                    }
 
                     BusinessProfileSummaryView(viewModel: viewModel)
 

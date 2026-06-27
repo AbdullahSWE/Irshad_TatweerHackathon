@@ -20,7 +20,7 @@ struct JourneyInputOverlayView: View {
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }
 
-            if !viewModel.isChoiceQuestionActive {
+            if !viewModel.isChoiceQuestionActive && !viewModel.isAdditionalContextPromptActive {
                 InputDockView(viewModel: viewModel, isWelcome: false)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
@@ -28,6 +28,7 @@ struct JourneyInputOverlayView: View {
         .frame(maxWidth: .infinity, alignment: .bottom)
         .animation(IrshadTheme.Animations.cardReveal, value: viewModel.toast)
         .animation(IrshadTheme.Animations.cardReveal, value: viewModel.isChoiceQuestionActive)
+        .animation(IrshadTheme.Animations.cardReveal, value: viewModel.isAdditionalContextPromptActive)
         .accessibilityElement(children: .contain)
     }
 }

@@ -308,7 +308,11 @@ extension DynamicCard {
     }
 
     var slotLabel: String? {
-        metadata.string(for: ["slot_label", "slotLabel"]) ?? normalized(slot)
+        if let label = metadata.string(for: ["slot_label", "slotLabel"]) {
+            return DisplayLabelFormatter.humanizeIfMachineLabel(label)
+        }
+
+        return normalized(slot).map(DisplayLabelFormatter.humanizeKey)
     }
 
     var statusLabel: String? {
