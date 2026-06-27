@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="Assets/hero-wordmark.png" alt="Irshad — إرشاد" width="100%" />
+<img src="Assets/irshad-banner.png" alt="Irshad — إرشاد" width="100%" />
 
 # إرشاد · Irshad
 
