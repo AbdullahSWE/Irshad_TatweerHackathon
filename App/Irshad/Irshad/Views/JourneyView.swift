@@ -65,7 +65,9 @@ struct JourneyView: View {
 
             JourneyContentView(viewModel: viewModel)
 
-            JourneyInputOverlayView(viewModel: viewModel)
+            if viewModel.shouldShowInputOverlay {
+                JourneyInputOverlayView(viewModel: viewModel)
+            }
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
     }

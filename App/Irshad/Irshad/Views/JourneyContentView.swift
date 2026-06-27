@@ -41,6 +41,10 @@ struct JourneyContentView: View {
             return IrshadTheme.Layout.spacingMajor
         }
 
+        if !viewModel.shouldShowInputOverlay {
+            return IrshadTheme.Layout.spacingMajor
+        }
+
         return IrshadTheme.Layout.bottomDockHeight + IrshadTheme.Layout.spacingMajor * 2
     }
 

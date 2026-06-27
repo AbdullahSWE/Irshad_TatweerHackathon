@@ -385,6 +385,15 @@ extension JourneyViewModel {
         return !currentCard.allowsCustomInput
     }
 
+    var shouldShowInputOverlay: Bool {
+        switch activeResultScreen {
+        case .license, .banking, .authority:
+            return false
+        case .none, .loadingLicense, .loadingBanking, .finalPlan:
+            return !isChoiceQuestionActive && !isAdditionalContextPromptActive
+        }
+    }
+
     func beginOnboarding() {
         guard !hasStartedOnboarding else {
             beginListening()
