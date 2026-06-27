@@ -42,7 +42,10 @@ struct JourneyView: View {
         .irshadClampedDynamicType()
         // Mirror the system Reduce Motion setting into the ViewModel so every
         // child animation falls back to static emphasis together.
-        .onAppear { viewModel.reduceMotionPreferred = systemReduceMotion }
+        .onAppear {
+            viewModel.reduceMotionPreferred = systemReduceMotion
+            viewModel.prepareSpeechEngine()
+        }
         .onChange(of: systemReduceMotion) { _, newValue in
             viewModel.reduceMotionPreferred = newValue
         }

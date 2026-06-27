@@ -28,6 +28,7 @@ final class JourneyViewModel {
     @ObservationIgnored private let clipboardClient: ClipboardClient
     @ObservationIgnored private var activeTask: Task<Void, Never>?
     @ObservationIgnored private var speechTask: Task<Void, Never>?
+    @ObservationIgnored private var speechWarmupTask: Task<Void, Never>?
     @ObservationIgnored private var pendingOperation: PendingOperation?
 
     let appTitle: String
@@ -194,18 +195,39 @@ final class JourneyViewModel {
 extension JourneyViewModel {
     func selectLanguage(_ language: AppLanguage) {
         currentLanguage = language
+        prepareSpeechEngine()
     }
 
     func selectVoicePersona(_ persona: VoicePersona) {
         selectedVoicePersona = persona
+        prepareSpeechEngine()
+    }
+
+    func prepareSpeechEngine() {
+        speechWarmupTask?.cancel()
+        speechWarmupTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+            await self.speechSynthesisService.prepare(language: self.currentLanguage, voice: self.selectedVoicePersona)
+        }
     }
 
     var onboardingGreetingMessage: String {
+        let name = selectedVoicePersona.displayName(in: currentLanguage)
+
         switch currentLanguage {
         case .ar:
-            return "يرجى الإجابة عن بعض الأسئلة حتى نتمكن من تقديم التوصيات المناسبة. ما نوع المشروع الذي تريد تأسيسه؟"
+            return "السلام عليكم، أنا \(name) وسأساعدك في إعداد مشروعك. أخبرني ما نوع المشروع الذي تريد تأسيسه."
         case .en:
-            return "Please answer a few questions so we can make the proper recommendations. What business would you like to set up?"
+            return "Assalamu Alaikum, I'm \(name) and I'm here to help you set up your business. Please share what business you'd like to set up."
+        }
+    }
+
+    var firstQuestionIntroMessage: String {
+        switch currentLanguage {
+        case .ar:
+            return "نود أن نسألك بعض الأسئلة حتى نقدم لك التوصيات المناسبة."
+        case .en:
+            return "We would like to ask you a few questions so we can provide the proper recommendations."
         }
     }
 
@@ -1054,7 +1076,10 @@ private extension JourneyViewModel {
 
         framingMessage = response.framing
         currentAssistantMessage = response.activity ?? response.framing
-        currentPrompt = response.card?.title ?? response.activity ?? response.framing
+        currentPrompt = firstQuestionPrompt(
+            cardTitle: response.card?.title,
+            fallback: response.activity ?? response.framing
+        )
         currentCard = response.card
         renderableCards = response.card.map { [$0] } ?? []
         unsupportedCard = unsupportedCardIfNeeded(response.card)
@@ -2296,6 +2321,14 @@ private extension JourneyViewModel {
                 word.prefix(1).uppercased() + word.dropFirst()
             }
             .joined(separator: " ")
+    }
+
+    func firstQuestionPrompt(cardTitle: String?, fallback: String?) -> String? {
+        if let title = cardTitle?.nonEmptyValue {
+            return "\(firstQuestionIntroMessage) \(title)"
+        }
+
+        return fallback?.nonEmptyValue
     }
 }
 

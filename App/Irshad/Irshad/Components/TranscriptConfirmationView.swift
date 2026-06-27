@@ -2,38 +2,13 @@ import SwiftUI
 
 struct TranscriptConfirmationView: View {
     var transcript: Binding<String>
-    var confidence: Double?
     var isProcessing: Bool
     var errorMessage: String?
     var language: AppLanguage = .en
-    var confirmTitle: String
     var retryListening: () -> Void
-    var confirm: () -> Void
 
     private var hasText: Bool {
         !transcript.wrappedValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-    }
-
-    private var confidenceText: String? {
-        guard let confidence else {
-            return nil
-        }
-
-        if confidence < 0.62 {
-            switch language {
-            case .ar:
-                return "الثقة منخفضة. عدل النص أو أعد التسجيل"
-            case .en:
-                return "Low confidence. Edit the text or record again"
-            }
-        }
-
-        switch language {
-        case .ar:
-            return "الثقة \(Int((confidence * 100).rounded()))%"
-        case .en:
-            return "\(Int((confidence * 100).rounded()))% confidence"
-        }
     }
 
     var body: some View {
@@ -44,14 +19,6 @@ struct TranscriptConfirmationView: View {
                     .foregroundStyle(IrshadTheme.Colors.primaryText)
 
                 Spacer()
-
-                if let confidenceText {
-                    Label(confidenceText, systemImage: isLowConfidence ? "exclamationmark.circle" : "checkmark.circle")
-                        .font(IrshadTheme.Typography.statusMicrocopy)
-                        .foregroundStyle(isLowConfidence ? IrshadTheme.Colors.warning : IrshadTheme.Colors.secondaryText)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.82)
-                }
             }
 
             ZStack(alignment: .topLeading) {
@@ -74,10 +41,10 @@ struct TranscriptConfirmationView: View {
                     .foregroundStyle(IrshadTheme.Colors.primaryText)
                     .scrollContentBackground(.hidden)
                     .padding(IrshadTheme.Layout.spacingTight)
-                    .frame(minHeight: 112, maxHeight: 168)
+                    .frame(minHeight: 56, maxHeight: 84)
                     .disabled(isProcessing)
             }
-            .frame(minHeight: 124)
+            .frame(minHeight: 68)
 
             if let errorMessage, !errorMessage.isEmpty {
                 Text(errorMessage)
@@ -86,21 +53,14 @@ struct TranscriptConfirmationView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            HStack(spacing: IrshadTheme.Layout.spacingStandard) {
-                Button(action: retryListening) {
-                    Label(retryTitle, systemImage: "arrow.counterclockwise")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(SecondaryInputButtonStyle())
-                .disabled(isProcessing)
-
-                Button(action: confirm) {
-                    Label(confirmTitle, systemImage: "paperplane.fill")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(PrimaryInputButtonStyle())
-                .disabled(!hasText || isProcessing)
+            Button(action: retryListening) {
+                Label(retryTitle, systemImage: "arrow.counterclockwise")
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+                    .frame(maxWidth: .infinity)
             }
+            .buttonStyle(SecondaryInputButtonStyle())
+            .disabled(isProcessing)
         }
         .padding(IrshadTheme.Layout.spacingComfortable)
         .background {
@@ -114,10 +74,6 @@ struct TranscriptConfirmationView: View {
         }
         .transition(IrshadTheme.Animations.cardRevealTransition)
         .animation(IrshadTheme.Animations.cardReveal, value: hasText)
-    }
-
-    private var isLowConfidence: Bool {
-        (confidence ?? 1) < 0.62
     }
 
     private var reviewTitle: String {

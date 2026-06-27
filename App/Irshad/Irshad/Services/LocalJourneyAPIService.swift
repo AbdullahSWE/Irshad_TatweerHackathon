@@ -410,6 +410,8 @@ private extension LocalJourneyAPIService {
             - toggle: binary on/off
             - Omit options for text type
             - Keep title conversational and specific to \(archetypeLabel)
+            - Use simple, concise, easy-to-understand words
+            - Avoid technical jargon, government jargon, acronyms, and complex business terms unless absolutely necessary
             """,
             language: language,
             debugLabel: "generateCard.\(stage).\(slot)",

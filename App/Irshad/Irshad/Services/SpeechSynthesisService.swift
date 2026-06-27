@@ -2,6 +2,7 @@ import AVFoundation
 import Foundation
 
 protocol SpeechSynthesisServiceProtocol: AnyObject {
+    func prepare(language: AppLanguage, voice: VoicePersona?) async
     func speak(_ text: String, language: AppLanguage, voice: VoicePersona?) async
     func stopSpeaking() async
 }
@@ -20,6 +21,11 @@ final class SpeechSynthesisService: NSObject, SpeechSynthesisServiceProtocol {
         self.audioSession = audioSession
         super.init()
         self.synthesizer.delegate = self
+    }
+
+    func prepare(language: AppLanguage, voice: VoicePersona?) async {
+        configureAudioSessionForSpeech()
+        _ = Self.matchingVoice(language: language, persona: voice)
     }
 
     func speak(_ text: String, language: AppLanguage, voice: VoicePersona?) async {
@@ -60,7 +66,7 @@ final class SpeechSynthesisService: NSObject, SpeechSynthesisServiceProtocol {
 private extension SpeechSynthesisService {
     func configureAudioSessionForSpeech() {
         do {
-            try audioSession.setCategory(.playback, mode: .spokenAudio, options: [.duckOthers])
+            try audioSession.setCategory(.playback, mode: .default, options: [])
             try audioSession.setActive(true)
         } catch {
             assertionFailure("Unable to configure audio session for speech: \(error.localizedDescription)")

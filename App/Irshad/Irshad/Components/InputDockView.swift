@@ -60,13 +60,10 @@ struct InputDockView: View {
             if shouldShowTranscript {
                 TranscriptConfirmationView(
                     transcript: transcriptBinding,
-                    confidence: viewModel.transcriptConfidence,
                     isProcessing: isProcessing,
                     errorMessage: viewModel.inputErrorMessage,
                     language: viewModel.currentLanguage,
-                    confirmTitle: confirmTitle,
-                    retryListening: viewModel.retryListening,
-                    confirm: confirmTranscript
+                    retryListening: viewModel.retryListening
                 )
             }
 
@@ -123,14 +120,6 @@ struct InputDockView: View {
         )
     }
 
-    private func confirmTranscript() {
-        if isWelcome {
-            viewModel.acceptTranscript()
-        } else {
-            viewModel.submitCurrentAnswer()
-        }
-    }
-
     private func submitTypedInput() {
         let value = viewModel.textFallbackValue.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !value.isEmpty else {
@@ -141,19 +130,6 @@ struct InputDockView: View {
             viewModel.startJourneyWithText(value)
         } else {
             viewModel.submitCurrentAnswer()
-        }
-    }
-
-    private var confirmTitle: String {
-        switch (isWelcome, viewModel.currentLanguage) {
-        case (true, .ar):
-            return "اعتمد"
-        case (true, .en):
-            return "Use transcript"
-        case (false, .ar):
-            return "أرسل"
-        case (false, .en):
-            return "Send"
         }
     }
 
