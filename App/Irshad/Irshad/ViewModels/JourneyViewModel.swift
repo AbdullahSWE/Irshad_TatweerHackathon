@@ -1607,19 +1607,19 @@ private extension JourneyViewModel {
         switch (screen, currentLanguage) {
         case (.loadingLicense, .ar):
             text = hasBusiness
-                ? "نبحث الآن عن أفضل رخصة مناسبة لـ \(business)."
-                : "نبحث الآن عن أفضل رخصة مناسبة لمشروعك."
+                ? "نبحث عن أفضل رخصة مناسبة لمشروع \(business)."
+                : "نبحث عن أفضل رخصة مناسبة لمشروعك."
         case (.loadingLicense, .en):
             text = hasBusiness
-                ? "We're finding the best license for \(business)."
+                ? "We're finding the best license for your \(business)."
                 : "We're finding the best license for your business."
         case (.loadingBanking, .ar):
             text = hasBusiness
-                ? "نبحث الآن عن أفضل الخيارات البنكية المناسبة لـ \(business)."
-                : "نبحث الآن عن أفضل الخيارات البنكية المناسبة لمشروعك."
+                ? "نبحث عن أفضل الخيارات البنكية المناسبة لمشروع \(business)."
+                : "نبحث عن أفضل الخيارات البنكية المناسبة لمشروعك."
         case (.loadingBanking, .en):
             text = hasBusiness
-                ? "We're finding the best banking options for \(business)."
+                ? "We're finding the best banking options for your \(business)."
                 : "We're finding the best banking options for your business."
         default:
             return

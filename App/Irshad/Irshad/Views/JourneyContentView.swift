@@ -14,8 +14,25 @@ struct JourneyContentView: View {
 
     @AccessibilityFocusState private var cardFocused: Bool
 
+    private var isResultLoadingScreen: Bool {
+        viewModel.activeResultScreen == .loadingLicense || viewModel.activeResultScreen == .loadingBanking
+    }
+
+    private var shouldShowBusinessProfile: Bool {
+        switch viewModel.activeResultScreen {
+        case .loadingLicense, .license, .loadingBanking, .banking:
+            return false
+        default:
+            return true
+        }
+    }
+
     /// Bottom inset so the anchored input dock never covers scrolling content.
     private var bottomInset: CGFloat {
+        if isResultLoadingScreen {
+            return IrshadTheme.Layout.spacingMajor
+        }
+
         if viewModel.isAdditionalContextPromptActive {
             return IrshadTheme.Layout.spacingMajor
         }
@@ -31,23 +48,27 @@ struct JourneyContentView: View {
         ScrollViewReader { proxy in
             ScrollView {
                 VStack(spacing: IrshadTheme.Layout.spacingSection) {
-                    JourneyHeaderView(
-                        viewModel: viewModel,
-                        onRetry: { viewModel.retryCurrentStep() },
-                        onCancel: { viewModel.cancelCurrentOperation() }
-                    )
+                    if !isResultLoadingScreen {
+                        JourneyHeaderView(
+                            viewModel: viewModel,
+                            onRetry: { viewModel.retryCurrentStep() },
+                            onCancel: { viewModel.cancelCurrentOperation() }
+                        )
 
-                    if viewModel.isAdditionalContextPromptActive {
-                        AdditionalContextView(viewModel: viewModel)
-                            .id(AnchorID.card)
-                            .accessibilityFocused($cardFocused)
-                    } else {
-                        DynamicCardRendererView(viewModel: viewModel)
-                            .id(AnchorID.card)
-                            .accessibilityFocused($cardFocused)
+                        if viewModel.isAdditionalContextPromptActive {
+                            AdditionalContextView(viewModel: viewModel)
+                                .id(AnchorID.card)
+                                .accessibilityFocused($cardFocused)
+                        } else {
+                            DynamicCardRendererView(viewModel: viewModel)
+                                .id(AnchorID.card)
+                                .accessibilityFocused($cardFocused)
+                        }
                     }
 
-                    BusinessProfileSummaryView(viewModel: viewModel)
+                    if shouldShowBusinessProfile {
+                        BusinessProfileSummaryView(viewModel: viewModel)
+                    }
 
                     JourneyOutputStageView(viewModel: viewModel)
                         .id(AnchorID.output)
@@ -68,6 +89,9 @@ struct JourneyContentView: View {
             .onChange(of: viewModel.journeyStatus) { _, newValue in
                 revealOutputIfNeeded(for: newValue, using: proxy)
             }
+            .onChange(of: viewModel.activeResultScreen) { _, newValue in
+                revealResultScreenIfNeeded(newValue, using: proxy)
+            }
         }
     }
 
@@ -83,6 +107,17 @@ struct JourneyContentView: View {
     private func revealOutputIfNeeded(for status: JourneyStatus, using proxy: ScrollViewProxy) {
         switch status {
         case .showingResults, .complete, .partial:
+            withAnimation(IrshadTheme.Animations.cardReveal) {
+                proxy.scrollTo(AnchorID.output, anchor: .top)
+            }
+        default:
+            break
+        }
+    }
+
+    private func revealResultScreenIfNeeded(_ screen: ActiveResultScreen, using proxy: ScrollViewProxy) {
+        switch screen {
+        case .loadingLicense, .loadingBanking, .license, .banking:
             withAnimation(IrshadTheme.Animations.cardReveal) {
                 proxy.scrollTo(AnchorID.output, anchor: .top)
             }

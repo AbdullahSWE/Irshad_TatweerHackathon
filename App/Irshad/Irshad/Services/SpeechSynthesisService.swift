@@ -91,13 +91,33 @@ extension SpeechSynthesisService: AVSpeechSynthesizerDelegate {
 }
 
 private extension SpeechSynthesisService {
+    static func preferredVoiceIdentifier(language: AppLanguage, persona: VoicePersona) -> String {
+        switch (language, persona) {
+        case (.en, .female):
+            return "com.apple.voice.enhanced.en-US.Allison"
+        case (.en, .male):
+            return "com.apple.voice.enhanced.en-US.Evan"
+        case (.ar, .male):
+            return "com.apple.voice.enhanced.ar-001.Maged"
+        case (.ar, .female):
+            return "com.apple.voice.enhanced.ar-001.Mariam"
+        }
+    }
+
     static func matchingVoice(language: AppLanguage, persona: VoicePersona?) -> AVSpeechSynthesisVoice? {
         let localeIdentifier = language.speechLocaleIdentifier
         let voices = AVSpeechSynthesisVoice.speechVoices()
             .filter { $0.language == localeIdentifier }
 
-        if let persona, let personaMatch = voices.first(where: { $0.matches(persona: persona) }) {
-            return personaMatch
+        if let persona {
+            let preferredIdentifier = preferredVoiceIdentifier(language: language, persona: persona)
+            if let preferredVoice = AVSpeechSynthesisVoice(identifier: preferredIdentifier) {
+                return preferredVoice
+            }
+
+            if let personaMatch = voices.first(where: { $0.matches(persona: persona) }) {
+                return personaMatch
+            }
         }
 
         return AVSpeechSynthesisVoice(language: localeIdentifier) ?? voices.first

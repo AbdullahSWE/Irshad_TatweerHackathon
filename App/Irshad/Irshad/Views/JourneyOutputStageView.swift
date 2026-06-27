@@ -21,10 +21,10 @@ struct JourneyOutputStageView: View {
                         title: "Finding your license",
                         systemImage: "doc.badge.gearshape",
                         messages: [
-                            "Checking license fit for your activity",
+                            "Checking license fit",
                             "Comparing official requirements",
-                            "Reviewing cost and timing signals",
-                            "Preparing the strongest match"
+                            "Matching your business activity",
+                            "Preparing the best option"
                         ],
                         reduceMotion: viewModel.reduceMotionPreferred
                     )
@@ -41,10 +41,10 @@ struct JourneyOutputStageView: View {
                         title: "Finding banking options",
                         systemImage: "building.columns",
                         messages: [
-                            "Checking account fit",
+                            "Checking bank account fit",
                             "Comparing bank requirements",
-                            "Reviewing documents and balances",
-                            "Shortlisting practical options"
+                            "Matching your license profile",
+                            "Preparing the best banking options"
                         ],
                         reduceMotion: viewModel.reduceMotionPreferred
                     )
@@ -109,103 +109,6 @@ private struct ContinueResultButton: View {
         }
         .buttonStyle(DynamicCardPrimaryButtonStyle())
         .disabled(isDisabled)
-    }
-}
-
-private struct ResultLoadingProgressView: View {
-    let title: String
-    let systemImage: String
-    let messages: [String]
-    var reduceMotion: Bool
-
-    @State private var startedAt = Date()
-    @State private var progress = 0.0
-    @State private var messageIndex = 0
-
-    private let duration = 8.0
-    private let timer = Timer.publish(every: 0.12, on: .main, in: .common).autoconnect()
-
-    private var currentMessage: String {
-        guard !messages.isEmpty else { return "Preparing your recommendation" }
-        return messages[min(messageIndex, messages.count - 1)]
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: IrshadTheme.Layout.spacingComfortable) {
-            HStack(alignment: .top, spacing: IrshadTheme.Layout.spacingStandard) {
-                ProcessingOrbView(symbolName: systemImage, title: title, isActive: true)
-                    .frame(width: 58, height: 58)
-                    .accessibilityHidden(true)
-
-                VStack(alignment: .leading, spacing: IrshadTheme.Layout.spacingTight) {
-                    Text(title)
-                        .font(IrshadTheme.Typography.cardTitle)
-                        .foregroundStyle(IrshadTheme.Colors.primaryText)
-
-                    Text(currentMessage)
-                        .font(IrshadTheme.Typography.secondaryLabel)
-                        .foregroundStyle(IrshadTheme.Colors.secondaryText)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .contentTransition(reduceMotion ? .identity : .opacity)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-            }
-
-            progressBar
-
-            StatusPill("Preparing", tone: .active, showsSpinner: true)
-        }
-        .padding(.horizontal, IrshadTheme.Layout.cardHorizontalPadding)
-        .padding(.vertical, IrshadTheme.Layout.cardVerticalPadding)
-        .background(
-            RoundedRectangle(cornerRadius: IrshadTheme.Layout.cardRadius, style: .continuous)
-                .fill(IrshadTheme.Colors.surface)
-                .overlay {
-                    RoundedRectangle(cornerRadius: IrshadTheme.Layout.cardRadius, style: .continuous)
-                        .stroke(IrshadTheme.Colors.separator, lineWidth: 1)
-                }
-        )
-        .irshadShadow(IrshadTheme.Shadows.cardShadow)
-        .onAppear {
-            startedAt = Date()
-            progress = 0
-            messageIndex = 0
-        }
-        .onReceive(timer) { now in
-            let elapsed = now.timeIntervalSince(startedAt)
-            let normalized = min(max(elapsed / duration, 0), 1)
-            progress = normalized
-
-            guard !messages.isEmpty else { return }
-            let nextIndex = min(Int(elapsed / (duration / Double(messages.count))), messages.count - 1)
-            if nextIndex != messageIndex {
-                if reduceMotion {
-                    messageIndex = nextIndex
-                } else {
-                    withAnimation(IrshadTheme.Animations.cardReveal) {
-                        messageIndex = nextIndex
-                    }
-                }
-            }
-        }
-        .animation(reduceMotion ? nil : IrshadTheme.Animations.progressTransition, value: progress)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(Text(title))
-        .accessibilityValue(Text(currentMessage))
-    }
-
-    private var progressBar: some View {
-        GeometryReader { proxy in
-            ZStack(alignment: .leading) {
-                Capsule(style: .continuous)
-                    .fill(IrshadTheme.Colors.progressTrack)
-                Capsule(style: .continuous)
-                    .fill(IrshadTheme.Colors.primaryAccent)
-                    .frame(width: proxy.size.width * progress)
-            }
-        }
-        .frame(height: 8)
-        .accessibilityHidden(true)
     }
 }
 
