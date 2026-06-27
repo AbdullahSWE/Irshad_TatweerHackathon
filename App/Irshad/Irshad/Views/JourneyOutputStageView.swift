@@ -51,8 +51,8 @@ struct JourneyOutputStageView: View {
                 case .banking:
                     BankRecommendationListView(viewModel: viewModel)
                     ContinueResultButton(
-                        title: "Contact government office",
-                        systemImage: "phone.connection",
+                        title: "Continue",
+                        systemImage: "arrow.forward",
                         isDisabled: viewModel.bankingRecommendations == nil || viewModel.isServiceBusy,
                         action: { viewModel.showAuthorityContacts() }
                     )
@@ -65,7 +65,6 @@ struct JourneyOutputStageView: View {
                         action: { viewModel.createFinalActionPlan() }
                     )
                 case .finalPlan:
-                    NextStepChecklistView(viewModel: viewModel)
                     FinalRoadmapView(viewModel: viewModel)
                 }
 

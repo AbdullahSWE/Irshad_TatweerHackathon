@@ -387,9 +387,9 @@ extension JourneyViewModel {
 
     var shouldShowInputOverlay: Bool {
         switch activeResultScreen {
-        case .license, .banking, .authority:
+        case .loadingLicense, .license, .loadingBanking, .banking, .authority, .finalPlan:
             return false
-        case .none, .loadingLicense, .loadingBanking, .finalPlan:
+        case .none:
             return !isChoiceQuestionActive && !isAdditionalContextPromptActive
         }
     }

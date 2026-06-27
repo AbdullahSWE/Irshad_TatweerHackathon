@@ -102,11 +102,15 @@ struct BankRecommendationCardView: View {
                 )
             }
 
-            HStack(spacing: IrshadTheme.Layout.spacingTight) {
+            VStack(spacing: IrshadTheme.Layout.spacingTight) {
                 Button {
                     viewModel.savePreferredBank(bank.id)
                 } label: {
-                    Label(isPreferred ? "Saved" : "Save", systemImage: isPreferred ? "bookmark.fill" : "bookmark")
+                    ContactActionLabel(
+                        title: isPreferred ? "Saved" : "Save",
+                        value: nil,
+                        systemImage: isPreferred ? "bookmark.fill" : "bookmark"
+                    )
                 }
                 .buttonStyle(DynamicCardSecondaryButtonStyle())
 
@@ -114,7 +118,7 @@ struct BankRecommendationCardView: View {
                     Button {
                         viewModel.openURL(websiteURL)
                     } label: {
-                        Label("Website", systemImage: "safari")
+                        ContactActionLabel(title: "Website", value: nil, systemImage: "safari")
                     }
                     .buttonStyle(DynamicCardSecondaryButtonStyle())
                 }
@@ -123,7 +127,7 @@ struct BankRecommendationCardView: View {
                     Button {
                         viewModel.callPhoneNumber(phone)
                     } label: {
-                        Label(phone, systemImage: "phone.fill")
+                        ContactActionLabel(title: "Phone", value: phone, systemImage: "phone.fill")
                     }
                     .buttonStyle(DynamicCardSecondaryButtonStyle())
                 }
@@ -132,7 +136,7 @@ struct BankRecommendationCardView: View {
                     Button {
                         viewModel.openURL(emailURL)
                     } label: {
-                        Label(email ?? "Email", systemImage: "envelope.fill")
+                        ContactActionLabel(title: "Email", value: email, systemImage: "envelope.fill")
                     }
                     .buttonStyle(DynamicCardSecondaryButtonStyle())
                 }
@@ -148,5 +152,36 @@ struct BankRecommendationCardView: View {
                 }
         )
         .accessibilityElement(children: .contain)
+    }
+}
+
+private struct ContactActionLabel: View {
+    let title: String
+    let value: String?
+    let systemImage: String
+
+    var body: some View {
+        HStack(alignment: .top, spacing: IrshadTheme.Layout.spacingTight) {
+            Image(systemName: systemImage)
+                .font(.system(size: 15, weight: .semibold))
+                .frame(width: 20)
+                .accessibilityHidden(true)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(IrshadTheme.Typography.statusMicrocopy)
+                    .fontWeight(.semibold)
+
+                if let value, !value.isEmpty {
+                    Text(value)
+                        .font(IrshadTheme.Typography.secondaryLabel)
+                        .foregroundStyle(IrshadTheme.Colors.primaryText)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

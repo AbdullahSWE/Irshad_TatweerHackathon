@@ -20,7 +20,7 @@ struct JourneyContentView: View {
 
     private var shouldShowBusinessProfile: Bool {
         switch viewModel.activeResultScreen {
-        case .loadingLicense, .license, .loadingBanking, .banking:
+        case .loadingLicense, .license, .loadingBanking, .banking, .finalPlan:
             return false
         default:
             return true
