@@ -7,6 +7,8 @@ struct TranscriptConfirmationView: View {
     var language: AppLanguage = .en
     var retryListening: () -> Void
 
+    @FocusState private var isTranscriptFocused: Bool
+
     private var hasText: Bool {
         !transcript.wrappedValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
@@ -41,10 +43,20 @@ struct TranscriptConfirmationView: View {
                     .foregroundStyle(IrshadTheme.Colors.primaryText)
                     .scrollContentBackground(.hidden)
                     .padding(IrshadTheme.Layout.spacingTight)
-                    .frame(minHeight: 56, maxHeight: 84)
+                    .frame(minHeight: 48, maxHeight: 68)
                     .disabled(isProcessing)
+                    .focused($isTranscriptFocused)
+                    .toolbar {
+                        ToolbarItemGroup(placement: .keyboard) {
+                            Spacer()
+
+                            Button(doneTitle) {
+                                isTranscriptFocused = false
+                            }
+                        }
+                    }
             }
-            .frame(minHeight: 68)
+            .frame(minHeight: 58)
 
             if let errorMessage, !errorMessage.isEmpty {
                 Text(errorMessage)
@@ -53,7 +65,7 @@ struct TranscriptConfirmationView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            Button(action: retryListening) {
+            Button(action: retryListeningAndDismissKeyboard) {
                 Label(retryTitle, systemImage: "arrow.counterclockwise")
                     .lineLimit(1)
                     .minimumScaleFactor(0.75)
@@ -85,6 +97,11 @@ struct TranscriptConfirmationView: View {
         }
     }
 
+    private func retryListeningAndDismissKeyboard() {
+        isTranscriptFocused = false
+        retryListening()
+    }
+
     private var placeholder: String {
         switch language {
         case .ar:
@@ -100,6 +117,15 @@ struct TranscriptConfirmationView: View {
             return "أعد"
         case .en:
             return "Retry"
+        }
+    }
+
+    private var doneTitle: String {
+        switch language {
+        case .ar:
+            return "تم"
+        case .en:
+            return "Done"
         }
     }
 }

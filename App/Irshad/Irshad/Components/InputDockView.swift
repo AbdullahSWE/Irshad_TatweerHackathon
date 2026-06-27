@@ -1,4 +1,7 @@
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 struct InputDockView: View {
     var viewModel: JourneyViewModel
@@ -70,12 +73,13 @@ struct InputDockView: View {
             VoiceControlHub(
                 voiceState: viewModel.voiceState,
                 transcriptState: viewModel.transcriptState,
+                isOperationLoading: viewModel.isServiceBusy,
                 language: viewModel.currentLanguage,
                 reduceMotion: viewModel.reduceMotionPreferred,
                 beginListening: viewModel.beginListening,
                 stopListening: viewModel.stopListening,
-                submitTranscript: viewModel.submitRecognizedSpeech,
-                retryListening: viewModel.retryListening
+                submitTranscript: submitTranscriptAndDismissKeyboard,
+                retryListening: retryListeningAndDismissKeyboard
             )
 
             if viewModel.voiceState == .listening {
@@ -121,6 +125,7 @@ struct InputDockView: View {
     }
 
     private func submitTypedInput() {
+        dismissKeyboard()
         let value = viewModel.textFallbackValue.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !value.isEmpty else {
             return
@@ -131,6 +136,22 @@ struct InputDockView: View {
         } else {
             viewModel.submitCurrentAnswer()
         }
+    }
+
+    private func submitTranscriptAndDismissKeyboard() {
+        dismissKeyboard()
+        viewModel.submitRecognizedSpeech()
+    }
+
+    private func retryListeningAndDismissKeyboard() {
+        dismissKeyboard()
+        viewModel.retryListening()
+    }
+
+    private func dismissKeyboard() {
+        #if canImport(UIKit)
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        #endif
     }
 
     private var submitTitle: String {

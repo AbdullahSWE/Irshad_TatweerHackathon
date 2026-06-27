@@ -1,4 +1,7 @@
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 struct AdditionalContextView: View {
     var viewModel: JourneyViewModel
@@ -66,12 +69,13 @@ struct AdditionalContextView: View {
                     VoiceControlHub(
                         voiceState: viewModel.voiceState,
                         transcriptState: viewModel.transcriptState,
+                        isOperationLoading: viewModel.isServiceBusy,
                         language: viewModel.currentLanguage,
                         reduceMotion: viewModel.reduceMotionPreferred,
                         beginListening: viewModel.beginListening,
                         stopListening: viewModel.stopListening,
-                        submitTranscript: viewModel.submitRecognizedSpeech,
-                        retryListening: viewModel.retryListening
+                        submitTranscript: submitTranscriptAndDismissKeyboard,
+                        retryListening: retryListeningAndDismissKeyboard
                     )
 
                     if viewModel.voiceState == .listening {
@@ -80,7 +84,7 @@ struct AdditionalContextView: View {
                             .transition(.opacity)
                     }
 
-                    Button(action: viewModel.skipAdditionalContext) {
+                    Button(action: skipAdditionalContextAndDismissKeyboard) {
                         Label(viewModel.additionalContextSkipTitle, systemImage: "forward.fill")
                             .lineLimit(1)
                             .minimumScaleFactor(0.76)
@@ -101,6 +105,27 @@ struct AdditionalContextView: View {
             IrshadTheme.Animations.resolved(IrshadTheme.Animations.cardReveal, reduceMotion: shouldReduceMotion),
             value: viewModel.voiceState
         )
+    }
+
+    private func submitTranscriptAndDismissKeyboard() {
+        dismissKeyboard()
+        viewModel.submitRecognizedSpeech()
+    }
+
+    private func retryListeningAndDismissKeyboard() {
+        dismissKeyboard()
+        viewModel.retryListening()
+    }
+
+    private func skipAdditionalContextAndDismissKeyboard() {
+        dismissKeyboard()
+        viewModel.skipAdditionalContext()
+    }
+
+    private func dismissKeyboard() {
+        #if canImport(UIKit)
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        #endif
     }
 
     private var emojiButton: some View {

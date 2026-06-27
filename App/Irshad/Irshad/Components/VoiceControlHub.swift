@@ -3,6 +3,7 @@ import SwiftUI
 struct VoiceControlHub: View {
     var voiceState: VoiceState
     var transcriptState: TranscriptState
+    var isOperationLoading: Bool = false
     var language: AppLanguage = .en
     var reduceMotion: Bool
     var beginListening: () -> Void
@@ -18,7 +19,7 @@ struct VoiceControlHub: View {
     }
 
     private var isProcessing: Bool {
-        voiceState == .processing
+        voiceState == .processing || isOperationLoading
     }
 
     private var isFailed: Bool {
@@ -56,9 +57,15 @@ struct VoiceControlHub: View {
                         .fill(Color.white)
                         .frame(width: size * 0.66, height: size * 0.66)
                         .overlay {
-                            Image(systemName: iconName)
-                                .font(.system(size: size * 0.27, weight: .semibold))
-                                .foregroundStyle(iconColor)
+                            if isProcessing {
+                                ProgressView()
+                                    .controlSize(.regular)
+                                    .tint(IrshadTheme.Colors.primaryAccent)
+                            } else {
+                                Image(systemName: iconName)
+                                    .font(.system(size: size * 0.27, weight: .semibold))
+                                    .foregroundStyle(iconColor)
+                            }
                         }
                 }
                 .frame(width: IrshadTheme.Layout.voiceButtonExpandedSize * 1.55, height: IrshadTheme.Layout.voiceButtonExpandedSize * 1.55)
@@ -107,7 +114,7 @@ struct VoiceControlHub: View {
         case .listening:
             return "stop.fill"
         case .processing:
-            return "hourglass"
+            return "mic.fill"
         case .transcriptReady:
             return "checkmark"
         case .failed:
@@ -121,6 +128,10 @@ struct VoiceControlHub: View {
 
     private var statusText: String {
         switch (voiceState, language) {
+        case (.idle, .ar) where isOperationLoading:
+            return "جاري التحميل"
+        case (.idle, .en) where isOperationLoading:
+            return "Loading"
         case (.idle, .ar):
             return transcriptState == .accepted ? "تم حفظ الإجابة" : "اضغط وتحدث"
         case (.idle, .en):
@@ -130,9 +141,9 @@ struct VoiceControlHub: View {
         case (.listening, .en):
             return "Listening now"
         case (.processing, .ar):
-            return "جاري التحضير"
+            return "جاري التحميل"
         case (.processing, .en):
-            return "Getting ready"
+            return "Loading"
         case (.transcriptReady, .ar):
             return "راجع النص ثم أرسله"
         case (.transcriptReady, .en):

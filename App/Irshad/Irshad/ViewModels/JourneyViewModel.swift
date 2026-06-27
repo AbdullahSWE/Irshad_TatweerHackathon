@@ -557,12 +557,15 @@ extension JourneyViewModel {
 
     func stopListening() {
         speechTask?.cancel()
+        voiceState = .processing
+        transcriptState = editableTranscript.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? .empty : .partial
         speechTask = Task { @MainActor [weak self] in
             guard let self else { return }
             await self.speechRecognitionService.stopListening()
+            self.voiceState = self.editableTranscript.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? .idle : .transcriptReady
+            self.transcriptState = self.editableTranscript.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? .empty : .final
+            self.speechTask = nil
         }
-        voiceState = editableTranscript.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? .idle : .transcriptReady
-        transcriptState = editableTranscript.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? .empty : .final
     }
 
     func stopListeningAndSubmit() {
@@ -592,7 +595,8 @@ extension JourneyViewModel {
 
     func submitRecognizedSpeech() {
         let accepted = editableTranscript.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !accepted.isEmpty else {
+        let fallback = textFallbackValue.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !accepted.isEmpty || !fallback.isEmpty else {
             voiceState = .idle
             transcriptState = .empty
             inputErrorMessage = localizedInputError(.emptyTranscript)
@@ -600,7 +604,7 @@ extension JourneyViewModel {
         }
 
         voiceState = .idle
-        transcriptState = .accepted
+        transcriptState = accepted.isEmpty ? .editing : .accepted
         submitCurrentAnswer()
     }
 
@@ -1551,38 +1555,49 @@ private extension JourneyViewModel {
         case .number:
             updateCardNumber(cardID: card.cardId, value: trimmed)
         case .singleSelect:
-            guard let option = safelyMatchedOption(in: card, transcript: trimmed) else {
+            if let option = safelyMatchedOption(in: card, transcript: trimmed) {
+                selectSingleOption(cardID: card.cardId, optionID: option.id)
+            } else if card.allowsCustomInput {
+                updateCardText(cardID: card.cardId, value: trimmed)
+            } else {
                 throw ViewModelError.invalidAnswer(reviewSpeechSelectionMessage())
             }
-            selectSingleOption(cardID: card.cardId, optionID: option.id)
         case .toggle:
             if let option = safelyMatchedOption(in: card, transcript: trimmed) {
                 setToggleAnswer(cardID: card.cardId, value: toggleValue(for: option))
             } else if let bool = boolFromSpeech(trimmed) {
                 setToggleAnswer(cardID: card.cardId, value: bool)
+            } else if card.allowsCustomInput {
+                updateCardText(cardID: card.cardId, value: trimmed)
             } else {
                 throw ViewModelError.invalidAnswer(reviewSpeechSelectionMessage())
             }
         case .multiSelect:
             let options = safelyMatchedOptions(in: card, transcript: trimmed)
-            guard !options.isEmpty else {
+            if !options.isEmpty {
+                cardAnswerDraft = CardAnswerDraft(
+                    cardID: card.cardId,
+                    value: .multiOptions(selectedIDsRespectingNone(options)),
+                    updatedAt: Date()
+                )
+            } else if card.allowsCustomInput {
+                updateCardText(cardID: card.cardId, value: trimmed)
+            } else {
                 throw ViewModelError.invalidAnswer(reviewSpeechSelectionMessage())
             }
-            cardAnswerDraft = CardAnswerDraft(
-                cardID: card.cardId,
-                value: .multiOptions(selectedIDsRespectingNone(options)),
-                updatedAt: Date()
-            )
         case .checklist:
             let options = safelyMatchedOptions(in: card, transcript: trimmed)
-            guard !options.isEmpty else {
+            if !options.isEmpty {
+                cardAnswerDraft = CardAnswerDraft(
+                    cardID: card.cardId,
+                    value: .checklist(selectedIDsRespectingNone(options)),
+                    updatedAt: Date()
+                )
+            } else if card.allowsCustomInput {
+                updateCardText(cardID: card.cardId, value: trimmed)
+            } else {
                 throw ViewModelError.invalidAnswer(reviewSpeechSelectionMessage())
             }
-            cardAnswerDraft = CardAnswerDraft(
-                cardID: card.cardId,
-                value: .checklist(selectedIDsRespectingNone(options)),
-                updatedAt: Date()
-            )
         case .info, .summary, .recommendation, .roadmap, .none, .unsupported:
             if allowsEmptyAnswer(card) {
                 cardAnswerDraft = CardAnswerDraft(cardID: card.cardId, value: .toggle(true), updatedAt: Date())

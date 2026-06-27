@@ -8,6 +8,8 @@ struct TextFallbackInputView: View {
     var submitTitle: String
     var submit: () -> Void
 
+    @FocusState private var isTextEditorFocused: Bool
+
     private var canSubmit: Bool {
         !isProcessing && !text.wrappedValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
@@ -47,10 +49,20 @@ struct TextFallbackInputView: View {
                         .padding(.vertical, 2)
                         .frame(minHeight: isExpanded ? 96 : 58, maxHeight: isExpanded ? 150 : 72)
                         .disabled(isProcessing)
+                        .focused($isTextEditorFocused)
+                        .toolbar {
+                            ToolbarItemGroup(placement: .keyboard) {
+                                Spacer()
+
+                                Button(doneTitle) {
+                                    isTextEditorFocused = false
+                                }
+                            }
+                        }
                 }
                 .frame(minHeight: isExpanded ? 104 : 64)
 
-                Button(action: submit) {
+                Button(action: submitAndDismissKeyboard) {
                     Image(systemName: "paperplane.fill")
                         .font(.system(size: 18, weight: .semibold))
                         .frame(width: IrshadTheme.Layout.minimumTapTarget, height: IrshadTheme.Layout.minimumTapTarget)
@@ -76,6 +88,11 @@ struct TextFallbackInputView: View {
         }
     }
 
+    private func submitAndDismissKeyboard() {
+        isTextEditorFocused = false
+        submit()
+    }
+
     private var inputLabel: String {
         switch language {
         case .ar:
@@ -91,6 +108,15 @@ struct TextFallbackInputView: View {
             return "اكتب فكرتك أو إجابتك"
         case .en:
             return "Type your idea or answer"
+        }
+    }
+
+    private var doneTitle: String {
+        switch language {
+        case .ar:
+            return "تم"
+        case .en:
+            return "Done"
         }
     }
 }

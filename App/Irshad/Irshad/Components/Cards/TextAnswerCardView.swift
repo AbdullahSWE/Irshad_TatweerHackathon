@@ -4,6 +4,8 @@ struct TextAnswerCardView: View {
     let card: DynamicCard
     var viewModel: JourneyViewModel
 
+    @FocusState private var isTextEditorFocused: Bool
+
     private var textValue: String {
         guard viewModel.cardAnswerDraft.cardID == card.cardId,
               case .text(let value) = viewModel.cardAnswerDraft.value else {
@@ -30,7 +32,7 @@ struct TextAnswerCardView: View {
             canSubmit: !textValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
             confirmTitle: card.confirmLabel,
             onCopy: card.showsCopyControl ? { viewModel.copyText(card.displayTitle) } : nil,
-            onConfirm: { viewModel.submitCardAnswer(card.cardId) }
+            onConfirm: submitAndDismissKeyboard
         ) {
             TextEditor(text: textBinding)
                 .font(IrshadTheme.Typography.primaryBody)
@@ -47,6 +49,12 @@ struct TextAnswerCardView: View {
                         }
                 )
                 .accessibilityLabel(Text(card.displayTitle))
+                .focused($isTextEditorFocused)
         }
+    }
+
+    private func submitAndDismissKeyboard() {
+        isTextEditorFocused = false
+        viewModel.submitCardAnswer(card.cardId)
     }
 }
