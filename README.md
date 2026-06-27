@@ -2,7 +2,7 @@
 
 <img src="Assets/irshad-banner.png" alt="Irshad — إرشاد" width="100%" />
 
-# إرشاد · Irshad
+# 🗣️💼 إرشاد · Irshad
 
 **A voice-controlled Arabic/English business guide that feels like a normal conversation and uses curated UAE license and bank database to create your tailored business action plan.**
 
@@ -24,7 +24,7 @@
 
 ---
 
-## Judge this in 60 seconds
+## 🔹 Irshad in 60 Seconds
 
 | | |
 |---|---|
