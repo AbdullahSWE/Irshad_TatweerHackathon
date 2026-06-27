@@ -121,7 +121,7 @@ Irshad is a voice-first iOS guide. The founder speaks an idea. The app asks a sm
 <img src="Assets/evidence-scorecard.png" alt="Evidence pack overview" width="100%" />
 </div>
 
-### Knowledge Base Snapshot
+### 📚 Knowledge Base Snapshot
 
 | Artifact | Current coverage |
 |---|---|
@@ -170,7 +170,7 @@ Its safety rule is simple: show what is verified, estimate only when grounded, a
 | Knowledge | Bundled JSON KB | Swap KB per emirate/community |
 | Journey | Server/card-driven flow | Add archetypes without redesigning UI |
 
-### Deployment Path
+### 📱 Deployment Path
 
 | Phase      | Deployment                                                                                  |
 | ---------- | ------------------------------------------------------------------------------------------- |
@@ -232,17 +232,6 @@ curl -X POST http://localhost:3000/api/journey/start \
 5. Speak an idea
 6. Follow the guided cards to the final plan
 ```
-
-### Judge verification checklist
-
-| Check | Where |
-|---|---|
-| App has real screens | `Assets/demo-flow-5up.png`, `Evidence/screenshots/` |
-| Backend can start a journey | API smoke test above |
-| Claims are testable | [Impact and testable claims](#5-impact-and-testable-claims) |
-| Sources are inspectable | `Backend/kb/knowledge.json`, `Evidence/source-matrix.md` |
-| Limitations are explicit | `Evidence/limitations.md` |
-| Hard questions are answered | `Evidence/rebuttals.md` |
 
 ---
 
